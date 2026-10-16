@@ -8,7 +8,7 @@ export interface VizFrame {
   settled?: number[];
 }
 
-const COLORS = {
+export const COLORS = {
   swap: "#ef4444",
   compare: "#f59e0b",
   key: "#a855f7",
@@ -18,7 +18,7 @@ const COLORS = {
   base: "#9ba6b5",
 };
 
-function colorFor(i: number, f: VizFrame): string {
+export function colorFor(i: number, f: VizFrame): string {
   if (f.swap && (f.swap[0] === i || f.swap[1] === i)) return COLORS.swap;
   if (f.compare && (f.compare[0] === i || f.compare[1] === i)) return COLORS.compare;
   if (f.key && f.key[0] === i) return COLORS.key;

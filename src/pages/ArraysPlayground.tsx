@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { record } from "../engine/timeline";
 import { lookup, insertAt, deleteAt, type ArrayOp } from "../algorithms/arrays";
-import Scrubber from "../components/viz/Scrubber";
-import ArrayBarViz from "../components/viz/ArrayBarViz";
+import FluidScrubber from "../components/viz/FluidScrubber";
+import FluidBars from "../components/viz/FluidBars";
 import { parseArray, clampInt, randomArray } from "../utils/parse";
 
 const OP_HINTS: Record<ArrayOp, string> = {
@@ -85,12 +85,12 @@ export default function ArraysPlayground() {
         {error && <p className="err">{error}</p>}
 
         {frames.length > 0 && (
-          <Scrubber
+          <FluidScrubber
             frames={frames}
-            render={(f) => (
+            render={(f, blend, next) => (
               <>
                 <p className="narrate">{f.message}</p>
-                <ArrayBarViz frame={f} />
+                <FluidBars curr={f} next={next} blend={blend} />
                 <div className="metrics">
                   <span className="badge">lecturas: {f.probes}</span>
                   <span className="badge">escrituras: {f.writes}</span>

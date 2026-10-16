@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { record } from "../engine/timeline";
 import { sorters, type SortId } from "../algorithms/sorting";
-import Scrubber from "../components/viz/Scrubber";
-import ArrayBarViz from "../components/viz/ArrayBarViz";
+import FluidScrubber from "../components/viz/FluidScrubber";
+import FluidBars from "../components/viz/FluidBars";
 import { parseArray, randomArray } from "../utils/parse";
 
 export default function SortingPlayground() {
@@ -86,12 +86,12 @@ export default function SortingPlayground() {
         {error && <p className="err">{error}</p>}
 
         {frames.length > 0 && (
-          <Scrubber
+          <FluidScrubber
             frames={frames}
-            render={(f) => (
+            render={(f, blend, next) => (
               <>
                 <p className="narrate">{f.message}</p>
-                <ArrayBarViz frame={f} />
+                <FluidBars curr={f} next={next} blend={blend} />
                 <div className="metrics">
                   <span className="badge">comparaciones: {f.comparisons}</span>
                   <span className="badge">escrituras: {f.writes}</span>

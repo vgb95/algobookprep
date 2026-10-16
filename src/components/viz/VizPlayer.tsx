@@ -6,8 +6,9 @@
 import { useMemo } from "react";
 import { record } from "../../engine/timeline";
 import Scrubber from "./Scrubber";
-import ArrayBarViz from "./ArrayBarViz";
-import TreeViz from "./TreeViz";
+import FluidScrubber from "./FluidScrubber";
+import FluidBars from "./FluidBars";
+import FluidTree from "./FluidTree";
 import GraphViz from "./GraphViz";
 import HeapViz from "./HeapViz";
 import { sorters, type SortId } from "../../algorithms/sorting";
@@ -34,12 +35,12 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
     );
     return (
       <div>
-        <Scrubber
+        <FluidScrubber
           frames={frames}
-          render={(f) => (
+          render={(f, blend, next) => (
             <>
               <p className="narrate">{f.message}</p>
-              <ArrayBarViz frame={f} />
+              <FluidBars curr={f} next={next} blend={blend} />
               <div className="meta">
                 <span className="badge">comparaciones: {f.comparisons}</span>
                 <span className="badge">escrituras: {f.writes}</span>
@@ -68,12 +69,12 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
     }
     return (
       <div>
-        <Scrubber
+        <FluidScrubber
           frames={frames}
-          render={(f: any) => (
+          render={(f: any, blend: number, next: any) => (
             <>
               <p className="narrate">{f.message}</p>
-              <ArrayBarViz frame={f} />
+              <FluidBars curr={f} next={next} blend={blend} />
               <div className="meta">
                 <span className="badge">lecturas: {f.probes}</span>
                 <span className="badge">escrituras: {f.writes}</span>
@@ -96,12 +97,12 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
     );
     return (
       <div>
-        <Scrubber
+        <FluidScrubber
           frames={frames}
           render={(f) => (
             <>
               <p className="narrate">{f.message}</p>
-              <TreeViz frame={f} />
+              <FluidTree frame={f} />
               <div className="meta">
                 <span className="badge">orden: {f.order.join(", ")}</span>
                 <span className="badge">
