@@ -4,7 +4,8 @@
  * linealmente según `blend`: los valores se deslizan en vez de saltar.
  * El color cambia a mitad del fundido para marcar el nuevo estado.
  */
-import { COLORS, colorFor, type VizFrame } from "./ArrayBarViz";
+import { colorFor, type VizFrame } from "./ArrayBarViz";
+import { ROLE } from "./roles";
 
 interface Props {
   curr: VizFrame;
@@ -50,11 +51,11 @@ export default function FluidBars({ curr, next, blend }: Props) {
         })}
       </div>
       <div className="legend">
-        <span className="chip"><i style={{ background: COLORS.compare }} /> comparando</span>
-        <span className="chip"><i style={{ background: COLORS.swap }} /> intercambio / desplazando</span>
-        <span className="chip"><i style={{ background: COLORS.cursor }} /> cursor / clave</span>
-        <span className="chip"><i style={{ background: COLORS.settled }} /> posición final</span>
-        <span className="chip"><i style={{ background: COLORS.found }} /> encontrado</span>
+        <span className="chip"><i style={{ background: ROLE.compare }} /> comparando</span>
+        <span className="chip"><i style={{ background: ROLE.swap }} /> intercambio / desplazando</span>
+        <span className="chip"><i style={{ background: ROLE.key }} /> cursor / clave</span>
+        <span className="chip"><i style={{ background: ROLE.settled }} /> posición final</span>
+        <span className="chip"><i style={{ background: ROLE.found }} /> encontrado</span>
       </div>
     </div>
   );

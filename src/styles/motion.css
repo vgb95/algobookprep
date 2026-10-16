@@ -29,6 +29,39 @@
   margin-top: 8px;
 }
 
+/* ————— Fase B: narración sincronizada + montículo —————
+ * La narración se re-anima en cada paso (key por índice): entra
+ * deslizando en vez de parpadear. El montículo funde color igual
+ * que el árbol.
+ */
+.narrate {
+  animation: narrate-in 0.3s ease;
+}
+
+@keyframes narrate-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.heap-svg circle {
+  transition: fill 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .narrate {
+    animation: none;
+  }
+  .heap-svg circle {
+    transition: none;
+  }
+}
+
 @keyframes node-ping {
   0% {
     transform: scale(1);
