@@ -189,3 +189,64 @@
 }
 
 .solution-details summary::-webkit-details-marker { display: none; }
+
+/* ————— Capítulo por bloques (Fase 5) ————— */
+
+.chapter-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.prose-block p {
+  font-size: 1.02rem;
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 68ch;
+}
+
+.prose-block p b { color: var(--ink); }
+
+.formula-block {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+  padding: 12px;
+  background: #f3f6f9;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.latex {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+
+.chapter-divider {
+  border: none;
+  border-top: 1px dashed var(--line);
+  margin: 24px 0;
+}
+
+.code-block {
+  background: #f3f6f9;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-top: 8px;
+}
+
+.problem-block {
+  margin-top: 10px;
+}
+
+.viz-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
