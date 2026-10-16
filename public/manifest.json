@@ -1,0 +1,21 @@
+{
+  "name": "AlgoBook",
+  "short_name": "AlgoBook",
+  "description": "Interactive handbook for Data Structures & Algorithms",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf6ef",
+  "theme_color": "#2b2926",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "computer-science"],
+  "lang": "es"
+}
