@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { runTraced } from "../engine/pyodide";
 import CodeLine from "../components/viz/CodeLine";
 import VariableInspector from "../components/viz/VariableInspector";
-import Scrubber from "../components/viz/Scrubber";
-import ArrayBarViz from "../components/viz/ArrayBarViz";
+import FluidScrubber from "../components/viz/FluidScrubber";
+import FluidBars from "../components/viz/FluidBars";
 
 /**
  * Code Playground: el usuario escribe Python, pulsa Run, y la traza línea a
@@ -94,11 +94,20 @@ export default function CodePlayground() {
       </section>
 
       {frames.length > 0 && (
-        <Scrubber
+        <FluidScrubber
           frames={frames}
-          render={(f) => {
+          render={(f, blend, next, index) => {
             const arrKey =
               arrayVar && f.arrays && f.arrays[arrayVar] ? arrayVar : null;
+            const toViz = (t: (typeof frames)[number]) => ({
+              array: arrKey && t.arrays && t.arrays[arrKey] ? t.arrays[arrKey] : [],
+              settled: [] as number[],
+              compare: undefined,
+              swap: undefined,
+              key: undefined,
+              cursor: undefined,
+              found: undefined,
+            });
             return (
               <>
                 <div className="trace-row">
@@ -106,7 +115,7 @@ export default function CodePlayground() {
                     <CodeLine lines={lines} activeLine={f.line} />
                   </div>
                   <div className="trace-state">
-                    <p className="narrate">
+                    <p className="narrate" key={index}>
                       Línea <b>{f.line}</b> ejecutada
                     </p>
                     <VariableInspector
@@ -123,16 +132,7 @@ export default function CodePlayground() {
                 {arrKey && (
                   <div className="trace-arr">
                     <p className="narrate">{`${arrKey} = [${f.arrays[arrKey].join(", ")}]`}</p>
-                    <ArrayBarViz
-                      frame={{
-                        array: f.arrays[arrKey],
-                        settled: [],
-                        cursor: undefined,
-                        swap: undefined,
-                        key: undefined,
-                        found: undefined,
-                      }}
-                    />
+                    <FluidBars curr={toViz(f)} next={toViz(next)} blend={blend} />
                   </div>
                 )}
               </>

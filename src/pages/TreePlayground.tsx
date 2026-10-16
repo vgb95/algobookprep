@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { record } from "../engine/timeline";
 import { treeOrders, type TreeOrder } from "../algorithms/binary-tree";
-import Scrubber from "../components/viz/Scrubber";
-import TreeViz from "../components/viz/TreeViz";
+import FluidScrubber from "../components/viz/FluidScrubber";
+import FluidTree from "../components/viz/FluidTree";
 import { parseArray, randomArray } from "../utils/parse";
 
 export default function TreePlayground() {
@@ -36,12 +36,12 @@ export default function TreePlayground() {
           </button>
         </div>
         {frames.length > 0 && (
-          <Scrubber
+          <FluidScrubber
             frames={frames}
-            render={(f) => (
+            render={(f, _blend, _next, index) => (
               <>
-                <p className="narrate">{f.message}</p>
-                <TreeViz frame={f} />
+                <p className="narrate" key={index}>{f.message}</p>
+                <FluidTree frame={f} />
                 <div className="meta">
                   <span className="badge">orden: {f.order.join(", ")}</span>
                   <span className="badge">visitados: {f.nodes.filter((n) => n.visited).length} / {f.nodes.length}</span>

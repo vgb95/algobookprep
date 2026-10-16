@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { record } from "../engine/timeline";
 import { graphAlgos, type GraphAlgo } from "../algorithms/graph";
-import Scrubber from "../components/viz/Scrubber";
-import GraphViz from "../components/viz/GraphViz";
+import FluidScrubber from "../components/viz/FluidScrubber";
+import FluidGraph from "../components/viz/FluidGraph";
 
 export default function GraphPlayground() {
   const [algo, setAlgo] = useState<GraphAlgo>("bfs");
@@ -45,12 +45,12 @@ export default function GraphPlayground() {
           </button>
         </div>
         {frames.length > 0 && (
-          <Scrubber
+          <FluidScrubber
             frames={frames}
-            render={(f) => (
+            render={(f, blend, next, index) => (
               <>
-                <p className="narrate">{f.message}</p>
-                <GraphViz frame={f} />
+                <p className="narrate" key={index}>{f.message}</p>
+                <FluidGraph curr={f} next={next} blend={blend} />
                 <div className="meta">
                   <span className="badge">cola/pila: [{f.queueOrStack.join(", ")}]</span>
                   <span className="badge">visita: {f.visitedOrder.join(", ")}</span>
