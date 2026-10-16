@@ -1,4 +1,4 @@
-import { chaptersContent } from "../content/chapter-content";
+import { chaptersContent } from "../content/chapter-content-index";
 import { chapters } from "../content/chapters";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import BlockRenderer from "../components/BlockRenderer";
@@ -40,7 +40,7 @@ export default function ChapterPage({ id }: { id: string }) {
 
       {content ? (
         <section className="chapter-body" style={{ marginTop: 20 }}>
-          {content.blocks.map((block) => (
+          {content.blocks.map((block: any) => (
             <BlockRenderer key={block.id} block={block} />
           ))}
         </section>

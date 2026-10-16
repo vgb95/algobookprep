@@ -1,23 +1,6 @@
-import { lazy, Suspense } from "react";
 import type { Block } from "../content/blocks";
 import Problem from "../pages/Problem";
-
-const SortingViz = lazy(() => import("../pages/SortingPlayground"));
-const TreeVizPage = lazy(() => import("../pages/TreePlayground"));
-const GraphVizPage = lazy(() => import("../pages/GraphPlayground"));
-const HeapVizPage = lazy(() => import("../pages/HeapPlayground"));
-
-function VizRenderer({ block }: { block: Extract<Block, { kind: "viz" }> }) {
-  const { type } = block;
-  return (
-    <Suspense fallback={<div className="viz-placeholder">Cargando visualización…</div>}>
-      {type === "sorting" && <SortingViz />}
-      {type === "tree" && <TreeVizPage />}
-      {type === "graph" && <GraphVizPage />}
-      {type === "heap" && <HeapVizPage />}
-    </Suspense>
-  );
-}
+import VizPlayer from "../components/viz/VizPlayer";
 
 export default function BlockRenderer({ block }: { block: Block }) {
   switch (block.kind) {
@@ -36,7 +19,7 @@ export default function BlockRenderer({ block }: { block: Block }) {
     case "divider":
       return <hr key={block.id} className="chapter-divider" />;
     case "viz":
-      return <VizRenderer block={block} />;
+      return <VizPlayer type={block.type} config={block.config} />;
     case "code":
       return (
         <div className="code-block" key={block.id}>

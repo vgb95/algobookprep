@@ -15,7 +15,8 @@ export type BlockKind =
   | "code"
   | "problem"
   | "divider"
-  | "formula";
+  | "formula"
+  | "array";
 
 export interface BlockBase {
   kind: BlockKind;
@@ -29,8 +30,8 @@ export interface ProseBlock extends BlockBase {
 
 export interface VizBlock extends BlockBase {
   kind: "viz";
-  type: "sorting" | "tree" | "graph" | "heap";
-  config: Record<string, unknown>;
+  type: "sorting" | "tree" | "graph" | "heap" | "array";
+  config: Record<string, string | number>;
 }
 
 export interface CodeBlock extends BlockBase {
@@ -54,13 +55,19 @@ export interface DividerBlock extends BlockBase {
   kind: "divider";
 }
 
+export interface ArrayBlock extends BlockBase {
+  kind: "array";
+  config: Record<string, string | number>;
+}
+
 export type Block =
   | ProseBlock
   | VizBlock
   | CodeBlock
   | ProblemBlock
   | FormulaBlock
-  | DividerBlock;
+  | DividerBlock
+  | ArrayBlock;
 
 export interface ChapterContent {
   id: string;
