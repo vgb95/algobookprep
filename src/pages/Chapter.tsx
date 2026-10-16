@@ -1,4 +1,5 @@
 import { chapters } from "../content/chapters";
+import { problems } from "../content/problems";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import SortingPlayground from "./SortingPlayground";
 import ArraysPlayground from "./ArraysPlayground";
@@ -22,6 +23,8 @@ export default function ChapterPage({ id }: { id: string }) {
   const prev = chapters[idx - 1];
   const next = chapters[idx + 1];
 
+  const chapterProblems = problems.filter((p) => p.chapter === id);
+
   return (
     <article>
       <div className="kicker">
@@ -32,7 +35,24 @@ export default function ChapterPage({ id }: { id: string }) {
       </h1>
       <p className="lede">{ch.blurb}</p>
 
-      {ch.status === "live" ? (
+      {chapterProblems.length > 0 ? (
+        <>
+          <p className="prose-note" style={{ marginBottom: 10 }}>
+            Práctica interactiva en este capítulo:
+          </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
+            {chapterProblems.map((p) => (
+              <a
+                key={p.id}
+                href={`#/problem/${p.id}`}
+                className="btn ghost"
+              >
+                {p.title}
+              </a>
+            ))}
+          </div>
+        </>
+      ) : ch.status === "live" ? (
         ch.id === "sorting" ? <SortingPlayground /> : <ArraysPlayground />
       ) : (
         <section className="card soon-card">

@@ -1,48 +1,31 @@
-/* ————— Fase 2: Code Playback ————— */
+/* ————— Fase 3: Problemas y editor ————— */
 
-.code {
+.cm-editor {
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: #fffdf8;
+  background: #1e1e1e !important;
   overflow: hidden;
   box-shadow: var(--shadow);
 }
 
-.code-line {
-  display: flex;
-  gap: 10px;
-  padding: 4px 12px;
+.cm-editor .cm-scroller {
   font-family: var(--font-mono);
   font-size: 0.85rem;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-.code-ln {
-  color: var(--ink-soft);
-  user-select: none;
-  width: 2rem;
-  text-align: right;
+.cm-editor .cm-content {
+  padding: 12px;
+  color: #d4d4d4;
 }
 
-.code-text {
-  white-space: pre;
+.cm-editor .cm-lineNumbers .cm-gutterElement {
+  color: #858585;
+  padding: 0 8px;
 }
 
-.code-line.active {
-  background: #fdf3ee;
-  border-left: 3px solid var(--accent);
-}
-
-.code-src {
-  width: 100%;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: #fff;
-  padding: 10px;
-  resize: vertical;
-  min-height: 220px;
+.problem-editor {
+  height: 420px;
 }
 
 .trace-row {
@@ -53,79 +36,107 @@
   margin-top: 10px;
 }
 
-.trace-code {
-  min-width: 0;
+.test-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
 }
 
-.trace-state {
-  min-width: 0;
-}
-
-.trace-arr {
-  margin-top: 10px;
-}
-
-.vars {
-  width: 100%;
-  border-collapse: collapse;
+.test-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid #f2ecd6;
+  background: #fffdf8;
   font-size: 0.85rem;
-  margin-top: 8px;
 }
 
-.vars th {
-  text-align: left;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink-soft);
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--line);
+.test-item.pass {
+  border-color: #86efac;
+  background: #f0fdf4;
 }
 
-.vars td {
-  padding: 5px 8px;
-  border-bottom: 1px solid #f2ecd6;
+.test-item.fail {
+  border-color: #fca5a5;
+  background: #fef2f2;
 }
 
-.var-name {
-  font-family: var(--font-mono);
-  color: var(--accent-2);
+.test-item.hidden {
+  opacity: 0.85;
 }
 
-.var-value {
+.test-mark {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.1rem;
+  width: 1.4rem;
+  text-align: center;
+}
+
+.test-item.pass .test-mark { color: #16a34a; }
+.test-item.fail .test-mark { color: #dc2626; }
+
+.test-name {
   color: var(--ink);
 }
 
-.array-row .var-name {
-  color: var(--accent-3);
-}
-
-.empty {
+.test-hidden {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--ink-soft);
-  font-size: 0.85rem;
-  margin-top: 10px;
+  margin-left: 6px;
+  background: var(--line);
+  padding: 1px 6px;
+  border-radius: 4px;
 }
 
-.stdout {
-  margin-top: 10px;
-  padding: 8px 10px;
+.test-detail {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  padding-left: 2.2rem;
+}
+
+.vars-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.var-chip {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   background: #f3f6f9;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  font-size: 0.82rem;
+  color: var(--ink-soft);
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
-.stdout-text {
-  font-family: var(--font-mono);
-  color: var(--ink-soft);
-  white-space: pre-wrap;
+.solution-details {
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px;
+  background: #fffdf8;
 }
 
-.trace-arr .narrate {
-  margin: 4px 0 8px;
-  font-size: 0.9rem;
-  color: var(--ink-soft);
+.solution-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent);
+  outline: none;
 }
+
+.solution-details summary::-webkit-details-marker { display: none; }
 
 .meta {
   margin-top: 10px;
@@ -135,10 +146,4 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-}
-
-.run-col {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
