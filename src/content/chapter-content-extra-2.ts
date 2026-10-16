@@ -34,10 +34,16 @@ export const stringsChapter: ChapterContent = {
         "Una técnica común es usar **hash rodante**: calcular el hash del patrón y deslizar una ventana sobre el texto, comparando hashes en O(1) por paso. Si los hashes coinciden, se verifica carácter por carácter para evitar falsos positivos.",
     },
     {
+      kind: "prose",
+      id: "str-ascii-note",
+      text:
+        "Con la convención A=1, B=2, …, la palabra HELLO se codifica como [8, 5, 12, 12, 15]. Buscar la letra L es un lookup por valor sobre ese array:",
+    },
+    {
       kind: "viz",
       id: "str-lookup-viz",
       type: "array",
-      config: { op: "lookup", array: "72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100", target: "87" },
+      config: { op: "lookup", array: "8, 5, 12, 12, 15", target: "12" },
     },
     {
       kind: "prose",

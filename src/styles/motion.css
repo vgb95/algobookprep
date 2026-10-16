@@ -205,6 +205,41 @@
   color: var(--accent-2);
 }
 
+/* ————— Contenido: markdown renderizado ————— */
+.prose-block p {
+  margin: 0 0 10px;
+}
+
+.prose-block p:last-child {
+  margin-bottom: 0;
+}
+
+.prose-block ul,
+.prose-block ol {
+  margin: 8px 0 12px;
+  padding-left: 1.4rem;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  max-width: 68ch;
+}
+
+.prose-block li {
+  margin: 4px 0;
+}
+
+.prose-block code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+
+.prose-block strong {
+  color: var(--ink);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .narrate {
     animation: none;

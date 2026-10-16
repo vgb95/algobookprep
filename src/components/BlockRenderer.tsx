@@ -1,19 +1,21 @@
 import type { Block } from "../content/blocks";
 import Problem from "../pages/Problem";
 import VizPlayer from "../components/viz/VizPlayer";
+import Markdown from "./Markdown";
+import LatexLite from "./LatexLite";
 
 export default function BlockRenderer({ block }: { block: Block }) {
   switch (block.kind) {
     case "prose":
       return (
         <div className="prose-block" key={block.id}>
-          <p>{block.text}</p>
+          <Markdown text={block.text} />
         </div>
       );
     case "formula":
       return (
         <div className="formula-block" key={block.id}>
-          <span className="latex">{block.latex}</span>
+          <LatexLite latex={block.latex} />
         </div>
       );
     case "divider":
@@ -23,9 +25,7 @@ export default function BlockRenderer({ block }: { block: Block }) {
     case "code":
       return (
         <div className="code-block" key={block.id}>
-          <p className="prose-note">
-            Ejemplo de código ({block.code.split("\n").length} líneas)
-          </p>
+          <pre className="snippet">{block.code}</pre>
         </div>
       );
     case "problem":

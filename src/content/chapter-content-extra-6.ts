@@ -8,7 +8,7 @@ export const backtrackingChapter: ChapterContent = {
   num: 21,
   title: "Backtracking",
   blurb:
-    "Recorrer el espacio de soluciones con poda por constraint satisfaction.",
+    "Recorrer el espacio de soluciones con poda por satisfacción de restricciones.",
   blocks: [
     {
       kind: "prose",
@@ -20,7 +20,7 @@ export const backtrackingChapter: ChapterContent = {
       kind: "prose",
       id: "bt-uses",
       text:
-        "Problemas clásicos:\n- **N reinas:** colocar N reinas en un tablero sin que se ataquen.\n- **Sodoku:** rellenar el tablero respetando filas, columnas y bloques.\n- **Laberintos:** encontrar una salida probando caminos y retrocediendo en callejones sin salida.\n- **Subconjuntos y permutaciones:** generar todas las combinaciones posibles.",
+        "Problemas clásicos:\n- **N reinas:** colocar N reinas en un tablero sin que se ataquen.\n- **Sudoku:** rellenar el tablero respetando filas, columnas y bloques.\n- **Laberintos:** encontrar una salida probando caminos y retrocediendo en callejones sin salida.\n- **Subconjuntos y permutaciones:** generar todas las combinaciones posibles.",
     },
     {
       kind: "formula",
@@ -73,7 +73,7 @@ export const bitOpsChapter: ChapterContent = {
       kind: "prose",
       id: "bit-tricks",
       text:
-        "Trucos útiles:\n- `x & (x - 1)` borra el bit 1 menos significativo.\n- `x & -x` aísla el bit 1 menos significativo.\n- `x ^ y` intercambia dos variables sin variable temporal.\n- Para comprobar si un número es potencia de 2: `x & (x - 1) == 0`.",
+        "Trucos útiles:\n- `x & (x - 1)` borra el bit 1 menos significativo.\n- `x & -x` aísla el bit 1 menos significativo.\n- `x ^= y; y ^= x; x ^= y` intercambia dos variables sin variable temporal.\n- Para comprobar si un número es potencia de 2 (con x > 0): `x & (x - 1) == 0`.",
     },
     {
       kind: "viz",

@@ -8,7 +8,7 @@ export const complexityChapter: ChapterContent = {
   num: 1,
   title: "Complexity Analysis",
   blurb:
-    "Big-O, Θ y Ω: a cuantificar el tiempo y la memoria que consume un algoritmo antes de discutir su diseño.",
+    "Big-O, Θ y Ω: a cuantificar el tiempo y la memoria que consume un algoritmo antes de escribirlo.",
   blocks: [
     {
       kind: "prose",
@@ -100,7 +100,7 @@ export const hashTablesChapter: ChapterContent = {
       kind: "prose",
       id: "ht-load-factor",
       text:
-        "El **factor de carga** α = n / m (elementos / tamaño del array) determina el rendimiento. Cuando α crece demasiado, se **rehashea**: se crea un array más grande (doble) y se vuelven a insertar todos los elementos con la nueva función de hash.",
+        "El **factor de carga** α = n / m (elementos / tamaño del array) determina el rendimiento. Cuando α crece demasiado, se aplica un **rehashing**: se crea un array más grande (normalmente el doble) y se reinsertan todos los elementos.",
     },
     {
       kind: "viz",
@@ -148,7 +148,7 @@ export const searchChapter: ChapterContent = {
       kind: "prose",
       id: "search-binary",
       text:
-        "**Búsqueda binaria:** requiere el array **ordenado**. Cada paso compara el valor medio y descarta la mitad que no puede contener el objetivo. Descarta la mitad del espacio en cada paso: O(log n).",
+        "**Búsqueda binaria:** requiere el array **ordenado**. Cada paso compara el valor medio y descarta la mitad que no puede contener el objetivo, así que el espacio se reduce a la mitad en cada paso: O(log n).",
     },
     {
       kind: "formula",
