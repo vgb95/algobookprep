@@ -2,7 +2,7 @@ import { useState } from "react";
 import { problems } from "../content/problems";
 import CodeEditor from "../components/editor/CodeEditor";
 import { evaluateSolution } from "../engine/evaluator";
-import Scrubber from "../components/viz/Scrubber";
+import FluidScrubber from "../components/viz/FluidScrubber";
 import { runTraced } from "../engine/pyodide";
 
 /**
@@ -190,11 +190,11 @@ _result = _target(${callArgs})
               cerrar traza
             </button>
           </div>
-          <Scrubber
+          <FluidScrubber
             frames={traceFrames}
-            render={(f) => (
+            render={(f, _blend, _next, index) => (
               <>
-                <p className="narrate">{f.message}</p>
+                <p className="narrate" key={index}>{f.message}</p>
                 <div className="vars-mini">
                   {Object.entries(f.locals).map(([name, value]) => (
                     <span className="var-chip" key={name}>
