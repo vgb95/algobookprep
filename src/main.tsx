@@ -5,7 +5,11 @@ import "./styles/global.css";
 import "./styles/playback.css";
 import { registerSW } from "virtual:pwa-register";
 
-registerSW({ onNeedRefresh: () => {}, onOfflineReady: () => {} });
+registerSW({
+  onNeedRefresh: () => {},
+  onOfflineReady: () => {},
+  onRegisterError: (error) => console.error("SW registration failed:", error),
+});
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
