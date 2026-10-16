@@ -12,8 +12,8 @@ import type { Frame } from "../../engine/timeline";
 
 interface Props<F extends Frame> {
   frames: readonly F[];
-  /** render(cuadroActual, blend 0..1, cuadroSiguiente) */
-  render: (frame: F, blend: number, next: F) => ReactNode;
+  /** render(cuadroActual, blend 0..1, cuadroSiguiente, índice) */
+  render: (frame: F, blend: number, next: F, index: number) => ReactNode;
 }
 
 const SPEEDS = [0.5, 1, 2];
@@ -57,7 +57,7 @@ export default function FluidScrubber<F extends Frame>({ frames, render }: Props
     <div className="player">
       <div className="stage fluid-stage">
         <VizErrorBoundary resetKey={p.index} label="fluid-player">
-          {render(frame, p.blend, next)}
+          {render(frame, p.blend, next, p.index)}
         </VizErrorBoundary>
       </div>
       <div className="player-controls">

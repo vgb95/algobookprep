@@ -88,9 +88,9 @@ export default function SortingPlayground() {
         {frames.length > 0 && (
           <FluidScrubber
             frames={frames}
-            render={(f, blend, next) => (
+            render={(f, blend, next, index) => (
               <>
-                <p className="narrate">{f.message}</p>
+                <p className="narrate" key={index}>{f.message}</p>
                 <FluidBars curr={f} next={next} blend={blend} />
                 <div className="metrics">
                   <span className="badge">comparaciones: {f.comparisons}</span>

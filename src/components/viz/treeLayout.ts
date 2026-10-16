@@ -6,6 +6,8 @@
  * y la fluidez se consigue fundiendo colores + pulso en el actual.
  */
 
+import { ROLE } from "./roles";
+
 export interface FlatNode {
   id: number;
   value: number;
@@ -68,5 +70,5 @@ export function layoutTree(nodes: FlatNode[], width = 700, height = 320): TreeLa
 }
 
 export function nodeFill(n: FlatNode): string {
-  return n.current ? "#e8543f" : n.visited ? "#22c55e" : "#f59e0b";
+  return n.current ? ROLE.current : n.visited ? ROLE.settled : ROLE.pending;
 }

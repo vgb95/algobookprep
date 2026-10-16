@@ -6,6 +6,7 @@
  */
 import type { TreeFrame } from "../../algorithms/binary-tree";
 import { layoutTree, nodeFill } from "./treeLayout";
+import { ROLE } from "./roles";
 
 export default function FluidTree({ frame }: { frame: TreeFrame }) {
   const { nodes } = frame;
@@ -46,9 +47,9 @@ export default function FluidTree({ frame }: { frame: TreeFrame }) {
         })}
       </svg>
       <div className="tree-legend">
-        <span className="chip"><i style={{ background: "#e8543f" }} /> actual</span>
-        <span className="chip"><i style={{ background: "#22c55e" }} /> visitado</span>
-        <span className="chip"><i style={{ background: "#f59e0b" }} /> pendiente</span>
+        <span className="chip"><i style={{ background: ROLE.current }} /> actual</span>
+        <span className="chip"><i style={{ background: ROLE.settled }} /> visitado</span>
+        <span className="chip"><i style={{ background: ROLE.pending }} /> pendiente</span>
       </div>
     </div>
   );

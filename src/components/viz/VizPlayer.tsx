@@ -5,11 +5,10 @@
  */
 import { useMemo } from "react";
 import { record } from "../../engine/timeline";
-import Scrubber from "./Scrubber";
 import FluidScrubber from "./FluidScrubber";
 import FluidBars from "./FluidBars";
 import FluidTree from "./FluidTree";
-import GraphViz from "./GraphViz";
+import FluidGraph from "./FluidGraph";
 import HeapViz from "./HeapViz";
 import { sorters, type SortId } from "../../algorithms/sorting";
 import { treeOrders, type TreeOrder } from "../../algorithms/binary-tree";
@@ -37,9 +36,9 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
       <div>
         <FluidScrubber
           frames={frames}
-          render={(f, blend, next) => (
+          render={(f, blend, next, index) => (
             <>
-              <p className="narrate">{f.message}</p>
+              <p className="narrate" key={index}>{f.message}</p>
               <FluidBars curr={f} next={next} blend={blend} />
               <div className="meta">
                 <span className="badge">comparaciones: {f.comparisons}</span>
@@ -71,9 +70,9 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
       <div>
         <FluidScrubber
           frames={frames}
-          render={(f: any, blend: number, next: any) => (
+          render={(f: any, blend: number, next: any, index: number) => (
             <>
-              <p className="narrate">{f.message}</p>
+              <p className="narrate" key={index}>{f.message}</p>
               <FluidBars curr={f} next={next} blend={blend} />
               <div className="meta">
                 <span className="badge">lecturas: {f.probes}</span>
@@ -99,9 +98,9 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
       <div>
         <FluidScrubber
           frames={frames}
-          render={(f) => (
+          render={(f, _blend, _next, index) => (
             <>
-              <p className="narrate">{f.message}</p>
+              <p className="narrate" key={index}>{f.message}</p>
               <FluidTree frame={f} />
               <div className="meta">
                 <span className="badge">orden: {f.order.join(", ")}</span>
@@ -134,12 +133,12 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
     ]);
     return (
       <div>
-        <Scrubber
+        <FluidScrubber
           frames={frames}
-          render={(f) => (
+          render={(f, blend, next, index) => (
             <>
-              <p className="narrate">{f.message}</p>
-              <GraphViz frame={f} />
+              <p className="narrate" key={index}>{f.message}</p>
+              <FluidGraph curr={f} next={next} blend={blend} />
               <div className="meta">
                 <span className="badge">
                   cola/pila: [{f.queueOrStack.join(", ")}]
@@ -165,11 +164,11 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
     );
     return (
       <div>
-        <Scrubber
+        <FluidScrubber
           frames={frames}
-          render={(f: any) => (
+          render={(f: any, _blend: number, _next: any, index: number) => (
             <>
-              <p className="narrate">{f.message}</p>
+              <p className="narrate" key={index}>{f.message}</p>
               <HeapViz frame={f} />
               <div className="meta">
                 <span className="badge">montículo: [{f.heap.join(", ")}]</span>
