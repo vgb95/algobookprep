@@ -1,5 +1,7 @@
 # AlgoBook 📖⚡
 
+[![CI](https://github.com/vgb95/algobookprep/actions/workflows/ci.yml/badge.svg)](https://github.com/vgb95/algobookprep/actions/workflows/ci.yml)
+
 > An interactive handbook for learning **Data Structures & Algorithms** — every visualization is a tape of frames you can play, pause, rewind and scrub through, generated from your own inputs.
 
 Inspired by [cartesian.app](https://cartesian.app), rebuilt on a lean open web stack (React + Vite + TypeScript). Next up: code playback with an embedded Python runtime (Pyodide), auto-checked problems, and an offline PWA.
