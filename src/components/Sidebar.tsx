@@ -47,7 +47,7 @@ export default function Sidebar() {
           </a>
         ))}
       </nav>
-      <div className="sidebar-foot">AlgoBook v0.1 · hecho para estudiar</div>
+      <div className="sidebar-foot">AlgoBook v0.4 · 22 capítulos · PWA offline</div>
     </aside>
   );
 }

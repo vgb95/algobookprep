@@ -49,8 +49,9 @@ The result is a flat `frames[]` that the same `Scrubber` from Phase 1 plays — 
 | 2 — Code playback | ✅ done | Pyodide + `sys.settrace` tracer |
 | 3 — Problems + evaluator | ✅ done | CodeMirror 6, visible/hidden tests, failing-test trace |
 | 4 — Viz library | ✅ done | trees (BST traversals), graphs (BFS/DFS), heaps (insert/extract-max) |
-| 5 — Content | 🔜 next | full chapter prose |
-| 6 — PWA + QOL | 🔜 | offline, bookmarks, notes |
+| 5 — Content | ✅ done | all 22 chapters with prose, formulas, viz and problems |
+| 6 — PWA + Pages | ✅ done | offline service worker, GitHub Pages deploy |
+| 7 — More content | 🔜 next | more problems, practice chapters, new languages |
 
 ## License
 

@@ -1,25 +1,38 @@
 const plan: { label: string; done: boolean }[] = [
   { label: "Fase 0 · Shell del libro — tipografía, 22 capítulos, progreso local", done: true },
   { label: "Fase 1 · Motor de cinta de cuadros + playgrounds (sorting y arrays)", done: true },
-  { label: "Fase 2 · Code playback con Python real (Pyodide + sys.settrace)", done: false },
-  { label: "Fase 3 · IDE embebido + evaluador de problemas con tests ocultos", done: false },
-  { label: "Fase 4 · Biblioteca de vis: árboles, grafos, heaps, recursión, matrices…", done: false },
-  { label: "Fase 5 · Contenido de capítulos completo y pulido", done: false },
-  { label: "Fase 6 · PWA offline + marcadores y notas", done: false },
+  { label: "Fase 2 · Code playback con Python real (Pyodide + sys.settrace)", done: true },
+  { label: "Fase 3 · IDE embebido + evaluador de problemas con tests ocultos", done: true },
+  { label: "Fase 4 · Biblioteca de vis: árboles, grafos, heaps, recursión, matrices…", done: true },
+  { label: "Fase 5 · Contenido de los 22 capítulos completo y pulido", done: true },
+  { label: "Fase 6 · PWA offline + despliegue a GitHub Pages", done: true },
+  { label: "Fase 7 · Más problemas, más capítulos de práctica, nuevos lenguajes", done: false },
 ];
 
 const features = [
   {
+    t: "22 capítulos completos",
+    b: "Teoría, fórmulas y visualizaciones interactivas para todo el temario de DSA: complejidad, arrays, hash tables, búsqueda, ordenado, strings, matrices, listas, pilas, colas, recursión, DP, árboles, heaps, BST, tries, grafos, algoritmos de grafos, union-find, MST, backtracking y operaciones a nivel de bit.",
+  },
+  {
     t: "Pausa al profe",
-    b: "Toda visualización es una cinta de cuadros precomputada: reprodúcela, paúsala, retrocede y rascas la línea de tiempo como si fuera un video.",
+    b: "Toda visualización es una cinta de cuadros precomputada: reprodúcela, paúsala, retrocede y rasca la línea de tiempo como si fuera un video.",
   },
   {
     t: "Tus propios datos",
     b: "Introduce tu array o elige uno aleatorio: la cinta se genera al instante y te narra cada comparación y cada intercambio.",
   },
   {
-    t: "Coste a la vista",
-    b: "Cada cuadro cuenta comparaciones y escrituras para que el O(n²) deje de ser una abstracción y se convierta en observación.",
+    t: "Code Playback real",
+    b: "Escribe Python, pulsa Run, y una traza real (sys.settrace sobre Pyodide/WASM) se convierte en una cinta de cuadros navegable — línea resaltada, variables en vivo y arrays dibujados como barras.",
+  },
+  {
+    t: "Evaluador de problemas",
+    b: "Editor CodeMirror 6 con tests visibles y ocultos, traza paso a paso del test fallido y solución de referencia al resolverlo.",
+  },
+  {
+    t: "PWA offline",
+    b: "Instalable como app y usable sin internet gracias al service worker con precache de assets y runtime cache de Pyodide.",
   },
 ];
 
@@ -76,8 +89,9 @@ const frames = record(bubbleSort([7, 3, 9]));
         ))}
       </ul>
       <p className="prose-note">
-        Inspirado en cartesian.app — reconstruido con el mismo concepto, pero sobre una web abierta
-        (React + Vite + Python/WASM en camino).
+        Inspirado en cartesian.app — reconstruido con el mismo concepto, sobre una web
+        abierta (React + Vite + TypeScript + Pyodide/WASM). Los 22 capítulos están
+        completos y funciona como PWA offline.
       </p>
     </>
   );
