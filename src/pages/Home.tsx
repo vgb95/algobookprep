@@ -40,6 +40,7 @@ export default function HomePage() {
         <div className="cta-row">
           <a className="btn primary" href="#/chapter/sorting">▶ Probar la demo</a>
           <a className="btn" href="#/chapter/arrays">Ver capítulo Arrays</a>
+          <a className="btn" href="#/code-playground">▶ Code Playback (Python)</a>
         </div>
         <div className="stats">
           <div className="stat"><b>22</b><span>capítulos planificados</span></div>

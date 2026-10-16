@@ -1,0 +1,144 @@
+/* ————— Fase 2: Code Playback ————— */
+
+.code {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fffdf8;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.code-line {
+  display: flex;
+  gap: 10px;
+  padding: 4px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.code-ln {
+  color: var(--ink-soft);
+  user-select: none;
+  width: 2rem;
+  text-align: right;
+}
+
+.code-text {
+  white-space: pre;
+}
+
+.code-line.active {
+  background: #fdf3ee;
+  border-left: 3px solid var(--accent);
+}
+
+.code-src {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  padding: 10px;
+  resize: vertical;
+  min-height: 220px;
+}
+
+.trace-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+  margin-top: 10px;
+}
+
+.trace-code {
+  min-width: 0;
+}
+
+.trace-state {
+  min-width: 0;
+}
+
+.trace-arr {
+  margin-top: 10px;
+}
+
+.vars {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+.vars th {
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.vars td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #f2ecd6;
+}
+
+.var-name {
+  font-family: var(--font-mono);
+  color: var(--accent-2);
+}
+
+.var-value {
+  color: var(--ink);
+}
+
+.array-row .var-name {
+  color: var(--accent-3);
+}
+
+.empty {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+.stdout {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: #f3f6f9;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.stdout-text {
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+}
+
+.trace-arr .narrate {
+  margin: 4px 0 8px;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.meta {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.run-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

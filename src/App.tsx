@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import HomePage from "./pages/Home";
 import ChapterPage from "./pages/Chapter";
+import CodePlayground from "./pages/CodePlayground";
 
 /** Minimal hash router — no deps needed. */
 function useHashRoute(): string {
@@ -22,7 +23,13 @@ export default function App() {
     <div className="app">
       <Sidebar />
       <main className="content">
-        {chapterId ? <ChapterPage id={chapterId} /> : <HomePage />}
+        {route === "/code-playground" ? (
+          <CodePlayground />
+        ) : chapterId ? (
+          <ChapterPage id={chapterId} />
+        ) : (
+          <HomePage />
+        )}
       </main>
     </div>
   );
