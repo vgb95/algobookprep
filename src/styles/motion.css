@@ -16,6 +16,19 @@
   pointer-events: none;
 }
 
+.viz-error {
+  border: 1px solid #fca5a5;
+  background: #fef2f2;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 12px 0;
+  color: var(--ink);
+}
+
+.viz-error .btn {
+  margin-top: 8px;
+}
+
 @keyframes node-ping {
   0% {
     transform: scale(1);

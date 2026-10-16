@@ -7,6 +7,7 @@
  */
 import { useEffect, type ReactNode } from "react";
 import { usePlayback } from "../../hooks/usePlayback";
+import VizErrorBoundary from "./VizErrorBoundary";
 import type { Frame } from "../../engine/timeline";
 
 interface Props<F extends Frame> {
@@ -54,7 +55,11 @@ export default function FluidScrubber<F extends Frame>({ frames, render }: Props
 
   return (
     <div className="player">
-      <div className="stage fluid-stage">{render(frame, p.blend, next)}</div>
+      <div className="stage fluid-stage">
+        <VizErrorBoundary resetKey={p.index} label="fluid-player">
+          {render(frame, p.blend, next)}
+        </VizErrorBoundary>
+      </div>
       <div className="player-controls">
         <button className="btn ghost" onClick={press(p.restart)} disabled={atStart} title="Reiniciar">
           ⏮
