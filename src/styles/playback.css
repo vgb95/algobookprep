@@ -147,3 +147,45 @@
   gap: 12px;
   flex-wrap: wrap;
 }
+
+.empty-tree {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 240px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.tree-legend, .graph-info, .heap-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+
+.chip i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.solution-details {
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px;
+  background: #fffdf8;
+}
+
+.solution-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent);
+  outline: none;
+}
+
+.solution-details summary::-webkit-details-marker { display: none; }

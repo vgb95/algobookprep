@@ -3,6 +3,9 @@ import { problems } from "../content/problems";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import SortingPlayground from "./SortingPlayground";
 import ArraysPlayground from "./ArraysPlayground";
+import TreePlayground from "./TreePlayground";
+import GraphPlayground from "./GraphPlayground";
+import HeapPlayground from "./HeapPlayground";
 
 export default function ChapterPage({ id }: { id: string }) {
   const [read, setRead] = useLocalStorage(`read:${id}`, false);
@@ -53,7 +56,12 @@ export default function ChapterPage({ id }: { id: string }) {
           </div>
         </>
       ) : ch.status === "live" ? (
-        ch.id === "sorting" ? <SortingPlayground /> : <ArraysPlayground />
+        ch.id === "sorting" ? <SortingPlayground /> :
+        ch.id === "arrays" ? <ArraysPlayground /> :
+        ch.id === "trees" ? <TreePlayground /> :
+        ch.id === "graphs" ? <GraphPlayground /> :
+        ch.id === "heaps" ? <HeapPlayground /> :
+        null
       ) : (
         <section className="card soon-card">
           <h3 className="serif">En construcción 🚧</h3>

@@ -48,8 +48,8 @@ The result is a flat `frames[]` that the same `Scrubber` from Phase 1 plays — 
 | 1 — Frame-tape engine | ✅ done | sorting + arrays playgrounds |
 | 2 — Code playback | ✅ done | Pyodide + `sys.settrace` tracer |
 | 3 — Problems + evaluator | ✅ done | CodeMirror 6, visible/hidden tests, failing-test trace |
-| 4 — Viz library | 🔜 next | trees, graphs, heaps, recursion, matrices |
-| 5 — Content | 🔜 | full chapter prose |
+| 4 — Viz library | ✅ done | trees (BST traversals), graphs (BFS/DFS), heaps (insert/extract-max) |
+| 5 — Content | 🔜 next | full chapter prose |
 | 6 — PWA + QOL | 🔜 | offline, bookmarks, notes |
 
 ## License
