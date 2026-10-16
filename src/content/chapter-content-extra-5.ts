@@ -85,7 +85,7 @@ export const unionFindChapter: ChapterContent = {
       kind: "viz",
       id: "uf-lookup-viz",
       type: "array",
-      config: { op: "lookup", array: "0, 1, 2, 3, 4, 5, 6", target: "4" },
+      config: { op: "lookup", array: "1, 2, 3, 4, 5, 6, 7", target: "4" },
     },
   ],
 };

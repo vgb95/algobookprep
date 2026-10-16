@@ -79,7 +79,7 @@ export const bstChapter: ChapterContent = {
     {
       kind: "formula",
       id: "bst-complexity-formula",
-      latex: "balanceado: O(log n), desgenerado: O(n)",
+      latex: "balanceado: O(log n), degenerado: O(n)",
     },
     {
       kind: "prose",
@@ -110,13 +110,19 @@ export const triesChapter: ChapterContent = {
       kind: "prose",
       id: "trie-uses",
       text:
-        "Usos:\n- Autocompletado: dado un prefijo, recorre el trie hasta ese nodo y lista todas las palabras que cuelgan de él.\n- Corrector ortográfico: sugiere palabras con prefijos similares.\n- Enrutamiento IP: las tablas de enrutamiento usan tries de bits.",
+        "Usos:\n- Autocompletado: dado un prefijo, recorre el trie hasta ese nodo y lista todas las palabras que cuelgan de él.\n- Corrector ortográfico: propone candidatas recorriendo caminos cercanos al prefijo escrito.\n- Enrutamiento IP: las tablas de enrutamiento usan tries de bits.",
+    },
+    {
+      kind: "prose",
+      id: "trie-ascii-note",
+      text:
+        "Con la convención A=1, B=2, …, la palabra APPLE se codifica como [1, 16, 16, 12, 5]. Buscar la segunda P es un lookup por valor:",
     },
     {
       kind: "viz",
       id: "trie-lookup-viz",
       type: "array",
-      config: { op: "lookup", array: "97, 112, 112, 108, 101, 98, 97, 110, 97, 110, 97", target: "98" },
+      config: { op: "lookup", array: "1, 16, 16, 12, 5", target: "16" },
     },
     {
       kind: "prose",
