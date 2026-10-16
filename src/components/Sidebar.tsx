@@ -32,10 +32,17 @@ export default function Sidebar() {
           >
             <span className="toc-num">{c.num}</span>
             <span className="toc-title">{c.title}</span>
-            {c.status === "live" && isRead(c.id) ? (
-              <span className="check" title="leído">✓</span>
+            {isRead(c.id) ? (
+              <span className="check" title="completado">✓</span>
             ) : (
-              <span className={`dot ${c.status}`} title={c.status === "live" ? "demo interactiva" : "próximamente"} />
+              <span
+                className="dot pending"
+                title={
+                  c.status === "live"
+                    ? "demo interactiva — pendiente"
+                    : "próximamente"
+                }
+              />
             )}
           </a>
         ))}

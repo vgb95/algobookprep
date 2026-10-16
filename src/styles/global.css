@@ -95,8 +95,7 @@ body {
 .toc-item.soon .toc-title { color: var(--ink-soft); }
 
 .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-.dot.live { background: var(--accent-3); }
-.dot.soon { background: var(--line); }
+.dot.pending { background: var(--line); }
 .check { color: var(--accent-3); flex: none; font-weight: 700; }
 
 .sidebar-foot {
