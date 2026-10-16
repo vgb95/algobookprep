@@ -8,13 +8,13 @@ const isRead = (id: string): boolean => {
   }
 };
 
-export default function Sidebar() {
+export default function Sidebar({ open = false }: { open?: boolean }) {
   const activeId = window.location.hash.startsWith("#/chapter/")
     ? window.location.hash.slice("#/chapter/".length)
     : null;
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${open ? " open" : ""}`}>
       <a href="#/" className="brand">
         <span className="brand-mark" aria-hidden>▤</span>
         <div>

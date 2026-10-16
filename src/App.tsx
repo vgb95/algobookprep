@@ -18,12 +18,32 @@ function useHashRoute(): string {
 
 export default function App() {
   const route = useHashRoute();
+  const [navOpen, setNavOpen] = useState(false);
+  useEffect(() => {
+    setNavOpen(false);
+  }, [route]);
   const problemId = route.startsWith("/problem/") ? route.slice("/problem/".length) : null;
   const chapterId = route.startsWith("/chapter/") ? route.slice("/chapter/".length) : null;
 
   return (
     <div className="app">
-      <Sidebar />
+      <div className="topbar">
+        <button
+          className="topbar-menu"
+          aria-label="Abrir navegación"
+          aria-expanded={navOpen}
+          onClick={() => setNavOpen(true)}
+        >
+          ☰
+        </button>
+        <a href="#/" className="topbar-brand">
+          ▤ AlgoBook
+        </a>
+      </div>
+      {navOpen && (
+        <button className="scrim" aria-label="Cerrar navegación" onClick={() => setNavOpen(false)} />
+      )}
+      <Sidebar open={navOpen} />
       <main className="content">
         {problemId ? (
           <Problem id={problemId} />

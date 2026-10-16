@@ -1,0 +1,173 @@
+/* ————— Fase C: móvil de verdad —————
+ * Fichero nuevo (no toca global.css/playback.css): navegación drawer,
+ * layout que no desborda, controles táctiles, editor sin zoom de iOS
+ * y safe-areas de la PWA instalada. Todo bajo el breakpoint de 940px
+ * que ya usa la app, más ajustes de puntero grueso.
+ */
+
+.topbar,
+.scrim {
+  display: none;
+}
+
+@media (max-width: 940px) {
+  /* Barra superior solo-móvil */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
+  }
+  .topbar-menu {
+    font: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fffdf8;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .topbar-brand {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* Drawer de navegación */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(320px, 86vw);
+    max-height: none;
+    z-index: 50;
+    background: var(--paper);
+    border-right: 1px solid var(--line);
+    border-bottom: none;
+    transform: translateX(-105%);
+    transition: transform 0.28s ease;
+    box-shadow: none;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .sidebar.open {
+    transform: none;
+    box-shadow: 20px 0 60px rgb(43 41 38 / 20%);
+  }
+  .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgb(43 41 38 / 38%);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  /* Vuelve la lista vertical legible (revierte las pastillas) */
+  .toc {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  .toc-item {
+    min-height: 44px;
+    font-size: 0.95rem;
+  }
+
+  /* Contenido */
+  .content {
+    padding: 20px 16px calc(48px + env(safe-area-inset-bottom));
+  }
+  .content > * {
+    max-width: none;
+  }
+  h1 {
+    font-size: 1.9rem;
+  }
+
+  /* Escenario fluido */
+  .stage {
+    min-height: 0;
+  }
+  .bars {
+    height: min(56vw, 250px);
+  }
+  .tree-svg,
+  .graph-svg,
+  .heap-svg,
+  .graph-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Formularios a ancho completo y sin zoom de iOS (<16px) */
+  .field {
+    flex: 1 1 100%;
+  }
+  .field input,
+  .field select {
+    width: 100%;
+    max-width: 100%;
+    font-size: 16px;
+  }
+  .cm-editor .cm-scroller {
+    font-size: 16px;
+  }
+  .code-src {
+    font-size: 16px;
+    width: 100%;
+  }
+
+  /* Traza código+estado apilada */
+  .trace-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Tablas con scroll horizontal */
+  .tbl {
+    display: block;
+    overflow-x: auto;
+  }
+
+  /* Controles táctiles */
+  .player-controls .btn,
+  .cta-row .btn {
+    min-height: 44px;
+  }
+  .cta-row .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  .scrub {
+    flex-basis: 100%;
+    height: 32px;
+  }
+}
+
+/* Puntero grueso en cualquier viewport */
+@media (pointer: coarse) {
+  .player-controls .btn {
+    min-height: 44px;
+  }
+  .toc-item {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}
