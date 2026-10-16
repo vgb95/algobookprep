@@ -3,12 +3,32 @@ import { runTraced } from "../engine/pyodide";
 import CodeLine from "../components/viz/CodeLine";
 import VariableInspector from "../components/viz/VariableInspector";
 import FluidScrubber from "../components/viz/FluidScrubber";
-import FluidBars from "../components/viz/FluidBars";
+import FluidBars, { type BarMarker } from "../components/viz/FluidBars";
+import { ROLE } from "../components/viz/roles";
 
 /**
- * Code Playground: el usuario escribe Python, pulsa Run, y la traza línea a
- * línea se convierte en una cinta de cuadros navegable.
+ * Heurística de punteros: locales con nombre de índice (i, j, min, mid…)
+ * cuyo valor entero cae dentro del array se muestran como marcadores
+ * sobre las casillas — las variables viven DENTRO de la visualización.
  */
+const INDEX_LIKE =
+  /^(i|j|k|l|r|m|left|right|mid|lo|hi|low|high|pos|idx|index|pivot|min|max|min_i|max_i|lo_i|hi_i)$/i;
+
+function markersFor(
+  locals: Record<string, string> | undefined,
+  len: number,
+): BarMarker[] {
+  if (!locals || len === 0) return [];
+  const out: BarMarker[] = [];
+  for (const [name, raw] of Object.entries(locals)) {
+    if (!INDEX_LIKE.test(name)) continue;
+    const v = Number.parseInt(String(raw), 10);
+    if (!Number.isInteger(v) || v < 0 || v >= len) continue;
+    out.push({ index: v, label: name, color: ROLE.key });
+  }
+  return out;
+}
+
 const DEFAULT_CODE = `def bubble_sort(a):
     n = len(a)
     for i in range(n):
@@ -34,6 +54,7 @@ export default function CodePlayground() {
   }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stdin, setStdin] = useState("");
   const [arrayVar, setArrayVar] = useState<string | null>(null);
   const arrayNames = useMemo(() => {
     const names = new Set<string>();
@@ -49,7 +70,7 @@ export default function CodePlayground() {
     setArrayVar(null);
     setLoading(true);
     try {
-      const traced = await runTraced(code);
+      const traced = await runTraced(code, 5000, stdin);
       setFrames(traced);
       if (traced.length > 0) {
         const firstArray = Object.keys(traced[0].arrays || {})[0];
@@ -90,6 +111,17 @@ export default function CodePlayground() {
             </button>
             {error && <p className="err">{error}</p>}
           </div>
+          <label className="field">
+            entrada (stdin)
+            <textarea
+              value={stdin}
+              onChange={(e) => setStdin(e.target.value)}
+              rows={3}
+              spellCheck={false}
+              className="code-src"
+              placeholder="Solo si tu código usa input(): una línea por cada llamada"
+            />
+          </label>
         </div>
       </section>
 
@@ -132,7 +164,12 @@ export default function CodePlayground() {
                 {arrKey && (
                   <div className="trace-arr">
                     <p className="narrate">{`${arrKey} = [${f.arrays[arrKey].join(", ")}]`}</p>
-                    <FluidBars curr={toViz(f)} next={toViz(next)} blend={blend} />
+                    <FluidBars
+                      curr={toViz(f)}
+                      next={toViz(next)}
+                      blend={blend}
+                      markers={markersFor(f.locals, f.arrays[arrKey].length)}
+                    />
                   </div>
                 )}
               </>

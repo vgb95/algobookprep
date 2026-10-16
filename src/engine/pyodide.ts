@@ -48,8 +48,15 @@ export async function initPyodide(): Promise<void> {
 export async function runTraced(
   code: string,
   maxSteps: number = 5000,
+  stdin: string = "",
 ): Promise<TraceFrame[]> {
   await initPyodide();
+
+  // Entrada estándar del programa: se fija en cada ejecución para que no
+  // queden restos entre runs. Vacío = EOF inmediato (input() lanza EOFError).
+  const chars = Array.from(stdin).map((c) => c.codePointAt(0) ?? 10);
+  let pos = 0;
+  pyodide.setStdin({ stdin: () => (pos < chars.length ? chars[pos++] : null) });
 
   const tracer = `
 import sys, json

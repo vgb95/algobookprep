@@ -4,6 +4,7 @@ import App from "./App";
 import "./styles/global.css";
 import "./styles/playback.css";
 import "./styles/motion.css";
+import "./styles/mobile.css";
 import { registerSW } from "virtual:pwa-register";
 
 registerSW({
