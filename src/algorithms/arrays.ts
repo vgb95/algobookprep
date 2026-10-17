@@ -1,128 +1,270 @@
 import type { FrameGenerator } from "../engine/timeline";
 
+/**
+ * Arrays — operaciones sobre memoria contigua.
+ *
+ * Cada celda lleva una identidad estable (id) y su slot actual, de modo
+ * que el reproductor pueda interpolar el DESPLAZAMIENTO entre cuadros:
+ * al insertar, las celdas se deslizan a la derecha y el hueco viaja hacia
+ * el índice; al borrar, colapsan a la izquierda y la última casilla se
+ * recorta. Sin saltos: movimiento continuo, estilo "cartas sobre papel".
+ */
+
+/* ————— Código Python canónico (Fase 2 lo reproduce línea a línea) ————— */
+
+export const LOOKUP_CODE = `def linear_search(a, target):
+    for i in range(len(a)):
+        if a[i] == target:
+            return i
+    return -1`;
+
+export const INSERT_CODE = `def insert_at(a, index, value):
+    if index >= len(a):
+        a.append(value)          # O(1) amortizado
+        return
+    a.append(None)               # hueco provisional al final
+    for j in range(len(a) - 1, index, -1):
+        a[j] = a[j - 1]
+    a[index] = value`;
+
+export const DELETE_CODE = `def delete_at(a, index):
+    for j in range(index, len(a) - 1):
+        a[j] = a[j + 1]
+    a.pop()
+    return a`;
+
+/* ————— Frames ————— */
+
+export interface ArrayCell {
+  /** Identidad estable de la celda (permite interpolar su movimiento). */
+  id: number;
+  value: number;
+  /** Posición actual (slot) en el array. */
+  slot: number;
+}
+
+export type CellStatus = "probe" | "cursor" | "shift" | "found";
+
 export interface ArrayFrame {
   message: string;
-  array: number[];
-  cursor?: number;
-  swap?: [number, number];
-  found?: number;
+  cells: ArrayCell[];
+  /** Estado visual por id de celda. */
+  status?: Record<string, CellStatus>;
+  /** Slot visible como hueco (vacío, punteado). */
+  hole?: number;
   probes: number;
   writes: number;
+  /** Fase 2: línea activa del código canónico, pausa extendida y variables. */
+  line?: number;
+  hold?: number;
+  vars?: Record<string, string | number>;
 }
 
 type ArrayGen = FrameGenerator<ArrayFrame>;
 
 export type ArrayOp = "lookup" | "insert" | "delete";
 
+export const arrayOps: Record<ArrayOp, { name: string; code: string }> = {
+  lookup: { name: "Búsqueda lineal", code: LOOKUP_CODE },
+  insert: { name: "Insertar en índice", code: INSERT_CODE },
+  delete: { name: "Borrar en índice", code: DELETE_CODE },
+};
+
+const st = (cells: ArrayCell[], kind: CellStatus): Record<string, CellStatus> =>
+  Object.fromEntries(cells.map((c) => [String(c.id), kind]));
+
+/* ————— Búsqueda por valor: O(n) ————— */
+
 export function* lookup(input: number[], target: number): ArrayGen {
   let probes = 0;
-  for (let i = 0; i < input.length; i++) {
-    probes++;
-    yield {
-      message: `Visitamos a[${i}] = ${input[i]}…`,
-      array: input.slice(),
-      cursor: i,
+  const cells: ArrayCell[] = input.map((v, i) => ({ id: i, value: v, slot: i }));
+
+  const frame = (
+    message: string,
+    line: number,
+    cursor: number | null,
+    found: boolean,
+    hold?: number,
+  ): ArrayFrame => {
+    const status: Record<string, CellStatus> = {};
+    for (let k = 0; k < (cursor ?? input.length); k++) status[String(k)] = "probe";
+    if (cursor !== null) status[String(cursor)] = found ? "found" : "cursor";
+    return {
+      message,
+      cells: cells.map((c) => ({ ...c })),
+      status,
       probes,
       writes: 0,
+      line,
+      hold,
+      vars: { i: cursor ?? "—", objetivo: target, lecturas: probes },
     };
+  };
+
+  for (let i = 0; i < cells.length; i++) {
+    probes++;
+    yield frame(`Visitamos a[${i}] = ${input[i]}…`, 2, i, false);
     if (input[i] === target) {
-      yield {
-        message: `¡Encontrado! a[${i}] = ${target}. Buscar por valor es O(n); solo el acceso por índice es O(1).`,
-        array: input.slice(),
-        found: i,
-        probes,
-        writes: 0,
-      };
+      yield frame(
+        `¡Encontrado! a[${i}] = ${target}. Buscar por valor es O(n); solo el acceso por índice es O(1).`,
+        3,
+        i,
+        true,
+        2.2,
+      );
       return;
     }
   }
-  yield {
-    message: `El ${target} no está en el array. linearSearch gastó ${probes} lecturas — eso es O(n).`,
-    array: input.slice(),
-    probes,
-    writes: 0,
-  };
+  yield frame(
+    `El ${target} no está: linear_search devolvería -1. ${probes} lecturas — eso es O(n).`,
+    5,
+    null,
+    false,
+    2,
+  );
 }
+
+/* ————— Inserción: hueco que viaja hacia el índice ————— */
 
 export function* insertAt(input: number[], index: number, value: number): ArrayGen {
   let probes = 0;
   let writes = 0;
+  const cells: ArrayCell[] = input.map((v, i) => ({ id: i, value: v, slot: i }));
+  let hole: number | undefined;
+  let nextId = input.length;
 
-  if (index >= input.length) {
-    const a = input.concat(value);
-    yield {
-      message: `Insertar al final es un append cuesta O(1) amortizado: ${value} entra en a[${index}].`,
-      array: a,
-      cursor: index,
+  const frame = (
+    message: string,
+    line: number,
+    moving: ArrayCell[] = [],
+    landed?: ArrayCell,
+    hold?: number,
+  ): ArrayFrame => {
+    const status = st(moving, "shift");
+    if (landed) status[String(landed.id)] = "found";
+    return {
+      message,
+      cells: cells.map((c) => ({ ...c })),
+      status,
+      hole,
       probes,
-      writes: 1,
+      writes,
+      line,
+      hold,
+      vars: { index, hueco: hole ?? "—", escrituras: writes },
     };
+  };
+
+  if (index >= cells.length) {
+    const slot = cells.length;
+    const fresh: ArrayCell = { id: nextId++, value, slot };
+    cells.push(fresh);
+    writes++;
+    yield frame(
+      `Insertar al final es un append: cuesta O(1) amortizado. ${value} entra en a[${slot}].`,
+      3,
+      [],
+      fresh,
+      2,
+    );
     return;
   }
 
-  const a = input.concat(0); // hueco temporal al final
-  yield {
-    message: `Para insertar ${value} en a[${index}] hay que hacer hueco: desplazamos hacia la derecha desde el final.`,
-    array: a.slice(),
-    cursor: a.length - 1,
-    probes,
-    writes,
-  };
-  for (let j = a.length - 1; j > index; j--) {
-    a[j] = a[j - 1];
+  // 1) Agrandamos el array en 1: el hueco provisional nace al final.
+  hole = cells.length;
+  yield frame(
+    `Para insertar ${value} en a[${index}] hay que hacer hueco: desplazamos hacia la derecha desde el final.`,
+    5,
+  );
+
+  // 2) Las celdas se deslizan una a una; el hueco viaja hacia index.
+  while (hole !== undefined && hole > index) {
+    const h: number = hole;
+    const moved = cells.find((c) => c.slot === h - 1)!;
+    moved.slot = h;
     probes++;
     writes++;
-    yield {
-      message: `Desplazamos ${a[j]} (a[${j - 1}]) a la casilla ${j}.`,
-      array: a.slice(),
-      swap: [j - 1, j],
-      cursor: j,
-      probes,
-      writes,
-    };
+    hole = h - 1;
+    yield frame(`Desplazamos ${moved.value} (a[${h - 1}]) a la casilla ${h}.`, 7, [moved]);
   }
-  a[index] = value;
+
+  // 3) La nueva celda entra en el hueco.
+  const fresh: ArrayCell = { id: nextId++, value, slot: index };
+  cells.push(fresh);
   writes++;
-  yield {
-    message: `Colocamos ${value} en a[${index}]. El array mide ahora ${a.length} — hacer hueco costó O(n).`,
-    array: a,
-    cursor: index,
-    probes,
-    writes,
-  };
+  hole = undefined;
+  yield frame(
+    `Colocamos ${value} en a[${index}]. El array mide ahora ${cells.length} — hacer hueco costó O(n).`,
+    8,
+    [],
+    fresh,
+    1.8,
+  );
 }
 
+/* ————— Borrado: colapso hacia la izquierda ————— */
+
 export function* deleteAt(input: number[], index: number): ArrayGen {
-  const a = input.slice();
-  const removed = a[index];
   let probes = 0;
   let writes = 0;
+  const cells: ArrayCell[] = input.map((v, i) => ({ id: i, value: v, slot: i }));
+  let hole: number | undefined;
 
-  yield {
-    message: `Vamos a borrar a[${index}] = ${removed}. Los elementos posteriores caen una casilla a la izquierda.`,
-    array: a.slice(),
-    cursor: index,
-    probes,
-    writes,
-  };
-  for (let j = index; j < a.length - 1; j++) {
-    a[j] = a[j + 1];
-    probes++;
-    writes++;
-    yield {
-      message: `${a[j]} (a[${j + 1}]) pasa a la casilla ${j}.`,
-      array: a.slice(),
-      swap: [j, j + 1],
-      cursor: j,
+  const frame = (
+    message: string,
+    line: number,
+    moving: ArrayCell[] = [],
+    leaving?: ArrayCell,
+    hold?: number,
+  ): ArrayFrame => {
+    const status = st(moving, "shift");
+    if (leaving) status[String(leaving.id)] = "cursor";
+    return {
+      message,
+      cells: cells.map((c) => ({ ...c })),
+      status,
+      hole,
       probes,
       writes,
+      line,
+      hold,
+      vars: { index, hueco: hole ?? "—", escrituras: writes },
     };
-  }
-  a.pop();
-  yield {
-    message: `Recortamos la última casilla: el array mide ahora ${a.length}. Borrar en medio cuesta O(n).`,
-    array: a,
-    probes,
-    writes,
   };
+
+  const leaving = cells[index];
+  yield frame(
+    `Vamos a borrar a[${index}] = ${leaving.value}. Los elementos posteriores caen una casilla a la izquierda.`,
+    1,
+    [],
+    leaving,
+    1.2,
+  );
+
+  // 1) La celda se extrae: queda un hueco en index.
+  hole = index;
+  cells.splice(cells.indexOf(leaving), 1);
+  yield frame(`${leaving.value} sale del array: queda un hueco en a[${index}].`, 4);
+
+  // 2) Las celdas de la derecha colapsan una a una hacia la izquierda.
+  while (hole !== undefined && hole < cells.length) {
+    const h: number = hole;
+    const moved = cells.find((c) => c.slot === h + 1);
+    if (!moved) break;
+    moved.slot = h;
+    probes++;
+    writes++;
+    hole = h + 1;
+    yield frame(`${moved.value} (a[${h + 1}]) pasa a la casilla ${h}.`, 2, [moved]);
+  }
+
+  // 3) Se recorta la última casilla.
+  hole = undefined;
+  yield frame(
+    `Recortamos la última casilla: el array mide ahora ${cells.length}. Borrar en medio cuesta O(n).`,
+    4,
+    [],
+    undefined,
+    1.8,
+  );
 }

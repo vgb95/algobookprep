@@ -1,7 +1,11 @@
 /**
  * VizPlayer — reproduce cualquier visualización a partir de configuración.
- * Recibe { type, config } y renderiza el scrubber correspondiente con los
- * frames generados por el algoritmo indicado.
+ * Recibe { type, config }, genera la cinta de cuadros con el algoritmo
+ * indicado y la reproduce con FluidScrubber.
+ *
+ * Regla de hooks: la cinta se memoiza UNA vez al inicio (todos los hooks
+ * se ejecutan en cada render, sin returns tempranos); el tipo solo decide
+ * el renderizado y los badges.
  */
 import { useMemo } from "react";
 import { record } from "../../engine/timeline";
@@ -10,175 +14,148 @@ import FluidBars from "./FluidBars";
 import FluidTree from "./FluidTree";
 import FluidGraph from "./FluidGraph";
 import HeapViz from "./HeapViz";
+import ArrayCells from "./ArrayCells";
 import { sorters, type SortId } from "../../algorithms/sorting";
 import { treeOrders, type TreeOrder } from "../../algorithms/binary-tree";
 import { graphAlgos, type GraphAlgo } from "../../algorithms/graph";
 import { heapOps, type HeapOp } from "../../algorithms/heap";
 import { lookup, insertAt, deleteAt } from "../../algorithms/arrays";
-import { parseArray } from "../../utils/parse";
+import { parseArray, clampInt } from "../../utils/parse";
 
 export interface VizPlayerProps {
   type: "sorting" | "tree" | "graph" | "heap" | "array";
   config: Record<string, string | number>;
 }
 
-export default function VizPlayer({ type, config }: VizPlayerProps) {
-  // --- Sorting ---
+/* ————— construcción de la cinta (fuera del componente: sin hooks) ————— */
+
+function buildTape(
+  type: VizPlayerProps["type"],
+  config: Record<string, string | number>,
+): any[] {
+  const raw = String(config.array ?? "");
+  const parsed = parseArray(raw);
+
   if (type === "sorting") {
+    if (!parsed) return [];
     const algo = (config.algo as SortId) ?? "bubble";
-    const raw = String(config.array ?? "7, 3, 9, 1, 5");
-    const parsed = parseArray(raw);
-    const frames = useMemo(
-      () => (parsed ? record(sorters[algo].run(parsed)) : []),
-      [parsed, algo],
-    );
-    return (
-      <div>
-        <FluidScrubber
-          frames={frames}
-          render={(f, blend, next, index) => (
-            <>
-              <p className="narrate" key={index}>{f.message}</p>
-              <FluidBars curr={f} next={next} blend={blend} />
-              <div className="meta">
-                <span className="badge">comparaciones: {f.comparisons}</span>
-                <span className="badge">escrituras: {f.writes}</span>
-              </div>
-            </>
-          )}
-        />
-      </div>
-    );
+    if (!(algo in sorters)) return [];
+    return record(sorters[algo].run(parsed));
   }
 
-  // --- Array operations ---
   if (type === "array") {
-    const op = (config.op as "lookup" | "insert" | "delete") ?? "lookup";
-    const raw = String(config.array ?? "4, 1, 7, 3, 9, 2");
-    const parsed = parseArray(raw);
-    let frames: any[] = [];
-    if (parsed) {
-      if (op === "lookup") {
-        frames = record(lookup(parsed, Number(config.target ?? 7)));
-      } else if (op === "insert") {
-        frames = record(insertAt(parsed, Number(config.index ?? 2), Number(config.value ?? 5)));
-      } else {
-        frames = record(deleteAt(parsed, Number(config.index ?? 2)));
-      }
+    if (!parsed) return [];
+    const op = (config.op as string) ?? "lookup";
+    if (op === "lookup") {
+      return record(lookup(parsed, clampInt(String(config.target ?? "7"), 1, 99, 7)));
     }
-    return (
-      <div>
-        <FluidScrubber
-          frames={frames}
-          render={(f: any, blend: number, next: any, index: number) => (
-            <>
-              <p className="narrate" key={index}>{f.message}</p>
-              <FluidBars curr={f} next={next} blend={blend} />
-              <div className="meta">
-                <span className="badge">lecturas: {f.probes}</span>
-                <span className="badge">escrituras: {f.writes}</span>
-              </div>
-            </>
-          )}
-        />
-      </div>
-    );
+    if (op === "insert") {
+      return record(
+        insertAt(
+          parsed,
+          clampInt(String(config.index ?? "2"), 0, parsed.length, 0),
+          clampInt(String(config.value ?? "5"), 1, 99, 5),
+        ),
+      );
+    }
+    if (op === "delete") {
+      return record(
+        deleteAt(parsed, clampInt(String(config.index ?? "2"), 0, Math.max(parsed.length - 1, 0), 0)),
+      );
+    }
+    return [];
   }
 
-  // --- Trees ---
   if (type === "tree") {
-    const order = (config.order as TreeOrder) ?? "inorder";
-    const raw = String(config.array ?? "8, 3, 10, 1, 6, 14, 4, 7, 13");
-    const parsed = parseArray(raw);
-    const frames = useMemo(
-      () => (parsed ? record(treeOrders[order].run(parsed)) : []),
-      [parsed, order],
-    );
-    return (
-      <div>
-        <FluidScrubber
-          frames={frames}
-          render={(f, _blend, _next, index) => (
-            <>
-              <p className="narrate" key={index}>{f.message}</p>
-              <FluidTree frame={f} />
-              <div className="meta">
-                <span className="badge">orden: {f.order.join(", ")}</span>
-                <span className="badge">
-                  visitados: {f.nodes.filter((n: any) => n.visited).length} /{" "}
-                  {f.nodes.length}
-                </span>
-              </div>
-            </>
-          )}
-        />
-      </div>
-    );
+    if (!parsed) return [];
+    const orderRaw = String(config.order ?? "inorder");
+    const order = (["inorder", "preorder", "postorder"].includes(orderRaw) ? orderRaw : "inorder") as TreeOrder;
+    return record(treeOrders[order].run(parsed));
   }
 
-  // --- Graphs ---
   if (type === "graph") {
     const algo = (config.algo as GraphAlgo) ?? "bfs";
-    const n = Number(config.n ?? 7);
-    const start = Number(config.start ?? 0);
+    if (!(algo in graphAlgos)) return [];
+    const n = clampInt(String(config.n ?? "7"), 2, 12, 7);
+    const start = clampInt(String(config.start ?? "0"), 0, n - 1, 0);
     const edges: [number, number][] = [];
     for (let i = 0; i < n; i++) {
       if (i + 1 < n) edges.push([i, i + 1]);
       if (i + 2 < n) edges.push([i, i + 2]);
     }
-    const frames = useMemo(() => record(graphAlgos[algo].run(n, edges, start)), [
-      algo,
-      n,
-      start,
-    ]);
-    return (
-      <div>
-        <FluidScrubber
-          frames={frames}
-          render={(f, blend, next, index) => (
-            <>
-              <p className="narrate" key={index}>{f.message}</p>
-              <FluidGraph curr={f} next={next} blend={blend} />
-              <div className="meta">
-                <span className="badge">
-                  cola/pila: [{f.queueOrStack.join(", ")}]
-                </span>
-                <span className="badge">visita: {f.visitedOrder.join(", ")}</span>
-              </div>
-            </>
-          )}
-        />
-      </div>
-    );
+    return record(graphAlgos[algo].run(n, edges, start));
   }
 
-  // --- Heaps ---
   if (type === "heap") {
+    if (!parsed) return [];
     const op = (config.op as HeapOp) ?? "insert";
-    const raw = String(config.array ?? "10, 7, 9, 5, 6, 3, 8");
-    const parsed = parseArray(raw);
-    const value = Number(config.value ?? 4);
-    const frames = useMemo(
-      () => (parsed ? record(heapOps[op].run(parsed, value)) : []),
-      [parsed, op, value],
-    );
-    return (
-      <div>
-        <FluidScrubber
-          frames={frames}
-          render={(f: any, _blend: number, _next: any, index: number) => (
-            <>
-              <p className="narrate" key={index}>{f.message}</p>
-              <HeapViz frame={f} />
-              <div className="meta">
-                <span className="badge">montículo: [{f.heap.join(", ")}]</span>
-              </div>
-            </>
-          )}
-        />
-      </div>
-    );
+    if (!(op in heapOps)) return [];
+    const value = clampInt(String(config.value ?? "4"), 1, 99, 4);
+    return record(heapOps[op].run(parsed, value));
   }
 
-  return <div className="viz-placeholder">Tipo de visualización no soportado.</div>;
+  return [];
+}
+
+/* ————— badges por tipo ————— */
+
+function metrics(type: VizPlayerProps["type"], f: any) {
+  switch (type) {
+    case "sorting":
+      return (
+        <>
+          <span className="badge">comparaciones: {f.comparisons}</span>
+          <span className="badge">escrituras: {f.writes}</span>
+        </>
+      );
+    case "array":
+      return (
+        <>
+          <span className="badge">lecturas: {f.probes}</span>
+          <span className="badge">escrituras: {f.writes}</span>
+        </>
+      );
+    case "tree":
+      return (
+        <>
+          <span className="badge">orden: {f.order.join(", ")}</span>
+          <span className="badge">
+            visitados: {f.nodes.filter((n: any) => n.visited).length} / {f.nodes.length}
+          </span>
+        </>
+      );
+    case "graph":
+      return (
+        <>
+          <span className="badge">cola/pila: [{f.queueOrStack.join(", ")}]</span>
+          <span className="badge">visita: {f.visitedOrder.join(", ")}</span>
+        </>
+      );
+    case "heap":
+      return <span className="badge">montículo: [{f.heap.join(", ")}]</span>;
+  }
+}
+
+export default function VizPlayer({ type, config }: VizPlayerProps) {
+  const cfgKey = JSON.stringify(config);
+  const frames = useMemo(() => buildTape(type, config), [type, cfgKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div>
+      <FluidScrubber
+        frames={frames}
+        render={(f: any, blend: number, next: any) => (
+          <>
+            <p className="narrate">{f.message}</p>
+            {type === "sorting" && <FluidBars curr={f} next={next} blend={blend} />}
+            {type === "array" && <ArrayCells curr={f} next={next} blend={blend} />}
+            {type === "tree" && <FluidTree frame={f} />}
+            {type === "graph" && <FluidGraph curr={f} next={next} blend={blend} />}
+            {type === "heap" && <HeapViz frame={f} />}
+            <div className="meta">{metrics(type, f)}</div>
+          </>
+        )}
+      />
+    </div>
+  );
 }

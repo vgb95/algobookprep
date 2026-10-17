@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { record } from "../engine/timeline";
 import { lookup, insertAt, deleteAt, type ArrayOp } from "../algorithms/arrays";
 import FluidScrubber from "../components/viz/FluidScrubber";
-import FluidBars from "../components/viz/FluidBars";
+import ArrayCells from "../components/viz/ArrayCells";
 import { parseArray, clampInt, randomArray } from "../utils/parse";
 
 const OP_HINTS: Record<ArrayOp, string> = {
@@ -90,7 +90,7 @@ export default function ArraysPlayground() {
             render={(f, blend, next, index) => (
               <>
                 <p className="narrate" key={index}>{f.message}</p>
-                <FluidBars curr={f} next={next} blend={blend} />
+                <ArrayCells curr={f} next={next} blend={blend} />
                 <div className="metrics">
                   <span className="badge">lecturas: {f.probes}</span>
                   <span className="badge">escrituras: {f.writes}</span>
