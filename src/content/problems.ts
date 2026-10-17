@@ -883,4 +883,643 @@ _target = find_duplicate`,
       { name: "todo igual (oculto)", args: [[2, 2, 2, 2, 2]], expected: 2, hidden: true },
     ],
   },
+  {
+    id: "valid-parentheses",
+    chapter: "stacks",
+    title: "¿Paréntesis válidos?",
+    difficulty: "fácil",
+    blurb: "Una cadena únicamente con ()[]{} ¿está balanceada: cada cierre casa con el abierto más reciente y su mismo tipo? Es el ejemplo resuelto del cap. 9 en forma de problema.",
+    setupCode: `def valid_parentheses(s):
+    """True si la cadena está balanceada."""
+    pass
+
+_target = valid_parentheses`,
+    starterCode: `def valid_parentheses(s):
+    # TODO: la pila del cap. 9 resuelve esto sola
+    pass`,
+    solutionCode: `def valid_parentheses(s):
+    pares = {")": "(", "]": "[", "}": "{"}
+    pila = []
+    for ch in s:
+        if ch in "([{":
+            pila.append(ch)
+        else:
+            if not pila or pila[-1] != pares[ch]:
+                return False
+            pila.pop()
+    return not pila`,
+    explanation:
+      "Abre → push. Cierra → pop y comparar. Y la comprobación FINAL: la pila debe quedar VACÍA (el caso «(» sin cerrar es el que se olvida). O(n) — cada carácter entra y sale de la pila como mucho una vez.",
+    tradeoff:
+      "Contar APERTURAS menos CIERRES falla con «([)]»: los contadores netos cuadran pero el ORDEN rompe — solo la pila recuerda cuál abierto espera su cierre. Es la diferencia entre saber «cuántos deben» y saber «quién debe»: la pila conserva el quién.",
+    hints: [
+      "Un dict {cierre: apertura} te descuenta el «debe casar el tipo».",
+      "Cierre con pila vacía o tope distinto → False inmediato.",
+      "Devuelve not pila: los abiertos sobrantes también invalidan.",
+    ],
+    tests: [
+      { name: "simple", args: ["()"], expected: true },
+      { name: "anidado (el cap. 9)", args: ["([{}])"], expected: true },
+      { name: "intercalado inválido", args: ["([)]"], expected: false },
+      { name: "abierto sin cerrar (oculto)", args: ["("], expected: false, hidden: true },
+    ],
+  },
+  {
+    id: "next-greater",
+    chapter: "stacks",
+    title: "El siguiente mayor a la derecha",
+    difficulty: "medio",
+    blurb: "Para cada elemento devuelve el PRIMER valor mayor que aparece a su derecha; si no existe, −1. Con pila monótona: O(n) frente al O(n²) ingenuo.",
+    setupCode: `def next_greater(nums):
+    """Lista: primer mayor a la derecha de cada elemento, o -1."""
+    pass
+
+_target = next_greater`,
+    starterCode: `def next_greater(nums):
+    # TODO: pila monótona de índices
+    pass`,
+    solutionCode: `def next_greater(nums):
+    out = [-1] * len(nums)
+    pila = []
+    for i, x in enumerate(nums):
+        while pila and nums[pila[-1]] < x:
+            out[pila.pop()] = x
+        pila.append(i)
+    return out`,
+    explanation:
+      "La pila guarda índices con valores aún SIN respuesta, en orden decreciente. Cuando llega un x mayor, resuelve de golpe TANTOS pendientes como supere: cada índice entra una vez y sale una vez → O(n). Es la pila del cap. 9 trabajando a la inversa: recuerda lo que espera una respuesta futura.",
+    tradeoff:
+      "El doble bucle es O(n²) — con n = 10⁵ son 10¹⁰ comparaciones: inviable; la pila monótona es O(n). Lo dificultoso no es el código (8 líneas) sino VER que los elementos de la pila comparten la condición «espero un mayor»: cuando la vista la detecta, media familia de problemas se vuelve pila.",
+    hints: [
+      "Guarda ÍNDICES, no valores: la respuesta va por posición.",
+      "Un x más grande despacha (pop) a todos los índices con valor menor que x.",
+      "Los que sobreviven sin despacharse se quedan con -1 (el array ya nace relleno).",
+    ],
+    tests: [
+      { name: "clásico", args: [[1, 3, 2, 4]], expected: [3, 4, 4, -1] },
+      { name: "ordena descendente", args: [[4, 3, 2, 1]], expected: [-1, -1, -1, -1] },
+      { name: "un solo elemento", args: [[1]], expected: [-1] },
+      { name: "ascendente (oculto)", args: [[1, 2, 3, 4]], expected: [2, 3, 4, -1], hidden: true },
+    ],
+  },
+  {
+    id: "evaluate-postfix",
+    chapter: "stacks",
+    title: "Evaluar expresión postfix",
+    difficulty: "medio",
+    blurb: "Tokens de una expresión en notación postfix (RPN), p. ej. [2, 1, +, 3, *] = 9. Devuelve el valor. La división es entera.",
+    setupCode: `def evaluate_postfix(tokens):
+    """Evalúa una lista de tokens postfix y devuelve el entero."""
+    pass
+
+_target = evaluate_postfix`,
+    starterCode: `def evaluate_postfix(tokens):
+    # TODO: operandos → pila; operador → pop pop push
+    pass`,
+    solutionCode: `def evaluate_postfix(tokens):
+    pila = []
+    for t in tokens:
+        if t in "+-*/":
+            b = pila.pop()
+            a = pila.pop()
+            if t == "+":
+                pila.append(a + b)
+            if t == "-":
+                pila.append(a - b)
+            if t == "*":
+                pila.append(a * b)
+            if t == "/":
+                pila.append(a // b)
+        else:
+            pila.append(int(t))
+    return pila[0]`,
+    explanation:
+      "Postfix no necesita paréntesis ni precedencia: el ORDEN de los tokens es la precedencia. Al ver un operador, los dos operandos son los DOS últimos que entraron: pop(pop) en orden b-luego-a (la resta y la división NO son conmutativas: el orden del pop decide si dice 5−3 o 3−5).",
+    tradeoff:
+      "Infix (la notación que escribe la gente) exige precedencia y paréntesis: los parsers shunting-yard construyen postfix… con LA MISMA PILA de este problema. La evaluación aquí es O(n) y sin estados ocultos; la recursión directa sobre un árbol de expresiones también funciona — esta pila es la versión plana de esa recursión.",
+    hints: [
+      "Operando → push. Operador → pop DOS operandos y push el resultado.",
+      "El PRIMER pop es el operando derecho: cuidado con − y /.",
+      "Al final queda exactamente un valor en la pila.",
+    ],
+    tests: [
+      { name: "dos operadores", args: [["2", "1", "+", "3", "*"]], expected: 9 },
+      { name: "división entera", args: [["4", "13", "5", "/"]], expected: 4 },
+      { name: "resta no conmutativa", args: [["5", "3", "-"]], expected: 2 },
+      { name: "un solo operador (oculto)", args: [["10", "2", "/"]], expected: 5, hidden: true },
+    ],
+  },
+  {
+    id: "sliding-window-max",
+    chapter: "queues",
+    title: "Máximo de cada ventana",
+    difficulty: "difícil",
+    blurb: "Ventana de tamaño k que avanza una posición por paso: devuelve el máximo de cada ventana. Con una deque monótona: O(n) frente al O(n·k) ingenuo.",
+    setupCode: `def sliding_window_max(nums, k):
+    """Lista con el máximo de cada ventana de k elementos."""
+    pass
+
+_target = sliding_window_max`,
+    starterCode: `def sliding_window_max(nums, k):
+    # TODO: deque de índices con candidatos a máximo
+    pass`,
+    solutionCode: `def sliding_window_max(nums, k):
+    from collections import deque
+    dq = deque()
+    out = []
+    for i, x in enumerate(nums):
+        while dq and nums[dq[-1]] <= x:
+            dq.pop()
+        dq.append(i)
+        if dq[0] <= i - k:
+            dq.popleft()
+        if i >= k - 1:
+            out.append(nums[dq[0]])
+    return out`,
+    explanation:
+      "La deque guarda ÍNDICES con valores en orden DECRECIENTE: el frente es el máximo de la ventana. Un x nuevo expulsa por la cola a los menores-iguales (nunca podrán ser máximos: x es más joven y más grande) y el frente se comprueba caducado (fuera de la ventana). Cada índice entra y sale una vez → O(n).",
+    tradeoff:
+      "Un heap maximiza rápido pero la CADUCIDAD exige expulsiones perezosas (lazy); el reescaneo de cada ventana es O(n·k). La deque es la tercera herramienta de mantenimiento de candidatos (tras la pila del cap. 9 y el heap): la diferencia pila/deque es que aquí el máximo caduca por la IZQUIERDA — y un deque se puede avanzar por ambos extremos.",
+    hints: [
+      "Guarda índices (para poder decidir la caducidad) y sus valores van decreciendo.",
+      "x expulsa por el LADO DE ATRÁS a todo menor o igual; el frente caducado sale por el otro extremo.",
+      "Escribe la respuesta cuando la ventana está completa (i >= k - 1).",
+    ],
+    tests: [
+      { name: "clásico", args: [[1, 3, -1, -3, 5, 3, 6, 7], 3], expected: [3, 3, 5, 5, 6, 7] },
+      { name: "k = 1", args: [[1], 1], expected: [1] },
+      { name: "k = 2", args: [[9, 10, 9, -7, -4, 8, 7, -6], 2], expected: [10, 10, 9, -4, 8, 8, 7] },
+      { name: "ventana completa (oculto)", args: [[1, 3, 1, 2, 0, 5], 3], expected: [3, 3, 2, 5], hidden: true },
+    ],
+  },
+  {
+    id: "interleave-queue",
+    chapter: "queues",
+    title: "Entrelazar la cola",
+    difficulty: "fácil",
+    blurb: "La cola (array de longitud PAR, siempre) se divide a la mitad: devuelve primero el 1º de la primera mitad, el 1º de la segunda, el 2º con el 2º… como un shuffle de dos mitades.",
+    setupCode: `def interleave_queue(q):
+    """Entrelaza las dos mitades: [a1..an, b1..bn] → [a1, b1, a2, b2…]."""
+    pass
+
+_target = interleave_queue`,
+    starterCode: `def interleave_queue(q):
+    # TODO: parte el array y entrelaza
+    pass`,
+    solutionCode: `def interleave_queue(q):
+    mitad = len(q) // 2
+    a = q[:mitad]
+    b = q[mitad:]
+    return [x for par in zip(a, b) for x in par]`,
+    explanation:
+      "Partir a la mitad y entrelazar — literalmente lo que pasa cuando dos filas se fusionan alternando turnos. zip con el patrón [x for par in zip(...) for x in par] aplana el emparejamiento en una sola lista.",
+    tradeoff:
+      "En una cola REAL (solo dequeue/enqueue, sin acceso por índice) el entrelazado exige sacar la primera mitad a una cola auxiliar y volver a fusionarlas alternando — O(n) igual, pero la mitad extra de memoria. Con arrays, el slicing lo hace sin cola auxiliar: el acceso por índice ES el superpoder del cap. 2.",
+    hints: [
+      "mitad = len(q) // 2 (longitud siempre par).",
+      "zip(a, b) produce pares (a1, b1), (a2, b2)…",
+      "El patrón de doble for aplana los pares en una lista única.",
+    ],
+    tests: [
+      { name: "seis elementos", args: [[1, 2, 3, 4, 5, 6]], expected: [1, 4, 2, 5, 3, 6] },
+      { name: "cuatro", args: [[10, 20, 30, 40]], expected: [10, 30, 20, 40] },
+      { name: "dos", args: [[1, 2]], expected: [1, 2] },
+      { name: "otro par (oculto)", args: [[1, 2, 3, 4]], expected: [1, 3, 2, 4], hidden: true },
+    ],
+  },
+  {
+    id: "fib-fast",
+    chapter: "recursion",
+    title: "Fibonacci sin recálculo",
+    difficulty: "fácil",
+    blurb: "fib(0) = 0, fib(1) = 1, fib(n) = fib(n−1) + fib(n−2). Los tests llegan hasta n = 50: la recursión ingenua del cap. 11 NO los sobreviviría — memoiza o itera.",
+    setupCode: `def fib(n):
+    """n-ésimo Fibonacci (fib(0)=0, fib(1)=1)."""
+    pass
+
+_target = fib`,
+    starterCode: `def fib(n):
+    # TODO: NO lo hagas con la recursión ingenua: memoiza o avanza con dos variables
+    pass`,
+    solutionCode: `def fib(n):
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a`,
+    explanation:
+      "Dos variables que avanzan juntos: en cada iteración (a, b) → (b, a + b). O(n) tiempo, O(1) espacio — y Python lo escribe sin índices: la asignación simultánea de la tupla es la firma del lenguaje. La memoización top-down llega al mismo coste a cambio de O(n) de caché (cap. 12).",
+    tradeoff:
+      "La recursión ingenua cuesta O(φⁿ): con n = 50 son ~12.000 millones de llamadas, ni Pyodide soporta eso. La iteración con dos variables es O(n) tiempo, O(1) espacio; si n escala a millones queda la matriz de potencias en O(log n) — pero para entrevistas, las dos variables son la respuesta limpia.",
+    hints: [
+      "Guarda SOLO los dos últimos: (a, b) y avanza.",
+      "a, b = b, a + b — la asignación simultánea evita una variable temporal.",
+      "fib(0) = 0: el bucle no gira ni una vez.",
+    ],
+    tests: [
+      { name: "base", args: [0], expected: 0 },
+      { name: "uno", args: [1], expected: 1 },
+      { name: "n = 10", args: [10], expected: 55 },
+      { name: "n = 50 (oculto)", args: [50], expected: 12586269025, hidden: true },
+    ],
+  },
+  {
+    id: "power-int",
+    chapter: "recursion",
+    title: "Potencia con exponente entero",
+    difficulty: "medio",
+    blurb: "base^exp con exp ≥ 0 SIN usar el operador ** (ni pow). Con base entera y exp entero: 2^10 = 1024. Bonus didáctico: la versión por cuadrados es O(log exp).",
+    setupCode: `def power(base, exp):
+    """base elevado a exp, exp >= 0, sin ** ni pow()."""
+    pass
+
+_target = power`,
+    starterCode: `def power(base, exp):
+    # TODO: multiplicar en cuadrados lo hace logarítmico
+    pass`,
+    solutionCode: `def power(base, exp):
+    resultado = 1
+    while exp > 0:
+        if exp % 2 == 1:
+            resultado *= base
+        base *= base
+        exp //= 2
+    return resultado`,
+    explanation:
+      "Exponenciación por cuadrados: exp en binario — cada bit que vale 1 añade una multiplicación al resultado; la base se cuadra a cada paso. 8 bits en lugar de 256 vueltas: O(log exp) multiplicaciones. Es «divide y vencerás» sobre el OPERADOR, no sobre el número.",
+    tradeoff:
+      "El bucle lineal (multiplicar exp veces) es O(exp) multiplicaciones y suficiente para tests pequeños — pero con exp = 10⁹ explota. La recursión doble (power(b, e/2)²) consigue el mismo O(log exp) y es más natural de leer; el while es la versión iterativa del mismo truco (los bits del exponente, del más bajo al más alto).",
+    hints: [
+      "Observa la expansión binaria del exponente: 13 = 1101 → b · b² · b⁸.",
+      "En cada paso: si exp es impar, multiplica el resultado; luego base *= base y exp //= 2.",
+      "exp = 0 → devuelve 1 (el while no entra).",
+    ],
+    tests: [
+      { name: "2^10", args: [2, 10], expected: 1024 },
+      { name: "base negativa", args: [-2, 3], expected: -8 },
+      { name: "exp cero", args: [5, 0], expected: 1 },
+      { name: "casi 2^62 (oculto)", args: [2, 62], expected: 4611686018427387904, hidden: true },
+    ],
+  },
+  {
+    id: "digital-root",
+    chapter: "recursion",
+    title: "Raíz digital",
+    difficulty: "fácil",
+    blurb: "Suma los dígitos de n; si el resultado tiene más de un dígito, repite. 9875 → 29 → 11 → 2. La recursión del cap. 11 en su versión mini.",
+    setupCode: `def digital_root(n):
+    """Suma los dígitos de n recursivamente hasta un solo dígito."""
+    pass
+
+_target = digital_root`,
+    starterCode: `def digital_root(n):
+    # TODO: base + llamada a sí misma con el problema más pequeño
+    pass`,
+    solutionCode: `def digital_root(n):
+    if n < 10:
+        return n
+    return digital_root(sum(int(c) for c in str(n)))`,
+    explanation:
+      "Caso base (n < 10) + caso recursivo (un problema claramente más pequeño: los dígitos de n suman menos que n para n > 9). Cada llamada es uno de los cuadros del árbol — aquí el árbol degenera en una cadena: la recursión de cola del cap. 11 (que Python no optimiza: con n de millones de dígitos sería un bucle, pero para números normales la profundidad es ~4).",
+    tradeoff:
+      "La fórmula cerrada existe: 1 + (n − 1) % 9 (con n > 0) — O(1) sin bucles, y es un buen «¿lo sabías?» de entrevista. La recursión educa EL PATRÓN general (base + reducción); la fórmula solo existe porque este problema tiene estructura modular — la mayoría de recursiones bonitas no la tienen.",
+    hints: [
+      "Caso base: un solo dígito (n < 10) se devuelve tal cual.",
+      "Paso recursivo: digital_root(suma_de_dígitos(n)).",
+      "sum(int(c) for c in str(n)) suma los dígitos de golpe.",
+    ],
+    tests: [
+      { name: "9875", args: [9875], expected: 2 },
+      { name: "cero", args: [0], expected: 0 },
+      { name: "un dígito", args: [9], expected: 9 },
+      { name: "solo unos (oculto)", args: [1000001], expected: 2, hidden: true },
+    ],
+  },
+  {
+    id: "climb-stairs",
+    chapter: "dynamic-programming",
+    title: "Subir la escalera",
+    difficulty: "fácil",
+    blurb: "Subes una escalera de n escalones dando pasos de 1 o 2. ¿De cuántas maneras distintas? Es Fibonacci disfrazado de DP.",
+    setupCode: `def climb_stairs(n):
+    """Nº de formas de subir n escalones con pasos de 1 o 2."""
+    pass
+
+_target = climb_stairs`,
+    starterCode: `def climb_stairs(n):
+    # TODO: la recurrencia es formas(n) = formas(n-1) + formas(n-2)
+    pass`,
+    solutionCode: `def climb_stairs(n):
+    a, b = 1, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a`,
+    explanation:
+      "El último salto fue de 1 (quedan n−1) o de 2 (quedan n−2): formas(n) = formas(n−1) + formas(n−2) con bases formas(0) = formas(1) = 1. Es la recurrencia de Fibonacci con las bases desplazadas: O(n) tiempo, O(1) espacio. El primer caso real de DP bottom-up del cap. 12.",
+    tradeoff:
+      "La recursión ingenua sería O(φⁿ): subproblemas solapados — la firma que exige DP. La tabla completa (array de n+1) es la forma explícita; las dos variables es la ventana de rodar del cap. 12 (solo mira los dos últimos). Espacio O(1) vs O(n) — gana la ventana si el problema no necesita consultar estados remotos.",
+    hints: [
+      "Piensa en el ÚLTIMO paso: ¿de 1 o de 2 escalones?",
+      "formas(n) = formas(n-1) + formas(n-2) con formas(0) = formas(1) = 1.",
+      "Con dos variables (a, b) avanzando, ni siquiera necesitas un array.",
+    ],
+    tests: [
+      { name: "dos escalones", args: [2], expected: 2 },
+      { name: "tres", args: [3], expected: 3 },
+      { name: "cinco", args: [5], expected: 8 },
+      { name: "n = 10 (oculto)", args: [10], expected: 89, hidden: true },
+    ],
+  },
+  {
+    id: "coin-change-min",
+    chapter: "dynamic-programming",
+    title: "Cambio mínimo de monedas",
+    difficulty: "medio",
+    blurb: "Monedas de valores dados (usables sin límite) y un total: ¿el mínimo número de monedas para pagar exactamente? Imposible → −1.",
+    setupCode: `def coin_change_min(coins, amount):
+    """Mínimo nº de monedas para amount; -1 si imposible."""
+    pass
+
+_target = coin_change_min`,
+    starterCode: `def coin_change_min(coins, amount):
+    # TODO: dp[t] = mínimo de monedas para pagar t
+    pass`,
+    solutionCode: `def coin_change_min(coins, amount):
+    INF = float("inf")
+    dp = [INF] * (amount + 1)
+    dp[0] = 0
+    for t in range(1, amount + 1):
+        for c in coins:
+            if c <= t and dp[t - c] + 1 < dp[t]:
+                dp[t] = dp[t - c] + 1
+    return dp[amount] if dp[amount] != INF else -1`,
+    explanation:
+      "dp[t] = mínimo de monedas para pagar t. La transición: el ÚLTIMO pago fue una moneda c → dp[t] = min(dp[t−c]) + 1. Caso base dp[0] = 0 (pagar cero cuesta nada). O(amount·nº de monedas) tiempo y O(amount) memoria — la tabla de estados del cap. 12 en forma pura: el molde estado/transición/base del cap. 12 con monedas de ejemplo.",
+    tradeoff:
+      "El greedy (coger siempre la más grande) FALLA con monedas no-canónicas: [1, 3, 4] para 6 → greedy 4+1+1 (3 monedas); DP: 3+3 (2 monedas). La DP garantiza el óptimo porque explora TODO el último paso. La recursión + memoización llega al mismo sitio: arriba-abajo vs abajo-arriba — la misma abstracción, distinta ergonomía.",
+    hints: [
+      "Construye la tabla dp[0..amount] desde dp[0] = 0.",
+      "Para cada total t, el ÚLTIMO pago fue una moneda c: dp[t] = 1 + dp[t-c].",
+      "Todo lo que quede en «infinito» al final no es pagable → -1.",
+    ],
+    tests: [
+      { name: "clásico", args: [[1, 2, 5], 11], expected: 3 },
+      { name: "imposible", args: [[2], 3], expected: -1 },
+      { name: "cero", args: [[1], 0], expected: 0 },
+      { name: "pesado (oculto)", args: [[186, 419, 83, 208], 6249], expected: 20, hidden: true },
+    ],
+  },
+  {
+    id: "house-robber",
+    chapter: "dynamic-programming",
+    title: "Casa sin vecinos",
+    difficulty: "medio",
+    blurb: "Array de tesoros por casa: roba el máximo SIN robar dos casas adyacentes. [2,7,9,3,1] → 12 (2 + 9 + 1).",
+    setupCode: `def house_robber(nums):
+    """Máximo elemento a robar sin dos adyacentes."""
+    pass
+
+_target = house_robber`,
+    starterCode: `def house_robber(nums):
+    # TODO: para cada casa: robarla o no robarla
+    pass`,
+    solutionCode: `def house_robber(nums):
+    if not nums:
+        return 0
+    robarlo, saltar = 0, 0
+    for x in nums:
+        robarlo, saltar = saltar + x, max(robarlo, saltar)
+    return max(robarlo, saltar)`,
+    explanation:
+      "Dos estados caminan contigo: «robo ESTA casa» (vengo del mejor estado que saltó la casa previa, y le sumas x) y «no robo esta» (vengo del mejor de los dos anteriores). La transición robarlo = saltar + x, saltar = max(robarlo_viejo, saltar_viejo) y robarlo/saltar empaquetan la DP en dos variables — ventana de rodar de 2 casillas.",
+    tradeoff:
+      "La tabla completa (dp[i] = mejor hasta i) es la forma clara; las dos variables son la optimización de espacio cuando solo miras O(1) estados hacia atrás — la distinción explícita del cap. 12. Hay solapes entre subproblemas — por eso la DP aporta; sin ellos (subproblemas disjuntos) no estaría justificada.",
+    hints: [
+      "Para cada casa tienes DOS opciones: la añades (vienes de no-robar la anterior) o la saltas.",
+      "Guarda dos totales: el mejor ACUMULADO si robas la casa actual y el mejor si la saltas.",
+      "La respuesta es el máximo de los dos al final.",
+    ],
+    tests: [
+      { name: "clásico", args: [[2, 7, 9, 3, 1]], expected: 12 },
+      { name: "alternados", args: [[1, 2, 3, 1]], expected: 4 },
+      { name: "una casa", args: [[5]], expected: 5 },
+      { name: "dos y dos (oculto)", args: [[2, 1, 1, 2]], expected: 4, hidden: true },
+    ],
+  },
+  {
+    id: "max-depth-tree",
+    chapter: "trees",
+    title: "Profundidad del árbol",
+    difficulty: "fácil",
+    blurb: "El árbol llega como lista por niveles con None para huecos: los hijos del índice i son 2i+1 y 2i+2 (un None no tiene hijos). Devuelve su profundidad en niveles. [] → 0.",
+    setupCode: `def max_depth_tree(level):
+    """Profundidad del árbol dado por niveles (None = hueco)."""
+    pass
+
+_target = max_depth_tree`,
+    starterCode: `def max_depth_tree(level):
+    # TODO: recursión sobre los índices 2i+1 / 2i+2
+    pass`,
+    solutionCode: `def max_depth_tree(level):
+    def profundidad(i):
+        if i >= len(level) or level[i] is None:
+            return 0
+        return 1 + max(profundidad(2 * i + 1), profundidad(2 * i + 2))
+    return profundidad(0)`,
+    explanation:
+      "La recursión camina los ÍNDICES en lugar de nodos: level[i] es None (o está fuera del rango) → 0; si no, 1 + máxima profundidad de sus dos hijos-puntero (2i+1, 2i+2). Es la recursión binaria del cap. 11 con la aritmética del heap: el array ES el árbol — el cap. 14 lo explotaba para prioridades, aquí para geometría.",
+    tradeoff:
+      "La profundidad es O(altura del árbol) de pila — balanceado O(log n), degenerado (cadena por un solo brazo) O(n): la misma advertencia del cap. 11. La versión iterativa con un array de pendientes (pila explícita) lo evita si el árbol es profundo… aunque los tests se quedan cortos.",
+    hints: [
+      "El nodo i existe si i < len(level) y level[i] no es None.",
+      "profundidad(i) = 1 + max(profundidad(2i+1), profundidad(2i+2)).",
+      "Lista vacía → 0; un solo nodo → 1.",
+    ],
+    tests: [
+      { name: "tres niveles", args: [[3, 9, 20, null, null, 15, 7]], expected: 3 },
+      { name: "vacío", args: [[]], expected: 0 },
+      { name: "un nodo", args: [[1]], expected: 1 },
+      { name: "hueco intermedio (oculto)", args: [[1, null, 2]], expected: 2, hidden: true },
+    ],
+  },
+  {
+    id: "preorder-from-level",
+    chapter: "trees",
+    title: "Preorder desde el array",
+    difficulty: "medio",
+    blurb: "Del mismo árbol por niveles (None = huecos, hijos de i: 2i+1/2i+2), devuelve la lista del recorrido PREORDER (raíz → izquierda → derecha, cap. 13).",
+    setupCode: `def preorder_from_level(level):
+    """Valores del árbol por niveles en orden preorder."""
+    pass
+
+_target = preorder_from_level`,
+    starterCode: `def preorder_from_level(level):
+    # TODO: append del valor ANTES de explorar los hijos
+    pass`,
+    solutionCode: `def preorder_from_level(level):
+    out = []
+    def walk(i):
+        if i >= len(level) or level[i] is None:
+            return
+        out.append(level[i])
+        walk(2 * i + 1)
+        walk(2 * i + 2)
+    walk(0)
+    return out`,
+    explanation:
+      "El recorrido preorder ES el orden del DFS: el valor se ANOTA al llegar (antes de los hijos). La pila de la recursión es la contabilidad del cap. 11/13 — el walk canónico que, cambiado de sitio el append (antes / después / entre los hijos), se convierte en preorder, inorder o postorder: tres recorridos, un esqueleto.",
+    tradeoff:
+      "La versión iterativa con pila explícita vale lo mismo (empuja el derecho primero y el izquierdo después: la pila desapila en orden de visita) y la recursión es más clara: el caso «leer None» es el caso base natural. El recorrido completo cuesta O(n): no hay plan mejor, cada nodo se toca una vez.",
+    hints: [
+      "append(level[i]) ANTES de walk(2i+1) — el orden de visita define preorder.",
+      "El caso base: índice fuera del array o None → return sin añadir.",
+      "La lista out necesita vivir FUERA de la función interna que la rellena.",
+    ],
+    tests: [
+      { name: "tres niveles", args: [[3, 9, 20, null, null, 15, 7]], expected: [3, 9, 20, 15, 7] },
+      { name: "un nodo", args: [[1]], expected: [1] },
+      { name: "vacío", args: [[]], expected: [] },
+      { name: "solo rama izquierda (oculto)", args: [[5, 2, null, 1]], expected: [5, 2, 1], hidden: true },
+    ],
+  },
+  {
+    id: "k-largest",
+    chapter: "heaps",
+    title: "Los k mayores",
+    difficulty: "medio",
+    blurb: "Devuelve los k elementos mayores del array, ordenados de MAYOR a menor. Con heapq.nlargest (min-heap interno) es una línea; sin ella, un min-heap de tamaño k.",
+    setupCode: `def k_largest(nums, k):
+    """Los k mayores de nums, en orden descendente."""
+    pass
+
+_target = k_largest`,
+    starterCode: `def k_largest(nums, k):
+    # TODO: ordenar es lo fácil; ¿cómo se hace con un heap de tamaño k?
+    pass`,
+    solutionCode: `def k_largest(nums, k):
+    import heapq
+    return heapq.nlargest(k, nums)`,
+    explanation:
+      "heapq.nlargest mantiene un MIN-heap de tamaño k: cualquier candidato que no supere al menor del heap no entra (es la poda del cap. 14 aplicada a selección). Ese «mirar solo la mayor porción» es el truco de los k-mayores sobre flujos: O(n log k) sin guardar todo el array ordenado.",
+    tradeoff:
+      "sorted(nums, reverse=True)[:k] es O(n log n); el heap de tamaño k es O(n log k) — con n grande y k chico la poda gana por mucho; cuando k ≈ n, los dos convergen al sort completo.",
+    hints: [
+      "heapq.nlargest(k, nums) ya devuelve la lista descendente de los k mayores.",
+      "El min-heap de tamaño k expulsa al más pequeño cuando el grupo supera k.",
+      "Si no quieres librería: sorted(nums, reverse=True)[:k] sirve (con otro coste).",
+    ],
+    tests: [
+      { name: "tres mayores", args: [[3, 1, 5, 12, 2, 11], 3], expected: [12, 11, 5] },
+      { name: "k = len(nums)", args: [[4, 2], 2], expected: [4, 2] },
+      { name: "uno", args: [[1], 1], expected: [1] },
+      { name: "repetidos (oculto)", args: [[9, 9, 9], 2], expected: [9, 9], hidden: true },
+    ],
+  },
+  {
+    id: "is-max-heap",
+    chapter: "heaps",
+    title: "¿Es un max-heap válido?",
+    difficulty: "medio",
+    blurb: "Dado un array (sin huecos: el heap SIEMPRE es completo), ¿respeta el invariante del max-heap: cada padre ≥ sus hijos? Es una pasada O(n) con la aritmética del cap. 14.",
+    setupCode: `def is_max_heap(a):
+    """True si a cumple el invariante del max-heap."""
+    pass
+
+_target = is_max_heap`,
+    starterCode: `def is_max_heap(a):
+    # TODO: para cada padre, mira sus hijos en 2i+1 y 2i+2
+    pass`,
+    solutionCode: `def is_max_heap(a):
+    n = len(a)
+    for i in range(n):
+        for h in (2 * i + 1, 2 * i + 2):
+            if h < n and a[h] > a[i]:
+                return False
+    return True`,
+    explanation:
+      "No hay que RECONSTRUIR nada: el invariante es local (padre ≥ sus dos hijos) y basta COMPROBARLO en cada índice. La aritmética de hijos (2i+1, 2i+2) es la codificación en array del cap. 14 — el mismo código con el que sift-down decide con quién intercambia.",
+    tradeoff:
+      "Recursión (comprobar padre y descender) vs doble bucle iterativo: la iterativa es más barata en pila y más simple de acotar. La dirección IMPORTA: validar es O(n) (una pasada); generarlo insertando sería O(n log n) — nunca confundir comprobar con construir.",
+    hints: [
+      "Los hijos del índice i son 2i+1 y 2i+2 (cuidado con el alcance del array).",
+      "Una sola violación padre < hijo → False inmediato.",
+      "Las hojas no tienen hijos: la comprobación se cuida con h < n.",
+    ],
+    tests: [
+      { name: "el heap del capítulo", args: [[10, 7, 9, 5, 6, 3, 8]], expected: true },
+      { name: "violado en una hoja", args: [[10, 7, 9, 5, 6, 3, 11]], expected: false },
+      { name: "un elemento", args: [[1]], expected: true },
+      { name: "empate perfecto (oculto)", args: [[9, 4, 7, 1, 2, 6, 5, 0]], expected: true, hidden: true },
+    ],
+  },
+  {
+    id: "valid-bst-level",
+    chapter: "binary-search-trees",
+    title: "¿Es un BST válido?",
+    difficulty: "difícil",
+    blurb: "Árbol por niveles (None = huecos, hijos de i: 2i+1/2i+2). ¿Cumple el invariante del BST: todos los valores del subárbol izquierdo menores, los del derecho mayores? Ojo: no basta comparar con los hijos directos.",
+    setupCode: `def is_valid_bst(level):
+    """True si el árbol (por niveles) es un BST válido."""
+    pass
+
+_target = is_valid_bst`,
+    starterCode: `def is_valid_bst(level):
+    # TODO: validación con límites min/max que BAJAN por el árbol
+    pass`,
+    solutionCode: `def is_valid_bst(level):
+    def valido(i, lo, hi):
+        if i >= len(level) or level[i] is None:
+            return True
+        v = level[i]
+        if not (lo < v < hi):
+            return False
+        return valido(2 * i + 1, lo, v) and valido(2 * i + 2, v, hi)
+    return valido(0, float("-inf"), float("inf"))`,
+    explanation:
+      "El invariante es GLOBAL: un nieto puede violarlo sin que su padre se entere (el clásico [5,1,4,None,None,3,6]: el 3 vive bajo el 4, que es hijo DERECHO del 5, y 3 < 5 rompe el invariante). La corrección: cada nodo hereda un RANGO (lo, hi) que se estrecha al descender — la recursión arrastra los límites que el invariante exige.",
+    tradeoff:
+      "La alternativa elegante: recorrer inorder y comprobar que la salida es estrictamente creciente (sin duplicados) — explota la propiedad del cap. 15 con una pasada extra de memoria. Los límites viven en la pila: O(altura) de memoria, mejor que la copia del inorder O(n) en árboles profundos y desbalanceados.",
+    hints: [
+      "Comparar con el padre directo NO basta: los límites vienen de ANCESTROS lejanos.",
+      "Raíz: (−∞, +∞); hijo izquierdo: (lo, valor_del_padre); hijo derecho: (valor_del_padre, hi).",
+      "Un nodo None o fuera del array siempre es válido (es un hueco).",
+    ],
+    tests: [
+      { name: "el árbol del capítulo", args: [[8, 3, 10, 1, 6, 14, 4, 7, 13]], expected: true },
+      { name: "nieto ladrón", args: [[5, 1, 4, null, null, 3, 6]], expected: false },
+      { name: "mini válido", args: [[2, 1, 3]], expected: true },
+      { name: "cadena derecha (oculto)", args: [[1, null, 2]], expected: true, hidden: true },
+    ],
+  },
+  {
+    id: "autocomplete-prefix",
+    chapter: "tries",
+    title: "Autocompletar con prefijo",
+    difficulty: "fácil",
+    blurb: "Dadas unas palabras y un prefijo, devuelve las que EMPIEZAN por él, ordenadas alfabéticamente. En un trie real esta consulta cuesta prefijo + subárbol — aquí calcula el equivalente con lo que tienes.",
+    setupCode: `def autocomplete_prefix(words, prefix):
+    """Palabras que empiezan por prefix, ordenadas."""
+    pass
+
+_target = autocomplete_prefix`,
+    starterCode: `def autocomplete_prefix(words, prefix):
+    # TODO: filtro por prefijo y orden
+    pass`,
+    solutionCode: `def autocomplete_prefix(words, prefix):
+    return sorted(w for w in words if w.startswith(prefix))`,
+    explanation:
+      "El contrato funcional es simple: filtrar con startswith y ordenar. La lección del trie (cap. 16) es dónde ESTÁ el atajo: con un trie, bajar por el prefijo te planta en el subárbol entero de palabras que casan — la salida sale ordenada gratis si el trie guarda hijos por orden alfabético (DFS del subárbol).",
+    tradeoff:
+      "El filtro en un array es O(n·k) (n palabras por prefijo de largo k); el trie natural es O(k + salida) INDEPENDIENTE del diccionario: con 1 millón de palabras es la diferencia entre «recorrerlas todas» y «bajar k escalones». Para diccionarios pequeños el array gana por simplicidad — se apuesta al trie cuando el prefijo es la consulta ESTRELLA.",
+    hints: [
+      "w.startswith(prefix) es el filtro.",
+      "sorted() ya da el orden alfabético pedido.",
+      "Ninguna palabra casada → lista vacía.",
+    ],
+    tests: [
+      { name: "algoritmo…", args: [["algobook", "algoritmo", "arbol", "algo"], "alg"], expected: ["algo", "algobook", "algoritmo"] },
+      { name: "sin coincidencias", args: [["oeste", "oslo"], "x"], expected: [] },
+      { name: "todas casan", args: [["estado", "estilo"], "es"], expected: ["estado", "estilo"] },
+      { name: "prefijo completo (oculto)", args: [["algo"], "algo"], expected: ["algo"], hidden: true },
+    ],
+  },
 ];
