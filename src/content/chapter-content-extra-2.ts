@@ -26,7 +26,7 @@ export const stringsChapter: ChapterContent = {
     {
       kind: "formula",
       id: "str-index",
-      latex: "s[i] \\\\in O(1) \\\\qquad s' = s + t \\\\in O(|s| + |t|)",
+      latex: "s[i] \\in O(1) \\qquad s' = s + t \\in O(|s| + |t|)",
     },
     {
       kind: "viz",
@@ -53,7 +53,7 @@ export const stringsChapter: ChapterContent = {
     {
       kind: "formula",
       id: "str-naive",
-      latex: "T(n, m) = O((n - m + 1) \\\\cdot m) = O(n \\\\cdot m)",
+      latex: "T(n, m) = O((n - m + 1) \\cdot m) = O(n \\cdot m)",
     },
     {
       kind: "prose",
@@ -116,7 +116,7 @@ export const matricesChapter: ChapterContent = {
     {
       kind: "formula",
       id: "mat-index",
-      latex: "\\\\text{pos}(i, j) = i \\\\cdot \\\\text{columnas} + j",
+      latex: "\\text{pos}(i, j) = i \\cdot \\text{columnas} + j",
     },
     {
       kind: "prose",

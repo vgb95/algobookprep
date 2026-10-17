@@ -82,7 +82,7 @@ export const stacksChapter: ChapterContent = {
       kind: "prose",
       id: "st-recap",
       text:
-        "**Recap:** la pila restringe el universo a UN extremo — y justo por eso garantiza push/pop/peek O(1) sin gestionar índices. Es la maquinaria del undo, del call stack, del parsing y del DFS. Y es el puente natural: se fabrica con una lista enlazada (cap. 8) y sostiene la recursión y el DFS de los caps. 11 y 14.",
+        "**Recap:** la pila restringe el universo a UN extremo — y justo por eso garantiza push/pop/peek O(1) sin gestionar índices. Es la maquinaria del undo, del call stack, del parsing y del DFS. Y es el puente natural: se fabrica con una lista enlazada (cap. 8) y sostiene la recursión y el DFS de los caps. 11 y 18.",
     },
   ],
 };
@@ -100,7 +100,7 @@ export const queuesChapter: ChapterContent = {
       kind: "prose",
       id: "qu-hook",
       text:
-        "**Gancho:** las tareas del mundo no se atienden como en una pila. Cuando 200 personas piden a la vez la misma página web, el servidor no dice «atiendo a la última que llegó» (esos usuarios protestan): forma UNA fila y la va sirviendo por orden de llegada. Los servidores de requests, los buffers de impresión, los sistemas de mensajería y el propio BFS del capítulo 14 comparten una pieza: la **cola**.",
+        "**Gancho:** las tareas del mundo no se atienden como en una pila. Cuando 200 personas piden a la vez la misma página web, el servidor no dice «atiendo a la última que llegó» (esos usuarios protestan): forma UNA fila y la va sirviendo por orden de llegada. Los servidores de requests, los buffers de impresión, los sistemas de mensajería y el propio BFS del capítulo 18 comparten una pieza: la **cola**.",
     },
     {
       kind: "prose",
@@ -139,7 +139,7 @@ export const queuesChapter: ChapterContent = {
       kind: "prose",
       id: "qu-tradeoffs",
       text:
-        "**Tradeoffs — y el truco de entrevista favorito:**\n\n| Criterio | Buffer circular | Lista + tail | Dos stacks (truco) |\n| --- | --- | --- | --- |\n| enqueue | O(1) | O(1) | O(1) |\n| dequeue | O(1) | O(1) | O(1) amortizado |\n| capacidad | fija (¡o se agranda!) | flexible | flexible |\n| memoria | solo datos | puntero por nodo | dos contenedores |\n\n**El truco (implement Queue with Two Stacks):** apilo todo en la pila «in» al hacer enqueue; al hacer dequeue vierto solo si la pila «out» está vacía — cada elemento viaja exactamente 2 veces → amortizado O(1). La lección que el entrevistador busca: un orden puede invertirse con DOS pilas — a cambio de transportar cada elemento dos veces y de algo más de memoria.\n\nOjo con la **cola de prioridad** (heap, cap. 13): ahí el orden de salida es el «mayor prioridad primero», no el de llegada — la estructura es la hermana rica de la cola simple.",
+        "**Tradeoffs — y el truco de entrevista favorito:**\n\n| Criterio | Buffer circular | Lista + tail | Dos stacks (truco) |\n| --- | --- | --- | --- |\n| enqueue | O(1) | O(1) | O(1) |\n| dequeue | O(1) | O(1) | O(1) amortizado |\n| capacidad | fija (¡o se agranda!) | flexible | flexible |\n| memoria | solo datos | puntero por nodo | dos contenedores |\n\n**El truco (implement Queue with Two Stacks):** apilo todo en la pila «in» al hacer enqueue; al hacer dequeue vierto solo si la pila «out» está vacía — cada elemento viaja exactamente 2 veces → amortizado O(1). La lección que el entrevistador busca: un orden puede invertirse con DOS pilas — a cambio de transportar cada elemento dos veces y de algo más de memoria.\n\nOjo con la **cola de prioridad** (heap, cap. 14): ahí el orden de salida es el «mayor prioridad primero», no el de llegada — la estructura es la hermana rica de la cola simple.",
     },
     {
       kind: "prose",
@@ -208,7 +208,7 @@ export const recursionChapter: ChapterContent = {
       kind: "prose",
       id: "rec-fib",
       text:
-        "**El lado oscuro: Fibonacci ingenuo.** `fib(n) = fib(n-1) + fib(n-2)` con bases fib(0)=fib(1)=1. El árbol de llamadas DUPLICA trabajo a cada nivel: fib(5) pregunta por fib(3) DOS veces; fib(40) recalcula fib(20) miles de veces. El coste explota al ritmo del número áureo: O(φⁿ) ≈ O(1.618ⁿ) llamadas.\n\nLa cura — **memoización** («cada respuesta calculada se guarda; si se vuelve a pedir, devuélvela») — baja el coste a O(n) con O(n) de memoria: es la puerta a la programación dinámica del capítulo 19. Misma recursión, distinta política de memoria.",
+        "**El lado oscuro: Fibonacci ingenuo.** `fib(n) = fib(n-1) + fib(n-2)` con bases fib(0)=fib(1)=1. El árbol de llamadas DUPLICA trabajo a cada nivel: fib(5) pregunta por fib(3) DOS veces; fib(40) recalcula fib(20) miles de veces. El coste explota al ritmo del número áureo: O(φⁿ) ≈ O(1.618ⁿ) llamadas.\n\nLa cura — **memoización** («cada respuesta calculada se guarda; si se vuelve a pedir, devuélvela») — baja el coste a O(n) con O(n) de memoria: es la puerta a la programación dinámica del capítulo 12. Misma recursión, distinta política de memoria.",
     },
     {
       kind: "divider",
@@ -230,7 +230,7 @@ export const recursionChapter: ChapterContent = {
       kind: "prose",
       id: "rec-recap",
       text:
-        "**Recap:** recursión = caso base + llamada en problema más pequeño, ejecutada sobre el call stack (cap. 9): espacio O(profundidad), tiempo = trabajo del árbol completo. Factorial para ver las dos mitades; Fibonacci para ver el recálculo que la memoización (→ programación dinámica, cap. 19) cura. La disciplina «elige–explora–deshace» del backtracking llega más adelante (cap. 21).",
+        "**Recap:** recursión = caso base + llamada en problema más pequeño, ejecutada sobre el call stack (cap. 9): espacio O(profundidad), tiempo = trabajo del árbol completo. Factorial para ver las dos mitades; Fibonacci para ver el recálculo que la memoización (→ programación dinámica, cap. 12) cura. La disciplina «elige–explora–deshace» del backtracking llega más adelante (cap. 21).",
     },
   ],
 };
