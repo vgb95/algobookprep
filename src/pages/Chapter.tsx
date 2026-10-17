@@ -1,4 +1,5 @@
 import { chaptersContent } from "../content/chapter-content-index";
+import { entrevistas } from "../content/entrevistas";
 import { chapters } from "../content/chapters";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import BlockRenderer from "../components/BlockRenderer";
@@ -59,6 +60,38 @@ export default function ChapterPage({ id }: { id: string }) {
             de sorting enseña el patrón entero del libro.
           </p>
           <a className="btn" href="#/chapter/sorting">Ver la demo que ya funciona →</a>
+        </section>
+      )}
+
+      {entrevistas[id] && ch.status === "live" && (
+        <section className="entrevista" aria-label="Consejos para la entrevista">
+          <div className="entrevista-head">
+            <span className="entrevista-tag">livecoding</span>
+            <h2 className="serif">En la entrevista</h2>
+          </div>
+          <p className="entrevista-enfoque">{entrevistas[id].enfoque}</p>
+          <div className="entrevista-grid">
+            <div className="entrevista-col">
+              <h3>Cómo conducir la conversación</h3>
+              <p>{entrevistas[id].comunicacion}</p>
+            </div>
+            <div className="entrevista-col">
+              <h3>Variantes que te pueden poner</h3>
+              <ul>
+                {entrevistas[id].variantes.map((v, i) => (
+                  <li key={i}>{v}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="entrevista-col">
+              <h3>Giros a mitad de la entrevista</h3>
+              <ul>
+                {entrevistas[id].cambios.map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </section>
       )}
 
