@@ -196,19 +196,32 @@ export const sortingChapter: ChapterContent = {
 };
 
 /**
- * Capítulo 13 — Trees (revisión 6c pendiente; vizzes actualizadas).
+ * Capítulo 13 — Trees (revisión 6c).
+ * Estructura: gancho → teoría → viz → ejemplo resuelto → tradeoffs →
+ * trampas → recap.
  */
 export const treesChapter: ChapterContent = {
   id: "trees",
   num: 13,
   title: "Trees",
-  blurb: "Jerarquías y sus recorridos: preorder, inorder, postorder sobre un BST balanceado.",
+  blurb: "Jerarquías: vocabulario, los tres recorridos y quién vale para qué.",
   blocks: [
+    {
+      kind: "prose",
+      id: "trees-hook",
+      text:
+        "**Gancho:** el DOM de esta página es un árbol. También lo es tu sistema de ficheros, el organigrama de una empresa y la escena de un videojuego (escena → grupos → objetos). En un array buscar el «hijo de X» no tiene sentido — el árbol añade jerarquía al mundo plano de las listas. Y su primera pregunta es siempre la misma: ¿EN QUÉ ORDEN lo recorro?",
+    },
     {
       kind: "prose",
       id: "trees-intro",
       text:
-        "Un **árbol** es una estructura jerárquica de nodos. Cada nodo tiene un valor y punteros a hijos (izquierdo y derecho en un árbol binario). El nodo sin padre es la **raíz**; los nodos sin hijos son **hojas**.",
+        "Un **árbol** es una estructura jerárquica: un nodo **raíz** y, colgando de él, nodos hijos que a su vez cuelgan subárboles. Vocabulario que usarás siempre:\n\n- **Nodo:** guarda valor + referencias a sus hijos.\n- **Hoja:** nodo sin hijos.\n- **Altura:** número de niveles de abajo a arriba — la profundidad que condiciona TODO (recursión del cap. 11, BST del cap. 15, heaps del cap. 14).\n\nEn árboles binarios, cada nodo tiene como mucho dos hijos (izquierdo y derecho). Cualquier recorrido visita los n nodos una vez: O(n) — la pregunta es el ORDEN de esas visitas.",
+    },
+    {
+      kind: "formula",
+      id: "trees-edges",
+      latex: "n \\text{ nodos} \\Rightarrow n - 1 \\text{ aristas} \\qquad \\text{recorrido: } O(n)",
     },
     {
       kind: "viz",
@@ -220,7 +233,7 @@ export const treesChapter: ChapterContent = {
       kind: "prose",
       id: "trees-inorder-text",
       text:
-        "**Inorder** (izquierda → raíz → derecha) es el recorrido natural de un árbol binario de búsqueda: visita los nodos en orden ascendente. Es el que usarás para imprimir un BST ordenado.",
+        "**Inorder** (izquierda → raíz → derecha): visita cada nodo DESPUÉS de su subárbol izquierdo y ANTES del derecho. En un árbol binario de BÚSQUEDA, esto produce los valores en orden ascendente — es la firma de este recorrido y la pregunta de entrevista más repetida del tema (ya lo verás en el cap. 15).",
     },
     {
       kind: "viz",
@@ -232,7 +245,7 @@ export const treesChapter: ChapterContent = {
       kind: "prose",
       id: "trees-preorder-text",
       text:
-        "**Preorder** (raíz → izquierda → derecha) visita la raíz antes que sus hijos. Útil para copiar un árbol o imprimir expresiones en notación prefija.",
+        "**Preorder** (raíz → izquierda → derecha): la raíz sale PRIMERO. Es el recorrido del copiar/serializar: para reconstruir el árbol se necesita conocer su estructura desde arriba. También el de imprimir un cálculo en notación prefija.",
     },
     {
       kind: "viz",
@@ -244,25 +257,60 @@ export const treesChapter: ChapterContent = {
       kind: "prose",
       id: "trees-postorder-text",
       text:
-        "**Postorder** (izquierda → derecha → raíz) visita los hijos antes que la raíz. Útil para liberar memoria de un árbol o calcular tamaños de subárboles de abajo hacia arriba.",
+        "**Postorder** (izquierda → derecha → raíz): los hijos salen antes que el padre. Es el recorrido del BORRADO (no puedes liberar un padre mientras sus hijos cuelgan) y del cálculo bottom-up: el tamaño o el balance de un subárbol se resuelve solo cuando ya conoces sus dos hijos.",
+    },
+    {
+      kind: "divider",
+      id: "trees-divider-1",
+    },
+    {
+      kind: "prose",
+      id: "trees-tradeoffs",
+      text:
+        "Los tres recorridos, con su mandato:\n\n| Recorrido | Orden | Para qué se usa |\n| --- | --- | --- |\n| inorder | izq → raíz → der | BST en orden creciente (cap. 15) |\n| preorder | raíz → izq → der | serializar/copiar/estructura |\n| postorder | izq → der → raíz | borrar, cálculos dependientes de los hijos |\n\nLos tres O(n). En todos, la implementación recursiva gasta O(altura) de pila (cap. 11): O(log n) si el árbol está balanceado, O(n) si degenera en cadena. Con pila EXPLÍCITA (cap. 9) se escribe iterativo: es el patrón típico cuando la profundidad dispara.",
+    },
+    {
+      kind: "prose",
+      id: "trees-pitfalls",
+      text:
+        "**Trampas frecuentes:**\n\n1. **Confundir «árbol binario» con «BST».** Solo el BST tiene orden — recorrer inorden un árbol binario CUALQUIERA no produce nada ordenado.\n2. **Base case None olvidado.** El hijo que no existe es el freno de la recursión — sin esa guarda, el recorrido explota (cap. 11).\n3. **Altura ≠ nº de nodos.** La profundidad de la recursión es la ALTURA: un árbol de 10.000 nodos puede medir 13 de alto (perfecto) o 10.000 (cadena). El MISMO código, futuro muy distinto.\n4. **Modificar mientras recorres.** Insertar/borrar dentro del propio recorrido invalida el orden — calcula y después edita, o vuelve a planificar el recorrido con cuidado.",
+    },
+    {
+      kind: "prose",
+      id: "trees-recap",
+      text:
+        "**Recap:** árbol = jerarquía de nodos (raíz, hijos, hojas) con altura que gobierna su coste. Los tres recorridos — inorder, preorder, postorder — cuestan O(n) y se distinguen por DÓNDE sale la raíz: en medio (datos ordenados), al principio (copiar), al final (borrar/cálculos bottom-up). Cuando el árbol ORDENA, manda el inorder: es el mundo del capítulo 15.",
     },
   ],
 };
 
 /**
- * Capítulo 17 — Graphs (revisión 6c pendiente; vizzes actualizadas).
+ * Capítulo 17 — Graphs (revisión 6c).
+ * Estructura: gancho → teoría → viz → ejemplo resuelto → tradeoffs →
+ * trampas → recap.
  */
 export const graphsChapter: ChapterContent = {
   id: "graphs",
   num: 17,
   title: "Graphs",
-  blurb: "BFS y DFS sobre grafos no dirigidos: orden de visita y colas/pilas.",
+  blurb: "Redes: representación y los dos recorridos madre (BFS y DFS).",
   blocks: [
+    {
+      kind: "prose",
+      id: "graphs-hook",
+      text:
+        "**Gancho:** «¿Tienes un amigo en común con tu amigo?» — esa pregunta NO se responde con arrays ni árboles: las relaciones van en todas direcciones, con ciclos y sin cabeza. El **grafo** es la estructura más general del libro: árbol = grafo sin ciclos; lista = camino. Todo lo demás (Dijkstra, union-find, MST de los caps. 18–20) es aplicar recorridos sobre esta base.",
+    },
     {
       kind: "prose",
       id: "graphs-intro",
       text:
-        "Un **grafo** modela relaciones entre objetos: nodos (vértices) y aristas (conexiones). No dirigidos significa que las aristas van en ambos sentidos. Los recorridos fundamentales son BFS (anchura) y DFS (profundidad).",
+        "Un **grafo** es un conjunto de nodos (vértices) y aristas que los conectan. En NO dirigidos, la arista vale para los dos sentidos; en dirigidos, solo en el suyo. Para describir el grafo en código hay dos representaciones:\n\n- **Lista de adyacencia:** por cada nodo, sus vecinos. Espacio O(n + m) — el estándar de casi todo.\n- **Matriz de adyacencia:** casilla n×n marcada si hay arista. Espacio O(n²) pero preguntar «¿a y b están conectados?» es O(1).\n\nn = nodos, m = aristas.",
+    },
+    {
+      kind: "formula",
+      id: "graphs-space",
+      latex: "\\text{lista: } O(n + m) \\qquad \\text{matriz: } O(n^2), \\qquad \\text{consulta } O(1)",
     },
     {
       kind: "viz",
@@ -274,7 +322,7 @@ export const graphsChapter: ChapterContent = {
       kind: "prose",
       id: "graphs-bfs-text",
       text:
-        "**BFS** explora capa por capa: primero el nodo inicial, luego sus vecinos directos, luego los vecinos de esos vecinos. Usa una **cola** (FIFO). Es el algoritmo para encontrar el camino más corto en grafos no ponderados.",
+        "**BFS (anchura):** una **cola** (cap. 10) hace el trabajo — dequeue al frente, encola los vecinos no visitados. El resultado es una ONDA: primero todo a distancia 1, luego a 2… Por eso BFS encuentra el **camino más corto** (en nº de aristas) de un grafo no ponderado — la propiedad que Dijkstra generalizará con pesos (cap. 18).",
     },
     {
       kind: "viz",
@@ -286,25 +334,66 @@ export const graphsChapter: ChapterContent = {
       kind: "prose",
       id: "graphs-dfs-text",
       text:
-        "**DFS** explora lo más profundo posible por una rama antes de retroceder. Usa una **pila** (LIFO) o recursión. Útil para detectar ciclos, orden topológico y resolver laberintos.",
+        "**DFS (profundidad):** una **pila** (o la recursión del cap. 11) — avanza por UNA rama hasta el fondo y retrocede (backtracking) cuando no queda salida. Cambiar la cola por la pila es UNA línea que produce otro algoritmo: sirve para detectar CICLOS, orden topológico (cap. 18), componentes conexas y resolver laberintos.",
+    },
+    {
+      kind: "divider",
+      id: "graphs-divider-1",
+    },
+    {
+      kind: "prose",
+      id: "graphs-ejemplo",
+      text:
+        "**Ejemplo resuelto — ¿BFS o DFS?** Grafo con n = 6 y m = 6: quieres el camino más corto de 0 a 5 → BFS (la primera vez que 5 sale de la cola, esa distancia es mínima). Quieres saber si hay ciclo → DFS (una arista hacia un nodo «en pila» = ciclo). Quieres listar componentes → un bucle que lanza DFS desde cada nodo no visitado. La estructura (lista de adyacencia) es idéntica; el CONTENEDOR (cola vs pila) cambia el algoritmo.",
+    },
+    {
+      kind: "prose",
+      id: "graphs-tradeoffs",
+      text:
+        "Cuándo cada uno:\n\n| Criterio | BFS | DFS |\n| --- | --- | --- |\n| orden de exploración | por capas (onda) | por rama (profundidad) |\n| camino más corto (sin pesos) | ✓ | no garantizado |\n| memoria | O(anchura) — puede ser toda una capa | O(profundidad) de la pila |\n| usa | cola | pila / recursión |\n| detección de ciclos | sí (con marca de visita) | sí, natural |\n\nCoste de ambos: O(n + m) con lista de adyacencia — cada nodo entra/sale del contenedor una vez, cada arista se mira dos veces.",
+    },
+    {
+      kind: "prose",
+      id: "graphs-pitfalls",
+      text:
+        "**Trampas frecuentes:**\n\n1. **Olvidar la marca de visitado.** En un grafo CON CICLOS, sin `visited` el recorrido entra en bucle infinito — la diferencia estructural con el árbol (que no tiene ciclos por definición).\n2. **Marcar tarde.** Marca el nodo al ENCOLARLO, no al sacarlo — si lo marcas al extraer, varios caminos lo encolen dos veces y la profundidad se acumula.\n3. **Componentes desconectadas.** Un solo BFS/DFS desde un nodo solo alcanza SU componente: para todo el grafo, lanza el recorrido desde cada nodo sin visitar.\n4. **Recursión profunda.** DFS recursivo sobre un grafo de 50.000 nodos lineales desborda el call stack (cap. 11) — versión iterativa con pila explícita.",
+    },
+    {
+      kind: "prose",
+      id: "graphs-recap",
+      text:
+        "**Recap:** el grafo generaliza arrays/árboles/listas: nodos + aristas con ciclos. Representación: lista O(n+m) por defecto, matriz O(n²) solo si necesitas consultas de par O(1). BFS (cola) = ondas y caminos mínimos; DFS (pila) = ramas, ciclos y topológico. Ambos O(n+m) — y son los motores de Dijkstra, union-find y MST de los caps. 18–20.",
     },
   ],
 };
 
 /**
- * Capítulo 14 — Heaps (revisión 6c pendiente; vizzes actualizadas).
+ * Capítulo 14 — Heaps (revisión 6c).
+ * Estructura: gancho → teoría → viz → ejemplo resuelto → tradeoffs →
+ * trampas → recap.
  */
 export const heapsChapter: ChapterContent = {
   id: "heaps",
   num: 14,
   title: "Heaps",
-  blurb: "Montículos binarios: insertar y extraer máximo con sift-up y sift-down.",
+  blurb: "El montículo: máxima prioridad siempre arriba, con sift-up y sift-down.",
   blocks: [
+    {
+      kind: "prose",
+      id: "heaps-hook",
+      text:
+        "**Gancho:** urgencias no atienden «por orden de llegada» ni «por orden de índice»: atienden LO MÁS GRAVE. Esa es una cola de prioridad, y su motor es el **montículo (heap)**: mantener el MÁXIMO (o mínimo) siempre arriba, con precio logarítmico por operación — sin ordenar el resto de la cola, que no lo necesita.",
+    },
     {
       kind: "prose",
       id: "heaps-intro",
       text:
-        "Un **montículo binario** (heap) es un árbol completo donde cada nodo cumple el **invariante del montículo**: en un max-heap, el padre es siempre mayor o igual que sus hijos. El máximo está siempre en la raíz. Se representa eficientemente como un array: el hijo izquierdo de i está en 2i+1, el derecho en 2i+2.",
+        "Un **montículo binario (max-heap)** es un árbol COMPLETO con invariante: cada padre es ≥ sus hijos. «Completo» significa que los niveles se llenan de izquierda a derecha — y esa propiedad es la clave práctica: un árbol completo vive DENTRO DE UN ARRAY sin huecos ni punteros.",
+    },
+    {
+      kind: "formula",
+      id: "heaps-indices",
+      latex: "\\text{hijo izq de } i = 2i + 1, \\quad \\text{der} = 2i + 2, \\quad \\text{padre} = \\lfloor (i - 1)/2 \\rfloor",
     },
     {
       kind: "viz",
@@ -316,7 +405,7 @@ export const heapsChapter: ChapterContent = {
       kind: "prose",
       id: "heaps-insert-text",
       text:
-        "Para **insertar**, colocas el valor al final del array (última hoja) y haces **sift-up**: comparas con el padre e intercambias mientras sea mayor. O(log n).",
+        "**Insertar** = añadir al FINAL del array (la próxima hoja libre — árbol completo ⇒ hueco fijo) + **sift-up**: subir burbujeando mientras el padre sea menor. O(log n) — la altura del árbol: lo único que recorres.",
     },
     {
       kind: "viz",
@@ -328,7 +417,29 @@ export const heapsChapter: ChapterContent = {
       kind: "prose",
       id: "heaps-extract-text",
       text:
-        "Para **extraer el máximo**, quitas la raíz, mueves el último elemento a la raíz y haces **sift-down**: comparas con los hijos e intercambias con el mayor mientras sea necesario. O(log n). Los montículos son la base de las colas de prioridad y del heapsort.",
+        "**Extraer el máximo** = llevar la RAÍZ (el máximo, gratis) al frente + poner el ÚLTIMO elemento en la raíz + **sift-down**: caer intercambiando con el hijo MAYOR mientras alguno lo supere. O(log n). El máximo sale ordenado cada vez — ese bucle ES el heapsort: O(n log n), en sitio.",
+    },
+    {
+      kind: "divider",
+      id: "heaps-divider-1",
+    },
+    {
+      kind: "prose",
+      id: "heaps-tradeoffs",
+      text:
+        "El montículo frente a sus rivales en «dame el máximo»:\n\n| Estructura | insertar | extraer máximo | ver máximo |\n| --- | --- | --- | --- |\n| **heap** | O(log n) | O(log n) | O(1) |\n| array ordenado | O(n) (insertar desplazando) | O(1) | O(1) |\n| BST balanceado (cap. 15) | O(log n) | O(log n) | O(log n) |\n| array sin orden | O(1) | O(n) (barrido) | O(n) |\n\nNinguna gana en TODO: el heap paga menos en cada operación y solo responde por el máximo — si necesitas el MÍNIMO, min-heap espejo; si necesitas cualquier ORDEN INTERMEDIO, el heap no lo da (no está ordenado globalmente: es «suficientemente ordenado» para prioridades).\n\nY el truco infrautilizado: **heapify** — convertir un array arbitrario en montículo en O(n) (desde el último padre, sift-down a cada uno), mejor que n inserciones O(n log n). De ahí nacen el heapsort y el clásico «los k mayores de un torrente de datos».",
+    },
+    {
+      kind: "prose",
+      id: "heaps-pitfalls",
+      text:
+        "**Trampas frecuentes:**\n\n1. **Min vs max.** Python `heapq` es MIN-heap: el «más prioritario» es el menor. Para simular un max-heap: guarda las prioridades NEGATIVAS.\n2. **Sift-down al hijo equivocado.** Intercambiar con el hijo menor destruye el invariante: siempre el MAYOR en max-heap.\n3. **Construir con inserciones.** n inserts son O(n log n); heapify es O(n) — para los k-mayores de un flujo enorme, esa diferencia es la solución entera.\n4. **Actualizar prioridad.** Un elemento cuya prioridad CAMBIA exige depurar su posición (sift-up o down) — la cola de Dijkstra (cap. 18) vive de esto; un heap «inmutable» no resuelve decrease-key directamente.",
+    },
+    {
+      kind: "prose",
+      id: "heaps-recap",
+      text:
+        "**Recap:** árbol completo ⇒ array sin punteros (hijos en 2i+1 / 2i+2, padre en (i-1)/2). Invariante padre ≥ hijos — no orden total, suficiente para prioridades. Insert y extract O(log n), peek O(1); heapify O(n). Es la cola de prioridad (urgencias, schedulers, Dijkstra) y el heapsort. Donde el mundo pide «el más importante YA», responde él.",
     },
   ],
 };
