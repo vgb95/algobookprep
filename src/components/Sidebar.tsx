@@ -23,6 +23,10 @@ export default function Sidebar({ open = false }: { open?: boolean }) {
         </div>
       </a>
       <nav className="toc">
+        <a href="#/problems" className="toc-item problems-link" title="Banco de problemas">
+          <span className="toc-num">✦</span>
+          <span>Problemas</span>
+        </a>
         {chapters.map((c) => (
           <a
             key={c.id}

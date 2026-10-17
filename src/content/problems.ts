@@ -6,12 +6,13 @@ export interface Problem {
   title: string;
   difficulty: "fácil" | "medio" | "difícil";
   blurb: string;
-  setupCode: string;      // código que se ejecuta antes (define la firma)
+  setupCode: string;      // define la firma de la función y el target
   starterCode: string;    // lo que ve el alumno en el editor
-  solutionCode: string;   // solución de referencia (oculta)
+  solutionCode: string;   // solución de referencia (oculta hasta resolver)
+  explanation: string;    // por qué funciona
+  tradeoff: string;       // contra qué alternativa se mide
+  hints: string[];        // pistas progresivas (1 → 3)
   tests: ProblemTest[];   // tests visibles + ocultos
-  hint: string;
-  explanation: string;
 }
 
 export const problems: Problem[] = [
@@ -40,14 +41,21 @@ _target = two_sum`,
             return [visto[complemento], i]
         visto[num] = i
     return []`,
+    explanation:
+      "Almacena cada número en un diccionario {valor: índice}. Para cada número, comprueba si target - valor ya está en el diccionario. O(n) tiempo, O(n) espacio.",
+    tradeoff:
+      "La fuerza bruta también es O(n²) tiempo pero O(1) espacio: esta versión compra tiempo pagando memoria. Con el array ordenado, la búsqueda binaria doma el O(n²) a O(n log n) sin el diccionario — pero exige ordenar (O(n log n)) y perder los índices originales.",
+    hints: [
+      "Para cada número, ¿qué necesitas poder preguntar rápido: «¿su pareja ya apareció antes?»",
+      "Un diccionario {valor: índice} responde esa pregunta en O(1). — recorres una vez y en cada paso consultas el complemento.",
+      "Si guardas el complemento ANTES de almacenar el propio valor, los índices salen en el orden [i_antiguo, j_actual] naturalmente.",
+    ],
     tests: [
       { name: "caso básico", args: [[2, 7, 11, 15], 9], expected: [0, 1] },
       { name: "números negativos", args: [[-3, 4, 3, 90], 0], expected: [0, 2] },
       { name: "sin solución", args: [[1, 2, 3], 7], expected: [] },
       { name: "test oculto", args: [[3, 2, 4], 6], expected: [1, 2], hidden: true },
     ],
-    hint: "Usa un diccionario para recordar qué número has visto y en qué índice.",
-    explanation: "Almacena cada número en un diccionario {valor: índice}. Para cada número, comprueba si target - valor ya está en el diccionario. O(n) tiempo, O(n) espacio.",
   },
   {
     id: "contains-duplicate",
@@ -65,13 +73,20 @@ _target = contains_duplicate`,
     pass`,
     solutionCode: `def contains_duplicate(nums):
     return len(set(nums)) != len(nums)`,
+    explanation:
+      "Un set elimina duplicados: si el set es más corto que el array original, hay duplicados. O(n) tiempo, O(n) espacio.",
+    tradeoff:
+      "Ordenar primero y comparar vecinos cuesta O(n log n) tiempo pero O(1) espacio extra (in-place) — mejor si la memoria es el recurso caro. El set es el equilibrio habitual: O(n) y legible.",
+    hints: [
+      "¿Qué estructura de datos confirma «no he visto esto antes» en O(1)?",
+      "Convierte el array en un set y compara longitudes.",
+      "Si len(set(nums)) < len(nums), algún valor se perdió al deduplicar: hay duplicados.",
+    ],
     tests: [
       { name: "con duplicados", args: [[1, 2, 3, 1]], expected: true },
       { name: "sin duplicados", args: [[1, 2, 3, 4]], expected: false },
       { name: "vacío", args: [[]], expected: false },
       { name: "test oculto", args: [[1, 1, 1, 3, 3, 4, 3, 2]], expected: true, hidden: true },
     ],
-    hint: "Compara la longitud del array con la de su conjunto (set).",
-    explanation: "Un set elimina duplicados. Si hay duplicados, el set es más corto que el array original.",
   },
 ];

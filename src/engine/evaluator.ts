@@ -8,6 +8,23 @@
 
 import { initPyodide } from "./pyodide";
 
+/**
+ * Nombre de la función a testear. Preferencias:
+ *  1) la etiqueta explícita «_target = nombre» en el setup del problema,
+ *  2) cualquier «_target = nombre» que el alumno dejara escrito,
+ *  3) el primer «def» que exista en setup o solución.
+ * Antes se parseaba SOLO la solución del alumno (que no suele traer la
+ * etiqueta) y saltaba a un fallback roto («solucion») → NameError.
+ */
+export function resolveTargetName(setupCode: string, solutionCode: string): string {
+  const inSetup = setupCode.match(/_target\s*=\s*([A-Za-z_]\w*)/);
+  if (inSetup) return inSetup[1];
+  const inUser = solutionCode.match(/_target\s*=\s*([A-Za-z_]\w*)/);
+  if (inUser) return inUser[1];
+  const defn = (setupCode + "\n" + solutionCode).match(/def\s+([A-Za-z_]\w*)/);
+  return defn ? defn[1] : "solucion";
+}
+
 export interface ProblemTest {
   name: string;
   args: any[];
@@ -81,7 +98,7 @@ ${setupCode}
 
 ${solutionCode}
 
-_target = ${getTargetName(solutionCode)}
+_target = ${resolveTargetName(setupCode, solutionCode)}
 
 ${testCalls}
 
@@ -137,12 +154,3 @@ async function pyodideRun(code: string): Promise<void> {
   await pyodide.runPythonAsync(code);
 }
 
-function getTargetName(solutionCode: string): string {
-  const defs = solutionCode.match(/def\s+(\w+)/g);
-  if (defs) {
-    const last = defs[defs.length - 1];
-    const name = last.match(/def\s+(\w+)/)?.[1];
-    if (name) return name;
-  }
-  return "solucion";
-}

@@ -1,3 +1,5 @@
+import { problems } from "../content/problems";
+
 const plan: { label: string; done: boolean }[] = [
   { label: "Fase 0 · Shell del libro — tipografía, 22 capítulos, progreso local", done: true },
   { label: "Fase 1 · Motor de cinta de cuadros + playgrounds (sorting y arrays)", done: true },
@@ -80,6 +82,15 @@ const frames = record(bubbleSort([7, 3, 9]));
             <p>{f.b}</p>
           </div>
         ))}
+      </div>
+
+      <div className="cta-row">
+        <a className="btn primary" href="#/problems">
+          ✦ Banco de problemas ({problems.length})
+        </a>
+        <a className="btn" href="#/code-playground">
+          Laboratorio de código
+        </a>
       </div>
 
       <h2 className="serif section-h">Roadmap</h2>

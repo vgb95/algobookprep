@@ -3,6 +3,7 @@ import Sidebar from "./components/Sidebar";
 import HomePage from "./pages/Home";
 import ChapterPage from "./pages/Chapter";
 import CodePlayground from "./pages/CodePlayground";
+import ProblemsIndex from "./pages/ProblemsIndex";
 import Problem from "./pages/Problem";
 
 /** Minimal hash router — no deps needed. */
@@ -49,6 +50,8 @@ export default function App() {
           <Problem id={problemId} />
         ) : route === "/code-playground" ? (
           <CodePlayground />
+        ) : route === "/problems" ? (
+          <ProblemsIndex />
         ) : chapterId ? (
           <ChapterPage id={chapterId} />
         ) : (
