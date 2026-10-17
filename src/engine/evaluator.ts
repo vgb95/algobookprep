@@ -85,6 +85,7 @@ export async function evaluateSolution({
     const expectedPy = pyLiteral(t.expected);
     const hiddenPy = t.hidden === true ? "True" : "False";
     return `
+_budget_reset()
 try:
     _result = _target(${argsPy})
     _ok = _result == ${expectedPy}
@@ -95,14 +96,14 @@ _tests.append({
     "name": ${JSON.stringify(t.name)},
     "passed": _ok,
     "got": repr(_result),
-    "expected": ${expectedPy},
+    "expected": repr(${expectedPy}),
     "hidden": ${hiddenPy},
 });
 `;
   }).join("\n");
 
   const runner = `
-import sys
+import sys, time
 
 _out = []
 class _Out:
@@ -115,6 +116,32 @@ sys.stdout = _Out()
 sys.stderr = _Out()
 
 _tests = []
+
+# --- presupuesto por test: corta bucles infinitos y soluciones tontas ---
+# El tracer de Python cuesta ~x2-x5 en bucles; los tests cosen pequeños,
+# y la ganancia (nunca colgar la pestaña) bien vale el sobrecoste.
+_pasos = 0
+_t0 = 0.0
+
+def _budget_reset():
+    global _pasos, _t0
+    _pasos = 0
+    _t0 = time.time()
+
+def _budget_check(frame, event, arg):
+    global _pasos
+    _pasos += 1
+    if _pasos > 2000000:
+        raise RuntimeError(
+            "más de 2M de pasos — ¿bucle infinito?"
+        )
+    if (_pasos & 1023) == 0 and (time.time() - _t0) > 5.0:
+        raise RuntimeError(
+            "más de 5 s en un test — imposible: busca un algoritmo más rápido"
+        )
+    return _budget_check
+
+sys.settrace(_budget_check)
 
 ${setupCode}
 

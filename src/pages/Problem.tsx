@@ -41,6 +41,7 @@ export default function Problem({ id }: { id: string }) {
     stdout: string;
   }[]>([]);
   const [traceCode, setTraceCode] = useState("");
+  const [traceError, setTraceError] = useState("");
   const [traceFailedTest, setTraceFailedTest] = useState<{
     name: string;
     args: unknown;
@@ -94,6 +95,7 @@ export default function Problem({ id }: { id: string }) {
     if (!test) return;
     setTraceFailedTest(test);
     setTraceFrames([]);
+    setTraceError("");
     try {
       const callArgs = `[${test.args.map(pyLiteral).join(", ")}]`;
       const tracedCode = `
@@ -106,7 +108,9 @@ _result = _target(${callArgs})
       setTraceCode(tracedCode);
       setTraceFrames(frames);
     } catch {
-      setTraceFrames([]);
+      setTraceError(
+        "no se pudo dibujar la traza — tu código lanza un error o supera el límite de pasos antes de terminar este test",
+      );
     }
   };
 
@@ -148,6 +152,16 @@ _result = _target(${callArgs})
             <button className="btn primary" onClick={runTests} disabled={loading}>
               {loading ? "Ejecutando…" : "▶ Ejecutar tests"}
             </button>
+            <button
+              className="btn ghost"
+              onClick={() => {
+                setUserCode(problem.starterCode);
+                setEvalResult(null);
+              }}
+              disabled={loading}
+            >
+              ↺ reiniciar código
+            </button>
             {allPassed && (
               <span
                 className="badge"
@@ -184,7 +198,7 @@ _result = _target(${callArgs})
                         <span className="test-mark">{r.passed ? "✓" : "✗"}</span>
                         <span className="test-name">{r.name}</span>
                         {r.hidden && <span className="test-hidden">(oculto)</span>}
-                        {!r.passed && (
+                        {!r.passed && !r.hidden && (
                           <>
                             <div className="test-detail">
                               esperado: <b>{r.expected}</b> · obtuviste: <b>{r.got}</b>
@@ -198,12 +212,22 @@ _result = _target(${callArgs})
                             </button>
                           </>
                         )}
+                        {!r.passed && r.hidden && (
+                          <div className="test-detail">
+                            falla — los datos del test oculto no se revelan
+                          </div>
+                        )}
                       </div>
                     );
                   })}
                   {evalResult.error && (
                     <p className="err" style={{ marginTop: 8 }}>
                       Error: {evalResult.error}
+                    </p>
+                  )}
+                  {traceError && (
+                    <p className="err" style={{ marginTop: 8 }}>
+                      Traza: {traceError}
                     </p>
                   )}
                 </div>
