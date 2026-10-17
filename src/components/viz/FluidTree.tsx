@@ -1,20 +1,25 @@
 /**
- * Fase A — árbol fluido: misma disposición que TreeViz pero los
- * cambios de estado funden color (transición CSS) y el nodo actual
- * lleva un anillo pulsante. En recorridos el conjunto de nodos es
- * estable, así que no hay saltos de posición.
+ * Fase A/B/C — árbol fluido.
+ * Fase 3: el layout ya no adivina — el TreeFrame lleva las aristas
+ * padre→hijo REALES y la profundidad real de cada nodo. Las aristas del
+ * camino de la pila de recursión se resaltan (violeta): ves el backtracking
+ * subiendo y bajando mientras las llamadas entran y salen.
  */
-import type { TreeFrame } from "../../algorithms/binary-tree";
-import { layoutTree, nodeFill } from "./treeLayout";
+import { layoutTree, nodeFill, type RealEdge } from "./treeLayout";
 import { ROLE } from "./roles";
+import type { TreeFrame } from "../../algorithms/binary-tree";
 
 export default function FluidTree({ frame }: { frame: TreeFrame }) {
-  const { nodes } = frame;
+  const { nodes, edges } = frame;
   if (nodes.length === 0) {
     return <div className="empty-tree">Árbol vacío.</div>;
   }
 
-  const { width, height, radius, xPos, yPos, edges } = layoutTree(nodes);
+  const { width, height, radius, xPos, yPos, edges: geom } = layoutTree(
+    nodes,
+    edges as RealEdge[],
+  );
+  const pathSet = new Set(nodes.filter((n) => n.path).map((n) => n.id));
 
   return (
     <div>
@@ -27,18 +32,39 @@ export default function FluidTree({ frame }: { frame: TreeFrame }) {
         role="img"
         aria-label="Recorrido del árbol"
       >
-        {edges.map((e, i) => (
-          <line key={i} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} stroke="#c9c3b8" strokeWidth="2" />
-        ))}
+        {geom.map((e, i) => {
+          const onPath = pathSet.has(e.from) && pathSet.has(e.to);
+          return (
+            <line
+              key={i}
+              x1={e.x1}
+              y1={e.y1}
+              x2={e.x2}
+              y2={e.y2}
+              stroke={onPath ? ROLE.key : ROLE.edge}
+              strokeWidth={onPath ? 3 : 2}
+              className={onPath ? "edge-path" : undefined}
+            />
+          );
+        })}
         {nodes.map((n) => {
           const x = xPos.get(n.id)!;
           const y = yPos.get(n.id)!;
+          const lens = n.path ? 3 : 2;
           return (
             <g key={n.id}>
               {n.current && (
-                <circle cx={x} cy={y} r={radius} fill="none" stroke="#e8543f" strokeWidth="2" className="node-ping" />
+                <circle cx={x} cy={y} r={radius} fill="none" stroke={ROLE.current} strokeWidth="2" className="node-ping" />
               )}
-              <circle cx={x} cy={y} r={radius} fill={nodeFill(n)} stroke="#2b2926" strokeWidth="2" className="node" />
+              <circle
+                cx={x}
+                cy={y}
+                r={radius}
+                fill={nodeFill(n)}
+                stroke={n.path && !n.current ? ROLE.key : ROLE.ink}
+                strokeWidth={lens}
+                className="node"
+              />
               <text x={x} y={y + 5} textAnchor="middle" fill="#fff" fontSize={14} fontWeight={700} fontFamily="var(--font-mono)">
                 {n.value}
               </text>
@@ -48,6 +74,7 @@ export default function FluidTree({ frame }: { frame: TreeFrame }) {
       </svg>
       <div className="tree-legend">
         <span className="chip"><i style={{ background: ROLE.current }} /> actual</span>
+        <span className="chip"><i style={{ background: ROLE.key }} /> en la pila de llamadas</span>
         <span className="chip"><i style={{ background: ROLE.settled }} /> visitado</span>
         <span className="chip"><i style={{ background: ROLE.pending }} /> pendiente</span>
       </div>

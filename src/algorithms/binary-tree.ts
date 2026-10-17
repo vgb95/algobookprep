@@ -46,6 +46,8 @@ export interface TreeFrame {
     path: boolean;
   }>;
   order: number[]; // ids en orden de visita hasta ahora
+  /** Aristas padre→hijo REALES (para el layout, Fase 3). */
+  edges: Array<{ from: number; to: number }>;
   line?: number;
   hold?: number;
   vars?: Record<string, string | number>;
@@ -83,7 +85,17 @@ interface TreeCtx {
   stack: number[];
 }
 
-function makeFramer(orderLabel: string, ctx: TreeCtx) {
+/** Aristas reales padre→hijo (izq antes que der) derivadas del BST. */
+function realEdges(nodes: TreeNode[]): Array<{ from: number; to: number }> {
+  const out: Array<{ from: number; to: number }> = [];
+  for (const n of nodes) {
+    if (n.left !== null) out.push({ from: n.id, to: n.left });
+    if (n.right !== null) out.push({ from: n.id, to: n.right });
+  }
+  return out;
+}
+
+function makeFramer(orderLabel: string, ctx: TreeCtx, edgesOut: Array<{ from: number; to: number }>) {
   const { nodes, visitOrder, stack } = ctx;
   return (
     message: string,
@@ -100,6 +112,7 @@ function makeFramer(orderLabel: string, ctx: TreeCtx) {
       path: stack.includes(n.id),
     })),
     order: [...visitOrder],
+    edges: edgesOut,
     line,
     hold,
     vars: {
@@ -115,12 +128,12 @@ function makeFramer(orderLabel: string, ctx: TreeCtx) {
 export function* inorderTraversal(input: number[]): TreeGen {
   const values = [...new Set(input)].sort((a, b) => a - b);
   if (values.length === 0) {
-    yield { message: "Árbol vacío: nada que recorrer.", nodes: [], order: [], line: 2, hold: 1.5, vars: {} };
+    yield { message: "Árbol vacío: nada que recorrer.", nodes: [], order: [], edges: [], line: 2, hold: 1.5, vars: {} };
     return;
   }
   const { root, nodes } = buildBalanced(values);
   const ctx: TreeCtx = { nodes, visitOrder: [], stack: [] };
-  const frame = makeFramer("inorder", ctx);
+  const frame = makeFramer("inorder", ctx, realEdges(nodes));
 
   yield frame("Construimos el BST balanceado. Orden inorder: izquierda → raíz → derecha.", null, 1, 1.2);
 
@@ -163,12 +176,12 @@ export function* inorderTraversal(input: number[]): TreeGen {
 export function* preorderTraversal(input: number[]): TreeGen {
   const values = [...new Set(input)].sort((a, b) => a - b);
   if (values.length === 0) {
-    yield { message: "Árbol vacío: nada que recorrer.", nodes: [], order: [], line: 2, hold: 1.5, vars: {} };
+    yield { message: "Árbol vacío: nada que recorrer.", nodes: [], order: [], edges: [], line: 2, hold: 1.5, vars: {} };
     return;
   }
   const { root, nodes } = buildBalanced(values);
   const ctx: TreeCtx = { nodes, visitOrder: [], stack: [] };
-  const frame = makeFramer("preorder", ctx);
+  const frame = makeFramer("preorder", ctx, realEdges(nodes));
 
   yield frame("Construimos el BST balanceado. Orden preorder: raíz → izquierda → derecha.", null, 1, 1.2);
 
@@ -211,12 +224,12 @@ export function* preorderTraversal(input: number[]): TreeGen {
 export function* postorderTraversal(input: number[]): TreeGen {
   const values = [...new Set(input)].sort((a, b) => a - b);
   if (values.length === 0) {
-    yield { message: "Árbol vacío: nada que recorrer.", nodes: [], order: [], line: 2, hold: 1.5, vars: {} };
+    yield { message: "Árbol vacío: nada que recorrer.", nodes: [], order: [], edges: [], line: 2, hold: 1.5, vars: {} };
     return;
   }
   const { root, nodes } = buildBalanced(values);
   const ctx: TreeCtx = { nodes, visitOrder: [], stack: [] };
-  const frame = makeFramer("postorder", ctx);
+  const frame = makeFramer("postorder", ctx, realEdges(nodes));
 
   yield frame("Construimos el BST balanceado. Orden postorder: izquierda → derecha → raíz.", null, 1, 1.2);
 

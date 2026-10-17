@@ -1,9 +1,16 @@
 /**
- * Disposición determinista de árbol binario (extraída de TreeViz para
- * compartirla entre el render clásico y el fluido): x por orden de
- * valor, y por profundidad. Como depende solo del conjunto de nodos
- * (estable entre cuadros de un recorrido), las posiciones no saltan
- * y la fluidez se consigue fundiendo colores + pulso en el actual.
+ * Disposición REAL de árbol binario (Fase 3):
+ *
+ *  - x: proporción de hojas — cada hoja ocupa una columna; los nodos
+ *    internos se centran entre sus hijos. Adiós a log2(id+1) y a las
+ *    aristas "por proximidad" que dibujaban un árbol mentiroso.
+ *  - y: profundidad REAL de recursión (5 niveles = 5 filas).
+ *  - las aristas son las verdaderas padre→hijo (frame.edges), nada de
+ *    vecinos cercanos.
+ *
+ * La estructura es constante durante un recorrido, así que las
+ * posiciones no saltan entre cuadros: la fluidez viene de los estados
+ * (visited/current/path) fundiéndose.
  */
 
 import { ROLE } from "./roles";
@@ -16,59 +23,91 @@ export interface FlatNode {
   path: boolean;
 }
 
+export interface RealEdge {
+  from: number;
+  to: number;
+}
+
 export interface TreeLayout {
   width: number;
   height: number;
   radius: number;
   xPos: Map<number, number>;
   yPos: Map<number, number>;
-  edges: Array<{ x1: number; y1: number; x2: number; y2: number }>;
+  edges: Array<{ from: number; to: number; x1: number; y1: number; x2: number; y2: number }>;
 }
 
-export function layoutTree(nodes: FlatNode[], width = 700, height = 320): TreeLayout {
-  const radius = 22;
-  const sortedByValue = [...nodes].sort((a, b) => a.value - b.value);
-  const xPos = new Map<number, number>();
-  sortedByValue.forEach((n, i) => {
-    xPos.set(n.id, 80 + (i / Math.max(sortedByValue.length - 1, 1)) * (width - 160));
-  });
+const LEAF_GAP = 66;
+const PAD_X = 50;
+const LEVEL_GAP = 84;
+const RADIUS = 22;
 
-  const depth = new Map<number, number>();
-  nodes.forEach((n) => depth.set(n.id, Math.floor(Math.log2(n.id + 1))));
-  const maxDepth = Math.max(...Array.from(depth.values()), 0);
-  const yFor = (d: number) => 60 + (d / Math.max(maxDepth, 1)) * (height - 100);
-  const yPos = new Map<number, number>();
-  nodes.forEach((n) => yPos.set(n.id, yFor(depth.get(n.id)!)));
-
-  const edges: TreeLayout["edges"] = [];
-  const nodesByDepth = new Map<number, FlatNode[]>();
-  nodes.forEach((n) => {
-    const d = depth.get(n.id)!;
-    if (!nodesByDepth.has(d)) nodesByDepth.set(d, []);
-    nodesByDepth.get(d)!.push(n);
-  });
-  const depths = Array.from(nodesByDepth.keys()).sort((a, b) => a - b);
-  for (let i = 0; i < depths.length - 1; i++) {
-    const upper = nodesByDepth.get(depths[i])!;
-    const lower = nodesByDepth.get(depths[i + 1])!;
-    for (const u of upper) {
-      for (const l of lower) {
-        if (Math.abs(xPos.get(u.id)! - xPos.get(l.id)!) < (width / upper.length) * 1.5) {
-          edges.push({
-            x1: xPos.get(u.id)!,
-            y1: yFor(depths[i]),
-            x2: xPos.get(l.id)!,
-            y2: yFor(depths[i + 1]),
-          });
-          break;
-        }
-      }
-    }
+export function layoutTree(nodes: FlatNode[], edges: RealEdge[] = []): TreeLayout {
+  if (nodes.length === 0) {
+    return { width: 700, height: 320, radius: RADIUS, xPos: new Map(), yPos: new Map(), edges: [] };
   }
 
-  return { width, height, radius, xPos, yPos, edges };
+  const children = new Map<number, number[]>();
+  const parent = new Map<number, number>();
+  for (const e of edges) {
+    if (!children.has(e.from)) children.set(e.from, []);
+    children.get(e.from)!.push(e.to);
+    parent.set(e.to, e.from);
+  }
+
+  const roots = nodes.filter((n) => !parent.has(n.id));
+  // Un BST con aristas reales tiene exactamente una raíz; robustés por si acaso.
+  const root = roots[0] ?? nodes[0];
+
+  const xPos = new Map<number, number>();
+  const depth = new Map<number, number>();
+  let leaves = 0;
+  let maxDepth = 0;
+
+  const place = (id: number, d: number): number => {
+    maxDepth = Math.max(maxDepth, d);
+    depth.set(id, d);
+    const kids = children.get(id) ?? [];
+    if (kids.length === 0) {
+      const x = PAD_X + leaves * LEAF_GAP;
+      leaves++;
+      xPos.set(id, x);
+      return x;
+    }
+    const xs = kids.map((k) => place(k, d + 1));
+    const avg = xs.reduce((a, b) => a + b, 0) / xs.length;
+    xPos.set(id, avg);
+    return avg;
+  };
+  place(root.id, 0);
+
+  const yPos = new Map<number, number>();
+  nodes.forEach((n) => yPos.set(n.id, 56 + depth.get(n.id)! * LEVEL_GAP));
+
+  const geometry = edges
+    .filter((e) => xPos.has(e.from) && xPos.has(e.to))
+    .map((e) => ({
+      from: e.from,
+      to: e.to,
+      x1: xPos.get(e.from)!,
+      y1: yPos.get(e.from)!,
+      x2: xPos.get(e.to)!,
+      y2: yPos.get(e.to)!,
+    }));
+
+  return {
+    width: Math.max(700, PAD_X * 2 + (Math.max(leaves - 1, 0)) * LEAF_GAP),
+    height: 56 + maxDepth * LEVEL_GAP + 60,
+    radius: RADIUS,
+    xPos,
+    yPos,
+    edges: geometry,
+  };
 }
 
 export function nodeFill(n: FlatNode): string {
-  return n.current ? ROLE.current : n.visited ? ROLE.settled : ROLE.pending;
+  if (n.current) return ROLE.current;
+  if (n.visited) return ROLE.settled;
+  if (n.path) return ROLE.key;
+  return ROLE.pending;
 }
