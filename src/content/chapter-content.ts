@@ -31,7 +31,7 @@ export const arraysChapter: ChapterContent = {
     {
       kind: "viz",
       id: "arrays-lookup-viz",
-      type: "graph",
+      type: "array",
       config: { op: "lookup", array: "4, 1, 7, 3, 9, 2", target: "7" },
     },
     {
@@ -43,7 +43,7 @@ export const arraysChapter: ChapterContent = {
     {
       kind: "viz",
       id: "arrays-insert-viz",
-      type: "graph",
+      type: "array",
       config: { op: "insert", array: "4, 1, 7, 3, 9, 2", index: "2", value: "5" },
     },
     {
@@ -55,7 +55,7 @@ export const arraysChapter: ChapterContent = {
     {
       kind: "viz",
       id: "arrays-delete-viz",
-      type: "graph",
+      type: "array",
       config: { op: "delete", array: "4, 1, 7, 3, 9, 2", index: "2" },
     },
     {
