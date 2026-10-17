@@ -45,6 +45,7 @@ export default function HeapPlayground() {
         {frames.length > 0 && (
           <FluidScrubber
             frames={frames}
+            code={heapOps[op].code}
             render={(f, _blend, _next, index) => (
               <>
                 <p className="narrate" key={index}>{f.message}</p>

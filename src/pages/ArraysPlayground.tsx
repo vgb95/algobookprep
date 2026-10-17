@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { record } from "../engine/timeline";
-import { lookup, insertAt, deleteAt, type ArrayOp } from "../algorithms/arrays";
+import { lookup, insertAt, deleteAt, arrayOps, type ArrayOp } from "../algorithms/arrays";
 import FluidScrubber from "../components/viz/FluidScrubber";
 import ArrayCells from "../components/viz/ArrayCells";
 import { parseArray, clampInt, randomArray } from "../utils/parse";
@@ -87,6 +87,7 @@ export default function ArraysPlayground() {
         {frames.length > 0 && (
           <FluidScrubber
             frames={frames}
+            code={arrayOps[op].code}
             render={(f, blend, next, index) => (
               <>
                 <p className="narrate" key={index}>{f.message}</p>

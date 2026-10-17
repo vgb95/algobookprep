@@ -88,6 +88,7 @@ export default function SortingPlayground() {
         {frames.length > 0 && (
           <FluidScrubber
             frames={frames}
+            code={sorters[algo].code}
             render={(f, blend, next, index) => (
               <>
                 <p className="narrate" key={index}>{f.message}</p>

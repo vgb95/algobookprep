@@ -5,6 +5,7 @@ import VariableInspector from "../components/viz/VariableInspector";
 import FluidScrubber from "../components/viz/FluidScrubber";
 import FluidBars, { type BarMarker } from "../components/viz/FluidBars";
 import { ROLE } from "../components/viz/roles";
+import type { SortFrame } from "../algorithms/sorting";
 
 /**
  * Heurística de punteros: locales con nombre de índice (i, j, min, mid…)
@@ -131,14 +132,14 @@ export default function CodePlayground() {
           render={(f, blend, next, index) => {
             const arrKey =
               arrayVar && f.arrays && f.arrays[arrayVar] ? arrayVar : null;
-            const toViz = (t: (typeof frames)[number]) => ({
-              array: arrKey && t.arrays && t.arrays[arrKey] ? t.arrays[arrKey] : [],
-              settled: [] as number[],
-              compare: undefined,
-              swap: undefined,
-              key: undefined,
-              cursor: undefined,
-              found: undefined,
+            const toViz = (t: (typeof frames)[number]): SortFrame => ({
+              message: `Línea ${t.line} ejecutada.`,
+              cells: (arrKey && t.arrays && t.arrays[arrKey] ? t.arrays[arrKey] : []).map(
+                (v, i) => ({ id: i, value: v, slot: i }),
+              ),
+              settled: [],
+              comparisons: 0,
+              writes: 0,
             });
             return (
               <>

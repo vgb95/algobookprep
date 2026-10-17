@@ -47,6 +47,7 @@ export default function GraphPlayground() {
         {frames.length > 0 && (
           <FluidScrubber
             frames={frames}
+            code={graphAlgos[algo].code}
             render={(f, blend, next, index) => (
               <>
                 <p className="narrate" key={index}>{f.message}</p>

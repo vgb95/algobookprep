@@ -38,6 +38,7 @@ export default function TreePlayground() {
         {frames.length > 0 && (
           <FluidScrubber
             frames={frames}
+            code={treeOrders[order].code}
             render={(f, _blend, _next, index) => (
               <>
                 <p className="narrate" key={index}>{f.message}</p>
