@@ -22,7 +22,7 @@ import { sorters, type SortId } from "../../algorithms/sorting";
 import { treeOrders, type TreeOrder } from "../../algorithms/binary-tree";
 import { graphAlgos, type GraphAlgo } from "../../algorithms/graph";
 import { heapOps, type HeapOp } from "../../algorithms/heap";
-import { lookup, insertAt, deleteAt, arrayOps, type ArrayOp } from "../../algorithms/arrays";
+import { lookup, insertAt, deleteAt, binarySearch, arrayOps, type ArrayOp } from "../../algorithms/arrays";
 import { parseArray, clampInt } from "../../utils/parse";
 import { sampleFor, parseEdges, SAMPLE_LABELS, type SampleKind } from "../../utils/sample";
 
@@ -71,6 +71,14 @@ function buildShow(
           ),
         ),
         code: arrayOps.insert.code,
+      };
+    }
+    if (op === "binary") {
+      // Precondición didáctica: la binaria exige array ordenado.
+      const sorted = parsed.slice().sort((a, b) => a - b);
+      return {
+        frames: record(binarySearch(sorted, clampInt(String(config.target ?? "7"), 1, 99, 7))),
+        code: arrayOps.binary.code,
       };
     }
     if (op === "delete") {

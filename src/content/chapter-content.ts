@@ -1,8 +1,9 @@
 import { ChapterContent } from "./blocks";
 
 /**
- * Capítulo 2 — Arrays. Contenido completo de ejemplo:
- * teoría, fórmulas, visualizaciones interactivas y problemas.
+ * Capítulo 2 — Arrays (revisión didáctica 6a).
+ * Estructura: gancho → teoría → vizzes → ejemplo resuelto →
+ * tabla de costes → trampas → recap → problemas.
  */
 export const arraysChapter: ChapterContent = {
   id: "arrays",
@@ -13,20 +14,20 @@ export const arraysChapter: ChapterContent = {
   blocks: [
     {
       kind: "prose",
+      id: "arrays-hook",
+      text:
+        "**Gancho:** un array es la estructura más humilde y la más rápida. ¿Por qué? Mira cómo vive en RAM: puro orden, sin desvíos. Piensa en una fila de casilleros numerados en línea: la casilla nº i es `primera + i·tamaño`, un solo salto, sin caminar el pasillo. Las demás estructuras existen para arreglar lo que el array NO hace bien: crecer o encoger en medio.",
+    },
+    {
+      kind: "prose",
       id: "arrays-intro",
       text:
-        "Un **array** es una colección de elementos del mismo tipo almacenados en **posiciones de memoria contiguas**. Gracias a eso, el ordenador sabe exactamente dónde está cada elemento: si sabe la dirección de inicio y el tamaño de cada elemento, puede saltar directamente a la posición *i* en tiempo constante.",
+        "Un **array** es una colección de elementos del mismo tipo almacenados en **posiciones de memoria contiguas**. Todas las casillas tienen el mismo tamaño (¡por eso ese \"elemento del mismo tipo\"!): si sabes dónde empieza el array y cuánto ocupa cada casilla, puedes calcular la dirección de cualquier elemento sin recorrer nada.",
     },
     {
       kind: "formula",
       id: "arrays-address",
       latex: "\\text{dirección}(a[i]) = \\text{dirección}(a[0]) + i \\times \\text{tamaño(elemento)}",
-    },
-    {
-      kind: "prose",
-      id: "arrays-o1",
-      text:
-        "Ese es el gran poder de los arrays: **acceso aleatorio en O(1)**. Puedes leer o escribir `a[5]` sin recorrer los elementos anteriores. El precio se paga cuando quieres insertar o borrar en medio: hay que desplazar todos los elementos posteriores para hacer o cerrar el hueco, y eso cuesta **O(n)**.",
     },
     {
       kind: "viz",
@@ -36,9 +37,15 @@ export const arraysChapter: ChapterContent = {
     },
     {
       kind: "prose",
+      id: "arrays-o1",
+      text:
+        "Esa fórmula es el superpoder del array: **acceso aleatorio en O(1)**. Leer o escribir `a[5]` es un solo salto de memoria. PERO mira la visualización: buscar *por valor* (¿dónde está el 7?) obliga a recorrer casilla a casilla — O(n). El O(1) vale solo para el índice; el valor hay que buscarlo.",
+    },
+    {
+      kind: "prose",
       id: "arrays-insert",
       text:
-        "Insertar un valor en la posición *i* obliga a desplazar una casilla a la derecha todos los elementos desde *i* hasta el final. En el peor caso (insertar al principio) mueves *n* elementos.",
+        "Ahora el lado oscuro: la contigüidad es un contrato rígido — no hay huecos. Para **insertar** en la posición *i*, todo lo posterior debe ganar una casilla a la derecha, UNO a UNO, para que siga habiendo contigüidad. En el peor caso (insertar al principio) desplazas los *n* elementos: **O(n)**.",
     },
     {
       kind: "viz",
@@ -50,7 +57,7 @@ export const arraysChapter: ChapterContent = {
       kind: "prose",
       id: "arrays-delete",
       text:
-        "Borrar en la posición *i* es lo inverso: desplazas una casilla a la izquierda todos los elementos posteriores para tapar el hueco. De nuevo, O(n) en el peor caso.",
+        "**Borrar** es lo inverso: el elemento sale y los posteriores caen una casilla a la izquierda para tapar el hueco. De nuevo **O(n)**. Fíjate en la visualización: el hueco viaja de la posición de salida al final mientras las tarjetas colapsan — físico, no abstracto.",
     },
     {
       kind: "viz",
@@ -64,9 +71,27 @@ export const arraysChapter: ChapterContent = {
     },
     {
       kind: "prose",
-      id: "arrays-summary",
+      id: "arrays-example",
       text:
-        "Resumen de costes: acceso por índice O(1); búsqueda por valor O(n); inserción O(n); borrado O(n). Si necesitas inserciones y borrados frecuentes en cualquier posición, una lista enlazada puede ser mejor opción — lo veremos en el capítulo 8.",
+        "**Ejemplo resuelto.** ¿Cuál es el coste total de insertar 1.000 veces SIEMPRE al principio de un array? Cada inserción desplaza toda la lista: 1 + 2 + … + 1.000 ≈ 500.000 escrituras — O(n²). En cambio, si insertas SIEMPRE al final (append), no hay que desplazar nada: 1.000 escrituras — O(n) total, O(1) **amortizado** por operación (de vez en cuando la tabla crece y paga un copy). Misma operación, distinta posición: lo que decides es el COSTE.",
+    },
+    {
+      kind: "prose",
+      id: "arrays-costs",
+      text:
+        "| Operación | Coste | Motivo |\n| --- | --- | --- |\n| acceso por índice `a[i]` | O(1) | aritmética de direcciones |\n| buscar por valor | O(n) | no hay orden garantizado |\n| insertar / borrar en medio | O(n) | desplazar el resto |\n| append al final | O(1) amortizado | nada que desplazar (crecer paga una copia) |\n\n**Tradeoff frente a otras estructuras:** si tu vida son inserciones en cualquier posición, la lista enlazada (cap. 8) hace la inserción en O(1)… pero su búsqueda también es O(n) y pierde el acceso aleatorio. Ninguna gana de forma absoluta: gana la que encaja con tu patrón de uso.",
+    },
+    {
+      kind: "prose",
+      id: "arrays-pitfalls",
+      text:
+        "**Trampas frecuentes:**\n\n1. **Off-by-one.** Bucles que en vez de `i < len` ponen `i <= len` — en Python, error; en C, corrupción silenciosa. Las casillas van de 0 a len−1.\n2. **Mutación compartida.** `b = a` copia la REFERENCIA (en Python): ordenar `b` ordena `a`. Copia de verdad cuando necesites copia: `b = a[:]`.\n3. **Borrar mientras iteras.** Eliminar elementos DENTRO de un bucle que recorre la lista hace que se te salten elementos: itera sobre índices ajustando el contador al borrar, o construye una lista nueva.\n4. **Arrays dinámicos como fijos.** En Python una lista es dinámica: el append es feliz. Pero si tu algoritmo promete O(n) total y encadenas N inserciones AL PRINCIPIO, sigue siendo O(n²) — amortizado solo cubre el append.",
+    },
+    {
+      kind: "prose",
+      id: "arrays-recap",
+      text:
+        "**Recap:** contigüidad = acceso O(1) por índice; buscar por valor O(n); insertar o borrar en medio O(n) porque las tarjetas desplazan; append O(1) amortizado. El array domina cuando tu patrón es \"leer por posición\"; pierde cuando es \"modificar en medio\" — eso lo resuelven listas enlazadas (cap. 8) y deques.",
     },
     {
       kind: "problem",
@@ -82,7 +107,7 @@ export const arraysChapter: ChapterContent = {
 };
 
 /**
- * Capítulo 5 — Sorting. Contenido de ejemplo.
+ * Capítulo 5 — Sorting (revisión didáctica 6a).
  */
 export const sortingChapter: ChapterContent = {
   id: "sorting",
@@ -93,45 +118,51 @@ export const sortingChapter: ChapterContent = {
   blocks: [
     {
       kind: "prose",
+      id: "sorting-hook",
+      text:
+        "**Gancho:** ordenar es la tarea más común del mundo (buscar, deduplicar, rangos, fusionar…). Hay docenas de algoritmos de ordenación, pero los tres elementales —bubble, insertion y selection— comparten la misma figura: en el peor caso hacen **O(n²) comparaciones** y todo sucede dentro del array. Lo que los distingue es CÓMO mueven las tarjetas: intercambiando vecinos, levantando una clave o seleccionando el mínimo.",
+    },
+    {
+      kind: "prose",
       id: "sorting-intro",
       text:
-        "Ordenar un array es una de las tareas más comunes en programación. Hay docenas de algoritmos de ordenación, pero los tres más sencillos de entender —bubble, insertion y selection— comparten una propiedad: en el peor caso hacen **O(n²) comparaciones**. Veamos cómo funciona cada uno, paso a paso.",
+        "Los tres trabajan completamente sobre el array: espacio extra O(1) — *in-place*. Míralos en movimiento: cada uno con sus contadores de comparaciones y escrituras activos, y el código Python debajo ejecutándose línea a línea (code playback). Cambia la entrada con 🎲 «casi ordenado» y observa cómo cambia el carácter de cada uno.",
     },
     {
       kind: "viz",
       id: "sorting-bubble-viz",
       type: "sorting",
-      config: { algo: "bubble", array: "7, 3, 9, 1, 5" },
+      config: { algo: "bubble", array: "7, 3, 9, 1, 5, 2" },
     },
     {
       kind: "prose",
       id: "sorting-bubble-text",
       text:
-        '**Bubble sort** compara pares adyacentes y los intercambia si están en el orden equivocado. En cada pasada, el elemento más grande "burbujea" hacia el final. Es fácil de recordar pero ineficiente: siempre recorre todo el array incluso si ya está ordenado (salvo que añadas una bandera de intercambio).',
+        "**Bubble sort** barre pares adyacentes e intercambia si están al revés: en cada pasada, el mayor de la zona activa \"flota\" hasta su posición final (fijada en verde). Su gracia: si una pasada entera se hace sin UN solo intercambio, el array ya está ordenado y puedes PARAR — mejor caso O(n). Sin esa bandera, pierde tiempo recorriendo array ya ordenado.",
     },
     {
       kind: "viz",
       id: "sorting-insertion-viz",
       type: "sorting",
-      config: { algo: "insertion", array: "7, 3, 9, 1, 5" },
+      config: { algo: "insertion", array: "7, 3, 9, 1, 5, 2" },
     },
     {
       kind: "prose",
       id: "sorting-insertion-text",
       text:
-        "**Insertion sort** construye el array ordenado de izquierda a derecha. Toma cada elemento y lo inserta en su sitio correcto dentro de la parte ya ordenada, desplazando los mayores hacia la derecha. Es eficiente en arrays casi ordenados (mejor caso O(n)).",
+        "**Insertion sort** va construyendo a la IZQUIERDA una versión ordenada: toma la siguiente clave, la LEVANTA (verás el hueco punteado), y la desliza hacia atrás hasta encajarla. Es el algoritmo de la baraja que usas sin darte cuenta jugando a cartas. Con entradas **casi ordenadas** vuela: O(n) — cada clave se mueve una casilla o ninguna. Además es **estable** (los iguales conservan su orden relativo).",
     },
     {
       kind: "viz",
       id: "sorting-selection-viz",
       type: "sorting",
-      config: { algo: "selection", array: "7, 3, 9, 1, 5" },
+      config: { algo: "selection", array: "7, 3, 9, 1, 5, 2" },
     },
     {
       kind: "prose",
       id: "sorting-selection-text",
       text:
-        "**Selection sort** busca el mínimo de la parte desordenada y lo coloca al final de la parte ordenada. Siempre hace el mismo número de comparaciones (O(n²)) sin importar el orden inicial, y no es estable (puede cambiar el orden relativo de elementos iguales).",
+        "**Selection sort** busca el mínimo de la zona desordenada y lo intercambia con el primer hueco libre. Su marca: hace SIEMPRE las mismas comparaciones — ~n²/2, sin importar cómo venga la entrada, son tarifa fija. A cambio solo hace hasta n−1 intercambios: si cada ESCRITURA te cuesta cara (memoria lenta, flash), escribir poco importa. No es estable.",
     },
     {
       kind: "divider",
@@ -139,21 +170,33 @@ export const sortingChapter: ChapterContent = {
     },
     {
       kind: "prose",
-      id: "sorting-comparison",
+      id: "sorting-example",
       text:
-        "| algoritmo | peor caso | mejor caso | espacio extra | estable |\n| --- | --- | --- | --- | --- |\n| bubble | O(n²) | O(n) | O(1) | sí |\n| insertion | O(n²) | O(n) | O(1) | sí |\n| selection | O(n²) | O(n²) | O(1) | no |",
+        "**Ejemplo resuelto.** [7, 3, 9, 1, 5, 2] con bubble: pasada 1 fija el 9 al final, pasada 2 fija el 7… los mayores van migrando hacia la derecha hasta que solo queda el 1 suelto. Pregunta clave: ¿cuántas pasadas si la entrada YA está ordenada? Con la bandera `swapped`: UNA pasada de n−1 comparaciones → O(n). Sin bandera: las n pasadas igualmente. Nada es gratis para quien no vigile su bucle.",
     },
     {
       kind: "prose",
-      id: "sorting-outro",
+      id: "sorting-costs",
       text:
-        "O(n²) está bien para aprender, pero para arrays grandes necesitamos algo mejor: merge sort y quicksort (O(n log n)) los veremos en los capítulos de recursión y divide y vencerás.",
+        "| Algoritmo | Peor | Mejor | Espacio | Estable | Cuándo usarlo |\n| --- | --- | --- | --- | --- | --- |\n| Bubble | O(n²) | O(n) (con bandera) | O(1) | sí | docencia, arrays minúsculos |\n| Insertion | O(n²) | O(n) | O(1) | sí | casi ordenado, n pequeño |\n| Selection | O(n²) | O(n²) | O(1) | no | escrituras caras, n pequeño |\n\n**Tradeoff central:** los tres comparten el O(n²) en el peor caso — lo que los distingue es el caso mejor (el carácter) y cuántas escrituras hacen. Para n grande: merge sort / quicksort O(n log n), los verás en el capítulo de recursión.",
+    },
+    {
+      kind: "prose",
+      id: "sorting-pitfalls",
+      text:
+        "**Trampas frecuentes:**\n\n1. **Bucle infinito «invisible».** Cualquier variante que en vez de avanzar (`i+1`, `hi−1`) deje el rango igual puede no terminar. Comprueba SIEMPRE que cada paso reduce el rango activo.\n2. **Estabilidad en selección.** El intercambio salta distancias: [2a, 2b, 1] → [1, 2b, 2a] reordena dos iguales — por eso selection NO es estable.\n3. **Insertion disfrazado.** Contar solo «escrituras» esconde el trabajo real del desplazamiento: la comparación `while j ≥ 0` es la que dispara el coste en orden inverso, no la escritura.\n4. **O(n²) a escala.** n = 10⁵ son ~10¹⁰ operaciones — minutos de CPU. Para millones de elementos, pasar a O(n log n) es la diferencia entre «hoy» y «nunca».",
+    },
+    {
+      kind: "prose",
+      id: "sorting-recap",
+      text:
+        "**Recap:** bubble = intercambios de vecinos con bandera de parada temprana; insertion = clave levantada que se encaja en el lado ordenado (rey del casi ordenado, estable); selection = mínimo global a lo suyo (pocas escrituras, inestable). Los tres in-place con O(1) extra y O(n²) en el peor caso. El paso siguiente: divide y vencerás (recursión) reduce ese n² a n log n.",
     },
   ],
 };
 
 /**
- * Capítulo 13 — Trees. Contenido de ejemplo.
+ * Capítulo 13 — Trees (revisión 6c pendiente; vizzes actualizadas).
  */
 export const treesChapter: ChapterContent = {
   id: "trees",
@@ -207,7 +250,7 @@ export const treesChapter: ChapterContent = {
 };
 
 /**
- * Capítulo 17 — Graphs. Contenido de ejemplo.
+ * Capítulo 17 — Graphs (revisión 6c pendiente; vizzes actualizadas).
  */
 export const graphsChapter: ChapterContent = {
   id: "graphs",
@@ -249,7 +292,7 @@ export const graphsChapter: ChapterContent = {
 };
 
 /**
- * Capítulo 14 — Heaps. Contenido de ejemplo.
+ * Capítulo 14 — Heaps (revisión 6c pendiente; vizzes actualizadas).
  */
 export const heapsChapter: ChapterContent = {
   id: "heaps",

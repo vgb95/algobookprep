@@ -33,6 +33,18 @@ export const DELETE_CODE = `def delete_at(a, index):
     a.pop()
     return a`;
 
+export const BINARY_CODE = `def binary_search(a, target):
+    lo, hi = 0, len(a) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if a[mid] == target:
+            return mid
+        if a[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1`;
+
 /* ————— Frames ————— */
 
 export interface ArrayCell {
@@ -62,12 +74,66 @@ export interface ArrayFrame {
 
 type ArrayGen = FrameGenerator<ArrayFrame>;
 
-export type ArrayOp = "lookup" | "insert" | "delete";
+export type ArrayOp = "lookup" | "insert" | "delete" | "binary";
+
+/**
+ * Búsqueda binaria: exige array ORDENADO (el reproductor lo ordena
+ * antes de representarla si hace falta). Las casillas descartadas
+ * quedan tintadas; el cursor marca el medio que probamos en cada paso.
+ */
+export function* binarySearch(input: number[], target: number): ArrayGen {
+  const cells: ArrayCell[] = input.map((v, i) => ({ id: i, value: v, slot: i }));
+  let probes = 0;
+  let lo = 0;
+  let hi = cells.length - 1;
+
+  const frame = (
+    message: string,
+    line: number,
+    mid: number,
+    found: boolean,
+    hold?: number,
+  ): ArrayFrame => {
+    const status: Record<string, CellStatus> = {};
+    for (let k = 0; k < lo; k++) status[String(k)] = "probe";
+    for (let k = hi + 1; k < cells.length; k++) status[String(k)] = "probe";
+    if (mid >= 0) status[String(mid)] = found ? "found" : "cursor";
+    return {
+      message,
+      cells: cells.map((c) => ({ ...c })),
+      status,
+      probes,
+      writes: 0,
+      line,
+      hold,
+      vars: { lo, hi, mid: mid < 0 ? "—" : mid, objetivo: target, pasadas: probes },
+    };
+  };
+
+  while (lo <= hi) {
+    probes++;
+    const mid = Math.floor((lo + hi) / 2);
+    yield frame(`Rango a[${lo}..${hi}]: probamos el medio a[${mid}] = ${input[mid]}.`, 4, mid, false);
+    if (input[mid] === target) {
+      yield frame(`¡Encontrado! a[${mid}] = ${target}. ${probes} pasadas — eso es O(log n).`, 6, mid, true, 2.2);
+      return;
+    }
+    if (input[mid] < target) {
+      lo = mid + 1;
+      yield frame(`a[${mid}] < ${target}: el objetivo solo puede estar a la derecha — descartamos la mitad izquierda.`, 8, mid, false);
+    } else {
+      hi = mid - 1;
+      yield frame(`a[${mid}] > ${target}: el objetivo solo puede estar a la izquierda — descartamos la mitad derecha.`, 9, mid, false);
+    }
+  }
+  yield frame(`El rango quedó vacío: ${target} no está. Devolvemos -1 tras ${probes} pasadas.`, 11, -1, false, 2);
+}
 
 export const arrayOps: Record<ArrayOp, { name: string; code: string }> = {
   lookup: { name: "Búsqueda lineal", code: LOOKUP_CODE },
   insert: { name: "Insertar en índice", code: INSERT_CODE },
   delete: { name: "Borrar en índice", code: DELETE_CODE },
+  binary: { name: "Búsqueda binaria (ordenado)", code: BINARY_CODE },
 };
 
 const st = (cells: ArrayCell[], kind: CellStatus): Record<string, CellStatus> =>

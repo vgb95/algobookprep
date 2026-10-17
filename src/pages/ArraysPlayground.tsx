@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { record } from "../engine/timeline";
-import { lookup, insertAt, deleteAt, arrayOps, type ArrayOp } from "../algorithms/arrays";
+import { lookup, insertAt, deleteAt, binarySearch, arrayOps, type ArrayOp } from "../algorithms/arrays";
 import FluidScrubber from "../components/viz/FluidScrubber";
 import ArrayCells from "../components/viz/ArrayCells";
 import { parseArray, clampInt, randomArray } from "../utils/parse";
@@ -12,6 +12,8 @@ const OP_HINTS: Record<ArrayOp, string> = {
     "Insertar en medio obliga a hacer hueco desplazando todo lo posterior: O(n). El append al final es O(1) amortizado.",
   delete:
     "Borrar en medio obliga a tapar el hueco desplazando todo lo posterior hacia la izquierda: O(n).",
+  binary:
+    "La búsqueda binaria exige array ORDENADO: cada paso descarta la mitad del rango y convierte n pasadas en ~log₂(n).",
 };
 
 export default function ArraysPlayground() {
@@ -26,6 +28,10 @@ export default function ArraysPlayground() {
     if (!parsed) return [];
     if (op === "lookup") {
       return record(lookup(parsed, clampInt(target, 1, 99, 1)));
+    }
+    if (op === "binary") {
+      // Precondición: la binaria exige array ordenado.
+      return record(binarySearch(parsed.slice().sort((a, b) => a - b), clampInt(target, 1, 99, 1)));
     }
     if (op === "insert") {
       return record(
@@ -47,6 +53,7 @@ export default function ArraysPlayground() {
             operación
             <select value={op} onChange={(e) => setOp(e.target.value as ArrayOp)}>
               <option value="lookup">buscar valor</option>
+              <option value="binary">búsqueda binaria</option>
               <option value="insert">insertar en i</option>
               <option value="delete">borrar en i</option>
             </select>
