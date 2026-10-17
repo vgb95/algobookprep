@@ -1898,4 +1898,378 @@ _target = autocomplete_prefix`,
       { name: "byte lleno (oculto)", args: [255], expected: 8, hidden: true },
     ],
   },
+  {
+    id: "iteraciones-modo",
+    chapter: "complexity",
+    title: "Pasos estimados por modo de bucle",
+    difficulty: "fácil",
+    blurb: "Dados n y un modo («lineal», «cuadrado», «logaritmico», «nlogn»), devuelve cuántos pasos hace el bucle de ese modo. «logaritmico» = cuántas veces puedes dividir n entre 2 antes de llegar a 0 (n = 0 → 0). El resto: «lineal» → n; «cuadrado» → n·n; «nlogn» → n·logaritmico(n).",
+    setupCode: `def iteraciones(n, modo):
+    \"\"\"Pasos estimados del bucle según el modo dado.\"\"\"
+    pass
+
+_target = iteraciones`,
+    starterCode: `def iteraciones(n, modo):
+    # TODO: mapea cada modo a su fórmula de coste
+    pass`,
+    solutionCode: `def iteraciones(n, modo):
+    if modo == "lineal":
+        return n
+    if modo == "cuadrado":
+        return n * n
+    def log_n(m):
+        pasos = 0
+        while m > 0:
+            m = m // 2
+            pasos += 1
+        return pasos
+    logaritmo = log_n(n)
+    if modo == "logaritmico":
+        return logaritmo
+    if modo == "nlogn":
+        return n * logaritmo
+    return -1`,
+    explanation:
+      "Es la tabla del cap. 1 convertida en función: cada modo es una clase de coste (O(n), O(n²), O(log n), O(n log n)) y el resultado es su valor exacto para ese n. El truco útil: contar divisiones entre 2 de un entero equivale a su bit_length() — porque «dividir a la mitad hasta 0» es contar los bits.",
+    tradeoff:
+      "log_n() con bucle vale el capítulo: es O(log n) y refleja de dónde sale el factor. La versión real usaría bit_length(), y para cuadrados grandes un n·n desborda en lenguajes fijos — pero Python maneja enteros grandes sin drama. Con esto puedes establecer la regla delante de cualquier n.",
+    hints: [
+      "logaritmico(n): bucle que divide entre 2 hasta 0 y cuenta vueltas.",
+      "n = 0 → 0 para todos los modos (ni un paso).",
+      "nlogn = n veces el logaritmico de n.",
+    ],
+    tests: [
+      { name: "lineal", args: [5, "lineal"], expected: 5 },
+      { name: "cuadrado", args: [4, "cuadrado"], expected: 16 },
+      { name: "logaritmico de 1", args: [1, "logaritmico"], expected: 1 },
+      { name: "cero", args: [0, "logaritmico"], expected: 0 },
+      { name: "nlogn de cuatro", args: [4, "nlogn"], expected: 12, hidden: true },
+      { name: "logaritmico de 10 (oculto)", args: [10, "logaritmico"], expected: 4, hidden: true },
+    ],
+  },
+  {
+    id: "papa-caliente",
+    chapter: "queues",
+    title: "La patata caliente",
+    difficulty: "fácil",
+    blurb: "En una fila circular, la patata pasa k veces: cada pase toma al primero de la fila y lo reencola al final; en el pase k-ésimo quien la recibe queda ELIMINADO. Repite hasta que quede uno y devuelve la lista con el ganador dentro. k = 1 elimina al primero de cada ronda.",
+    setupCode: `def ganador(fila, k):
+    \"\"\"El que sobrevive a la patata caliente de k pases por ronda.\"\"\"
+    pass
+
+_target = ganador`,
+    starterCode: `def ganador(fila, k):
+    # TODO: pases = quitar de delante y volver a poner detrás;
+    # el k-ésimo pase no vuelve a la fila
+    pass`,
+    solutionCode: `def ganador(fila, k):
+    cola = fila[:]
+    while len(cola) > 1:
+        for i in range(k):
+            primera = cola.pop(0)
+            if i < k - 1:
+                cola.append(primera)
+    return cola`,
+    explanation:
+      "Es el BFS de las fiestas: una cola circular. Cada pase es dequeue + enqueue; el pase k-ésimo se salta el reencolado y ese nombre desaparece. Rotar la fila k−1 veces con append/pop(0) es exactamente lo que hace el doble bucle — y si k fuera gigante, el truco mod: (índice + k − 1) % len(cola) elude los pases uno a uno.",
+    tradeoff:
+      "El pop(0) de listas es O(n): la simulación entera queda O(n²) para filas grandes; con collections.deque los pases son O(1) y el total O(n·k) sin remodelar el algoritmo. Y como en la ventaja del deque del cap. 10: la ESTRUCTURA del contenedor consigue la misma idea más barata — la plantilla mental (rotar y expulsar) no cambia.",
+    hints: [
+      "k−1 pases normales y el k-ésimo elimina (no reencola).",
+      "pop(0) quita de delante; append(x) devuelve al final — eso ES rotar.",
+      "El bucle para cuando la cola tiene un solo nombre.",
+    ],
+    tests: [
+      { name: "cuatro y pases dos", args: [["a", "b", "c", "d"], 2], expected: ["a"] },
+      { name: "tres y pases tres", args: [["a", "b", "c"], 3], expected: ["b"] },
+      { name: "pase uno elimina al primero", args: [["a", "b", "c"], 1], expected: ["c"] },
+      { name: "dos jugadores (oculto)", args: [["ana", "eva"], 4], expected: ["ana"], hidden: true },
+    ],
+  },
+  {
+    id: "triage-hospital",
+    chapter: "heaps",
+    title: "Triage con severidad",
+    difficulty: "fácil",
+    blurb: "Cada paciente es [severidad, nombre]. Devuelve los nombres de los k primeros que ATENDE el triage: de mayor severidad a menor, y a igual severidad, el que llegó antes (la lista está ordenada por llegada). Si k supera a los pacientes, devuélvelos todos ya ordenados por el mismo criterio.",
+    setupCode: `def triage(pacientes, k):
+    \"\"\"Los k primeros según severidad (mayor primero, estable).\"\"\"
+    pass
+
+_target = triage`,
+    starterCode: `def triage(pacientes, k):
+    # TODO: clave (−severidad, llegada) — o un max-heap del tamaño k que reciba la cima
+    pass`,
+    solutionCode: `def triage(pacientes, k):
+    orden = []
+    for i, p in enumerate(pacientes):
+        orden.append([-p[0], i, p[1]])
+    orden.sort()
+    return [nombre for _, _, nombre in orden[:k]]`,
+    explanation:
+      "El max-heap es la fórmula del cap. 14: la cima concentra al urgente. En Python la respuesta se ordena con una CLAVE COMPUESTA (−severidad, llegada): el − invierte el signo para que el min-heap del heapq se comporte como max, y el índice de llegada resuelve los empates con estabilidad total. Un heap real con push/pop limitado a k es la versión «de stream»: mismo criterio, memoria O(k).",
+    tradeoff:
+      "El sort completo es O(n log n) y nuevo-código mínimo — perfecto con n razonable y datos ya reunidos; el heap limitado a k baja a O(n log k) memoria O(k) y crea prioridad para un STREAM que nunca deja de llegar. Cuando los pacientes siguen entrando mientras atiendes, el sort por cada consulta vuelve a ser O(n log n) y el heap solo actualiza — esa es la razón práctica del capítulo 14.",
+    hints: [
+      "La clave de orden es (−severidad, índice de llegada).",
+      "orden[:k] tras el sort da los k primeros; si k > n, slice no protesta.",
+      "−5 ordena ANTES que −3: el min-heap de negativos actúa como max-heap.",
+    ],
+    tests: [
+      { name: "dos urgentes primero", args: [[[3, "ana"], [5, "bo"], [3, "aly"], [5, "don"]], 2], expected: ["bo", "don"] },
+      { name: "k tres con empates", args: [[[3, "ana"], [5, "bo"], [3, "aly"], [5, "don"]], 3], expected: ["bo", "don", "ana"] },
+      { name: "k gigante devuelve todos", args: [[[2, "x"]], 5], expected: ["x"] },
+      { name: "de menor a mayor (oculto)", args: [[[1, "a"], [2, "b"]], 1], expected: ["b"], hidden: true },
+    ],
+  },
+  {
+    id: "hojas-arbol",
+    chapter: "trees",
+    title: "Cuántas hojas tiene el árbol",
+    difficulty: "fácil",
+    blurb: "El árbol llega como lista por niveles con None para huecos (hijos de i: 2i+1 y 2i+2). Cuenta cuántos nodos son HOJA: ninguno de los dos hijos existe (está fuera del array o es None). El array [] tiene 0 hojas.",
+    setupCode: `def cuenta_hojas(level):
+    \"\"\"Número de hojas del árbol por niveles (None = hueco).\"\"\"
+    pass
+
+_target = cuenta_hojas`,
+    starterCode: `def cuenta_hojas(level):
+    # TODO: recursión por índices; hoja = sin ninguno de los dos hijos
+    pass`,
+    solutionCode: `def cuenta_hojas(level):
+    def existe(i):
+        return i < len(level) and level[i] is not None
+
+    def recorrido(i):
+        if not existe(i):
+            return 0
+        izq, der = 2 * i + 1, 2 * i + 2
+        if not existe(izq) and not existe(der):
+            return 1
+        return recorrido(izq) + recorrido(der)
+    return recorrido(0)`,
+    explanation:
+      "La recursión es la misma del cap. 13 con un acumulador distinto: el nodo cuenta 1 cuando AMBOS hijos están ausentes (fuera del array o None) y si no reparte la pregunta entre 2i+1 y 2i+2. En un array por niveles un None puede tener nietos (el hueco no corta la rama a la derecha) — por eso existe() mira primero y la hoja se define por la AUSENCIA de hijos, no por la marca del array.",
+    tradeoff:
+      "Recursión por índices = nadie materializa el árbol; pila pequeña si está balanceado (O(log n)) y O(n) recorrido puntual. La versión con cola (BFS nivel a nivel) añade memoria O(n) para salvar la profundidad — misma cuenta, más estructura. Con BFS podrías parar antes si todo lo que queda son huecos… pero el array ES el árbol: jugar con índices es el atajo más limpio.",
+    hints: [
+      "existe(i) = i < len(level) y level[i] no es None.",
+      "Hoja: sin hijos izq. NI der. — y devuelve 1 entonces.",
+      "El total es la suma de hojas de las dos ramas.",
+    ],
+    tests: [
+      { name: "raiz con dos hojas", args: [[1, 2, 3]], expected: 2 },
+      { name: "solo raiz", args: [[7]], expected: 1 },
+      { name: "vacio", args: [[]], expected: 0 },
+      { name: "con hueco al medio", args: [[1, 2, 3, 4, null, null, 6, 7]], expected: 2, hidden: true },
+    ],
+  },
+  {
+    id: "bst-k-esimo",
+    chapter: "binary-search-trees",
+    title: "El k-ésimo del BST",
+    difficulty: "medio",
+    blurb: "Dado el orden de inserciones, construye al vuelo el BST insertando en ese orden y devuelve el k-ésimo valor más pequeño (k desde 1). Si k supera al número de nodos, −1.",
+    setupCode: `def bst_k(orden, k):
+    \"\"\"k-ésimo más pequeño del BST construido con las inserciones dadas.\"\"\"
+    pass
+
+_target = bst_k`,
+    starterCode: `def bst_k(orden, k):
+    # TODO: insertar en orden y recorrer inorder contando
+    pass`,
+    solutionCode: `def bst_k(orden, k):
+    raiz = None
+
+    class Nodo:
+        def __init__(self, valor):
+            self.valor = valor
+            self.izq = None
+            self.der = None
+
+    def insertar(nodo, valor):
+        if nodo is None:
+            return Nodo(valor)
+        if valor < nodo.valor:
+            nodo.izq = insertar(nodo.izq, valor)
+        else:
+            nodo.der = insertar(nodo.der, valor)
+        return nodo
+
+    for v in orden:
+        raiz = insertar(raiz, v)
+
+    contador = [0]
+    respuesta = [-1]
+
+    def inorder(nodo):
+        if nodo is None or respuesta[0] != -1:
+            return
+        inorder(nodo.izq)
+        contador[0] += 1
+        if contador[0] == k:
+            respuesta[0] = nodo.valor
+            return
+        inorder(nodo.der)
+
+    inorder(raiz)
+    return respuesta[0]`,
+    explanation:
+      "Insertar en un BST (cap. 15): menor a la izquierda, mayor/igual a la derecha; el árbol que salga refleja el orden de llegada, no sale ordenado por sí solo. Y ahí está el tiro: el inorder de CUALQUIER BST sale creciente — recorrer en ese orden y contar es encontrar el k-ésimo sin ordenar nada. El cortocircuito (respuesta != -1) detiene la recursión en cuanto lo encuentra, la poda del inorder contado.",
+    tradeoff:
+      "El inorder completo cuesta O(n) SIEMPRE, con o sin cortocircuito; pero con un BST aumentado (cada nodo anota cuántos viven debajo) el k-ésimo baja a O(h) con una única bajada. Si el árbol llegara balanceado, O(log n): el balanceo es quien paga el siguiente tramo del capítulo 15 — y la altura depende del orden de inserción, que aquí dicta el array.",
+    hints: [
+      "insertar(nodo, valor): menor → izquierda; si no, derecha.",
+      "El inorder visita izq, el nodo mismo, der — cuenta y compara con k.",
+      "Deténte en cuanto el contador toque k — no sigas recorriendo el árbol entero.",
+    ],
+    tests: [
+      { name: "el tercero de seis", args: [[5, 3, 7, 1, 4, 9], 3], expected: 4 },
+      { name: "el primero", args: [[2, 1, 3], 1], expected: 1 },
+      { name: "k fuera de rango", args: [[5, 3, 7], 5], expected: -1 },
+      { name: "un nodo", args: [[10], 1], expected: 10 },
+      { name: "el mayor (oculto)", args: [[5, 3, 7, 1, 4, 9], 6], expected: 9, hidden: true },
+    ],
+  },
+  {
+    id: "contar-prefijo",
+    chapter: "tries",
+    title: "Cuántas palabras empiezan por el prefijo",
+    difficulty: "fácil",
+    blurb: "Dado un diccionario de palabras y una consulta q, devuelve cuántas palabras empiezan por q. El prefijo vacío cuenta TODAS. Con un trie, construirlo cuesta una vez y cada consulta es una bajada; para pocas consultas, el bucle con startswith basta.",
+    setupCode: `def contar_prefijo(palabras, q):
+    """Cuántas palabras empiezan por el prefijo q."""
+    pass
+
+_target = contar_prefijo`,
+    starterCode: `def contar_prefijo(palabras, q):
+    # TODO: opcion A) startswith en un bucle
+    #       opcion B) trie: baja por el prefijo y cuenta la hoja
+    pass`,
+    solutionCode: `def contar_prefijo(palabras, q):
+    trie = {}
+    END = "fin"
+    for palabra in palabras:
+        nodo = trie
+        for letra in palabra:
+            nodo = nodo.setdefault(letra, {})
+        nodo[END] = True
+
+    nodo = trie
+    for letra in q:
+        if letra not in nodo:
+            return 0
+        nodo = nodo[letra]
+
+    def cuenta(rama):
+        total = 1 if END in rama else 0
+        for letra, sub in rama.items():
+            if letra != END:
+                total += cuenta(sub)
+        return total
+
+    return cuenta(nodo)`,
+    explanation:
+      "El trie del cap. 16 en su forma de dict de dicts: cada palabra deja un camino de caracteres y una marca de fin. La consulta q es solo una bajada por ese camino: si una letra no está, cero; si está, el subárbol colgante concentra TODAS las palabras que comparten el prefijo — contarlas ahí es recorrer ese subárbol, no todo el diccionario. El caso del prefijo vacío sale gratis: el nodo de arranque ES la raíz entera.",
+    tradeoff:
+      "El bucle con startswith es O(m·L) POR CONSULTA (m palabras, L longitud) y su código cabe en tres líneas — perfecto para pocas consultas o diccionarios pequeños. El trie cuesta O(total de caracteres) UNA VEZ y cada consulta es O(len(q) + subárbol): con miles de q sobre el mismo diccionario la diferencia es de minutos a milisegundos. Es exactamente el intercambio del capítulo: ¿estructura propia o bucle cada vez?",
+    hints: [
+      "Dict de dicts: nodo[letra] = sub-dict; tras la última letra, una marca de fin.",
+      "Baja por q letra a letra; una letra ausente → 0 de golpe.",
+      "El conteo del subárbol: +1 si hay marca de fin, y recursión por cada rama distinta de la marca.",
+    ],
+    tests: [
+      { name: "tres con anillo", args: [["ana", "anillo", "andaluz", "bolso"], "an"], expected: 3 },
+      { name: "prefijo vacio todas", args: [["hola"], ""], expected: 1 },
+      { name: "ninguna con z", args: [["a", "b", "ab"], "z"], expected: 0 },
+      { name: "dos con a (oculto)", args: [["a", "b", "ab"], "a"], expected: 2, hidden: true },
+    ],
+  },
+  {
+    id: "cuello-ruta",
+    chapter: "mst",
+    title: "El peaje máximo de la ruta más ligera",
+    difficulty: "medio",
+    blurb: "Grafo no dirigido con nodos 0..n−1 y aristas [u, v, w]: entre s y t, encuentra el camino cuya arista MÁS PESADA sea lo más pequeña posible (problema minimax) y devuelve ese peso. s == t → 0; sin conexión → −1.",
+    setupCode: `def cuello_ruta(n, edges, s, t):
+    """Minimax: mínimo sobre caminos del máximo de sus aristas."""
+    pass
+
+_target = cuello_ruta`,
+    starterCode: `def cuello_ruta(n, edges, s, t):
+    # TODO: ordena por peso y une componentes hasta que s y t toquen
+    pass`,
+    solutionCode: `def cuello_ruta(n, edges, s, t):
+    padre = list(range(n))
+
+    def buscar(x):
+        while padre[x] != x:
+            x = padre[x]
+        return x
+
+    if s == t:
+        return 0
+    for u, v, w in sorted(edges, key=lambda e: e[2]):
+        ru, rv = buscar(u), buscar(v)
+        if ru != rv:
+            padre[ru] = rv
+        if buscar(s) == buscar(t):
+            return w
+    return -1`,
+    explanation:
+      "Es Kruskal con un objetivo distinto: en el cap. 20 sumabas pesos hasta conectar el grafo; aquí te paras en la PRIMERA arista que pisa s y t en la misma componente. ¿Por qué funciona? Un camino de s a t solo puede existir con aristas de peso ≤ w, y la primera arista que consigue unir sus componentes marca el MÍNIMO w que lo logra — la propiedad del corte al servicio del minimax.",
+    tradeoff:
+      "Sort + union-find es O(E log E) y el código cabe en media pantalla — formidable para consultas de UN par (s, t). Con MUCHOS pares conviene el MST completo (el camino entre cualquiera de los dos por el árbol de expansión mínima es su minimax óptimo) o un preprocesado por componentes; Dijkstra con max en vez de suma lo resuelve por O(E log V) par a par pero es mucho más código para un solo par.",
+    hints: [
+      "sorted(edges, key=lambda e: e[2]): aristas de barato a caro.",
+      "Fusiona componentes, no mires pesos para la suma — solo para avanzar.",
+      "En cuanto s y t tocan la misma componente, el peso de la arista de esa ronda es la respuesta.",
+    ],
+    tests: [
+      { name: "tres aristas necesarias", args: [4, [[0, 1, 2], [1, 2, 3], [2, 3, 4]], 0, 3], expected: 4 },
+      { name: "hay un atajo", args: [5, [[0, 1, 1], [1, 3, 9], [0, 2, 1], [2, 3, 2]], 0, 3], expected: 2 },
+      { name: "origen y destino iguales", args: [3, [[0, 1, 5]], 2, 2], expected: 0 },
+      { name: "el barato llega igual (oculto)", args: [3, [[0, 1, 2], [1, 2, 1]], 0, 2], expected: 2, hidden: true },
+    ],
+  },
+  {
+    id: "potencia-de-cuatro",
+    chapter: "bit-operations",
+    title: "¿Es potencia de cuatro?",
+    difficulty: "fácil",
+    blurb: "Devuelve True si n es una potencia exacta de cuatro (4⁰ = 1, 4, 16, 64…). El truco de bits apaga la duda: potencia de dos con el 1 en posición par.",
+    setupCode: `def potencia_cuatro(n):
+    \"\"\"True si n == 4**k para algún k ≥ 0.\"\"\"
+    pass
+
+_target = potencia_cuatro`,
+    starterCode: `def potencia_cuatro(n):
+    # TODO: primero potencia de dos; luego la posición del bit
+    pass`,
+    solutionCode: `def potencia_cuatro(n):
+    if n <= 0:
+        return False
+    if n & (n - 1) != 0:
+        return False
+    return (n & 0x5555555555555555) == n`,
+    explanation:
+      "Dos cerrojos sientan el veredicto. Primero n & (n−1) == 0: «apaga el uno más bajo», y si el resultado es cero, n solo tenía UN bit — es potencia de dos (o n ≤ 0, bloqueado arriba). Pero 8 también pasa ese filtro; la diferencia es DÓNDE vive el bit: las potencias de cuatro lo sitúan en posiciones 0, 2, 4… (pares), así que comparar n con la máscara 0b…0101 (0x55…) debe salir idéntica. Un solo AND explica lo que el módulo n % 3 confirmaría a ojo de número.",
+    tradeoff:
+      "El bucle de dividir entre 4 también acaba (O(log₄ n)) y lo entiende cualquiera; el bitmask es O(1) en dos instrucciones y funciona con números gigantes sin tocar el valor. En la entrevista cuadra con la ronda del capítulo 22: máscara para la potencia de dos y máscara 0x55… para la posición. El módulo (n % 3 == 1 después del filtro) es la alternativa aritmética con menos refrán pero misma eficacia.",
+    hints: [
+      "n & (n−1) == 0 quiere decir «un solo bit encendido».",
+      "Con solo un bit, revisa que caiga en posición par: la máscara 0x5555…5555 tiene 1 en las posiciones pares (0, 2, 4…)",
+      "n ≤ 0 sale False ANTES de los ANDs.",
+    ],
+    tests: [
+      { name: "uno", args: [1], expected: true },
+      { name: "cuatro", args: [4], expected: true },
+      { name: "ocho es solo de dos", args: [8], expected: false },
+      { name: "sesenta y cuatro", args: [64], expected: true },
+      { name: "cero", args: [0], expected: false },
+      { name: "seis no", args: [6], expected: false, hidden: true },
+      { name: "negativo (oculto)", args: [-4], expected: false, hidden: true },
+    ],
+  },
+
 ];
