@@ -32,6 +32,26 @@ export interface ProblemTest {
   hidden?: boolean;
 }
 
+/**
+ * Serializa un valor JS como literal de Python.
+ * JSON.stringify produce true/false/null en minúsculas — Python pide
+ * True/False/None (un NameError no capturable rompería cada test).
+ */
+export function pyLiteral(v: unknown): string {
+  if (v === null || v === undefined) return "None";
+  if (typeof v === "boolean") return v ? "True" : "False";
+  if (typeof v === "number") return String(v);
+  if (typeof v === "string") return JSON.stringify(v);
+  if (Array.isArray(v)) return `[${v.map(pyLiteral).join(", ")}]`;
+  if (typeof v === "object") {
+    const entries = Object.entries(v as Record<string, unknown>).map(
+      ([k, val]) => `${JSON.stringify(k)}: ${pyLiteral(val)}`,
+    );
+    return `{${entries.join(", ")}}`;
+  }
+  return JSON.stringify(v);
+}
+
 export interface TestResult {
   name: string;
   passed: boolean;
@@ -60,12 +80,14 @@ export async function evaluateSolution({
   await initPyodide();
 
   const testCalls = tests.map((t) => {
-    const argsJs = JSON.stringify(t.args);
-    const expectedJs = JSON.stringify(t.expected);
+    // Los corchetes SON los paréntesis de la llamada: _target([a, b]) ≡ _target(a, b).
+    const argsPy = `[${t.args.map(pyLiteral).join(", ")}]`;
+    const expectedPy = pyLiteral(t.expected);
+    const hiddenPy = t.hidden === true ? "True" : "False";
     return `
 try:
-    _result = _target(${argsJs})
-    _ok = _result == ${expectedJs}
+    _result = _target(${argsPy})
+    _ok = _result == ${expectedPy}
 except Exception as _e:
     _result = f"ERROR: {_e}"
     _ok = False
@@ -73,8 +95,8 @@ _tests.append({
     "name": ${JSON.stringify(t.name)},
     "passed": _ok,
     "got": repr(_result),
-    "expected": ${expectedJs},
-    "hidden": ${t.hidden === true},
+    "expected": ${expectedPy},
+    "hidden": ${hiddenPy},
 });
 `;
   }).join("\n");

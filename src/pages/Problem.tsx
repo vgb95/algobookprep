@@ -2,7 +2,7 @@ import { useState } from "react";
 import { problems } from "../content/problems";
 import { chapters } from "../content/chapters";
 import CodeEditor from "../components/editor/CodeEditor";
-import { evaluateSolution, resolveTargetName } from "../engine/evaluator";
+import { evaluateSolution, pyLiteral, resolveTargetName } from "../engine/evaluator";
 import FluidScrubber from "../components/viz/FluidScrubber";
 import { runTraced } from "../engine/pyodide";
 
@@ -95,7 +95,7 @@ export default function Problem({ id }: { id: string }) {
     setTraceFailedTest(test);
     setTraceFrames([]);
     try {
-      const callArgs = JSON.stringify(test.args);
+      const callArgs = `[${test.args.map(pyLiteral).join(", ")}]`;
       const tracedCode = `
 ${problem.setupCode}
 ${userCode}
