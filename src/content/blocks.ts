@@ -29,7 +29,7 @@ export interface ProseBlock extends BlockBase {
 
 export interface VizBlock extends BlockBase {
   kind: "viz";
-  type: "sorting" | "tree" | "graph" | "heap" | "array";
+  type: "sorting" | "tree" | "graph" | "heap" | "array" | "list";
   config: Record<string, string | number>;
 }
 

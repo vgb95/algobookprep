@@ -17,17 +17,19 @@ import FluidBars from "./FluidBars";
 import FluidTree from "./FluidTree";
 import FluidGraph from "./FluidGraph";
 import FluidHeap from "./FluidHeap";
+import FluidList from "./FluidList";
 import ArrayCells from "./ArrayCells";
 import { sorters, type SortId } from "../../algorithms/sorting";
 import { treeOrders, type TreeOrder } from "../../algorithms/binary-tree";
 import { graphAlgos, type GraphAlgo } from "../../algorithms/graph";
 import { heapOps, type HeapOp } from "../../algorithms/heap";
+import { listLookup, listInsert, listDelete, listOps, type ListOp } from "../../algorithms/linked-list";
 import { lookup, insertAt, deleteAt, binarySearch, arrayOps, type ArrayOp } from "../../algorithms/arrays";
 import { parseArray, clampInt } from "../../utils/parse";
 import { sampleFor, parseEdges, SAMPLE_LABELS, type SampleKind } from "../../utils/sample";
 
 export interface VizPlayerProps {
-  type: "sorting" | "tree" | "graph" | "heap" | "array";
+  type: "sorting" | "tree" | "graph" | "heap" | "array" | "list";
   config: Record<string, string | number>;
 }
 
@@ -90,6 +92,36 @@ function buildShow(
       };
     }
     return { frames: [] };
+  }
+
+  if (type === "list") {
+    if (!parsed) return { frames: [] };
+    const op = (config.op as ListOp) ?? "lookup";
+    if (!(op in listOps)) return { frames: [] };
+    if (op === "lookup") {
+      return {
+        frames: record(listLookup(parsed, clampInt(String(config.target ?? "7"), 1, 99, 7))),
+        code: listOps.lookup.code,
+      };
+    }
+    if (op === "insert") {
+      return {
+        frames: record(
+          listInsert(
+            parsed,
+            clampInt(String(config.index ?? "2"), 0, parsed.length, 0),
+            clampInt(String(config.value ?? "5"), 1, 99, 5),
+          ),
+        ),
+        code: listOps.insert.code,
+      };
+    }
+    return {
+      frames: record(
+        listDelete(parsed, clampInt(String(config.index ?? "2"), 0, Math.max(parsed.length - 1, 0), 0)),
+      ),
+      code: listOps.delete.code,
+    };
   }
 
   if (type === "tree") {
@@ -178,6 +210,13 @@ function metrics(type: VizPlayerProps["type"], f: any) {
           </span>
         </>
       );
+    case "list":
+      return (
+        <>
+          <span className="badge">saltos: {f.steps}</span>
+          <span className="badge">lista: [{f.nodes.map((n: any) => n.value).join(" → ")}]</span>
+        </>
+      );
   }
 }
 
@@ -216,7 +255,7 @@ function Controls({
     </select>
   );
 
-  const op = String(cfg.op ?? (type === "heap" ? "insert" : "lookup"));
+  const op = String(cfg.op ?? (type === "heap" ? "insert" : type === "list" ? "lookup" : "lookup"));
 
   if (type === "graph") {
     const n = clampInt(String(cfg.n ?? "7"), 2, 12, 7);
@@ -264,11 +303,11 @@ function Controls({
     insert: ["index", "value"],
     delete: ["index"],
   };
-  const arrayLabel = type === "heap" ? "montículo" : type === "tree" ? "nodos" : "array";
+  const arrayLabel = type === "heap" ? "montículo" : type === "tree" ? "nodos" : type === "list" ? "lista" : "array";
 
   // Entradas extra según la operación: target (búsqueda), index/value.
   const extraOps = (() => {
-    if (type === "array") return needs[op] ?? [];
+    if (type === "array" || type === "list") return needs[op] ?? [];
     if (type === "heap") return op === "insert" ? ["value"] : [];
     return [];
   })();
@@ -300,6 +339,16 @@ function Controls({
           operación
           <select value={op} onChange={(e) => upd("op", e.target.value)}>
             {Object.entries(arrayOps).map(([id, o]) => (
+              <option key={id} value={id}>{o.name}</option>
+            ))}
+          </select>
+        </label>
+      )}
+      {type === "list" && (
+        <label className="field">
+          operación
+          <select value={op} onChange={(e) => upd("op", e.target.value)}>
+            {Object.entries(listOps).map(([id, o]) => (
               <option key={id} value={id}>{o.name}</option>
             ))}
           </select>
@@ -377,6 +426,7 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
             {type === "tree" && <FluidTree frame={f} />}
             {type === "graph" && <FluidGraph curr={f} next={next} blend={blend} />}
             {type === "heap" && <FluidHeap curr={f} next={next} blend={blend} />}
+            {type === "list" && <FluidList curr={f} next={next} blend={blend} />}
             <div className="meta">{metrics(type, f)}</div>
           </>
         )}
