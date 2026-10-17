@@ -8,7 +8,9 @@ const plan: { label: string; done: boolean }[] = [
   { label: "Fase 4 · Biblioteca de vis: árboles, grafos, heaps, recursión, matrices…", done: true },
   { label: "Fase 5 · Contenido de los 22 capítulos completo y pulido", done: true },
   { label: "Fase 6 · PWA offline + despliegue a GitHub Pages", done: true },
-  { label: "Fase 7 · Más problemas, más capítulos de práctica, nuevos lenguajes", done: false },
+  { label: "Fase 7 · Banco de problemas: 55 ejercicios con editor, tests y solución progresiva", done: true },
+  { label: "Fase 8 · Evaluador blindado (tiempo/pasos) + sección «En la entrevista» en los 22 capítulos", done: true },
+  { label: "Fase 9 · Pulido final, QA completo y despliegue a GitHub Pages", done: true },
 ];
 
 const features = [
@@ -27,6 +29,10 @@ const features = [
   {
     t: "Code Playback real",
     b: "Escribe Python, pulsa Run, y una traza real (sys.settrace sobre Pyodide/WASM) se convierte en una cinta de cuadros navegable — línea resaltada, variables en vivo y arrays dibujados como barras.",
+  },
+  {
+    t: "En la entrevista",
+    b: "Cada capítulo cierra con la capa de livecoding: cómo afrontar la familia de problemas, qué decir en voz alta al entrevistador, las variantes que te pueden poner y los giros de mitad de sesión.",
   },
   {
     t: "Evaluador de problemas",
@@ -58,9 +64,9 @@ export default function HomePage() {
           <a className="btn" href="#/code-playground">▶ Code Playback (Python)</a>
         </div>
         <div className="stats">
-          <div className="stat"><b>22</b><span>capítulos planificados</span></div>
-          <div className="stat"><b>2</b><span>playgrounds en vivo</span></div>
-          <div className="stat"><b>3</b><span>algoritmos de sorting</span></div>
+          <div className="stat"><b>22</b><span>capítulos completos y en vivo</span></div>
+          <div className="stat"><b>{problems.length}</b><span>problemas con tests</span></div>
+          <div className="stat"><b>5</b><span>playgrounds interactivos</span></div>
           <div className="stat"><b>0</b><span>registros ni tracking</span></div>
         </div>
       </header>
