@@ -312,6 +312,82 @@ h2.section-h { font-size: 1.45rem; margin: 42px 0 14px; }
   background: #fff;
 }
 
+/* ————— code playback (reproductor a dos columnas estilo cartesian) ————— */
+.player.with-code {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.code-panel {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fffdf8;
+  overflow: hidden;
+  align-self: stretch;
+}
+.code-panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper-2);
+}
+.code-panel-title .lang {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+}
+.code-panel-title .hint { font-size: 0.7rem; color: var(--ink-soft); }
+
+.code-src {
+  margin: 0;
+  padding: 10px 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+.code-line { display: flex; gap: 10px; padding: 0 12px; border-left: 3px solid transparent; }
+.code-line .ln {
+  width: 1.5em;
+  text-align: right;
+  color: #c3b89f;
+  flex: none;
+  user-select: none;
+}
+.code-line.done { color: #b9ac91; }
+.code-line.active {
+  background: #f3ecfe;
+  border-left-color: var(--accent, #e8543f);
+  color: var(--ink);
+  border-radius: 6px;
+}
+
+.code-vars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px 12px;
+  border-top: 1px dashed var(--line);
+}
+.code-vars .var {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.73rem;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+.code-vars .var b { font-weight: 700; color: var(--ink-soft); }
+.code-vars .var .val { color: var(--ink); font-weight: 600; }
+
 /* ————— tables ————— */
 .tbl { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 6px 0 10px; }
 .tbl th, .tbl td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
@@ -337,4 +413,5 @@ h2.section-h { font-size: 1.45rem; margin: 42px 0 14px; }
   }
   .toc { flex-direction: row; flex-wrap: wrap; }
   .content { padding: 30px 18px 50px; }
+  .player.with-code { grid-template-columns: 1fr; }
 }

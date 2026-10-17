@@ -34,7 +34,11 @@ export interface Playback {
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
-export function usePlayback(count: number, stepsPerSecond = 2.4): Playback {
+export function usePlayback(
+  count: number,
+  stepsPerSecond = 1.7,
+  holds?: readonly number[],
+): Playback {
   const last = Math.max(count - 1, 0);
   const [pos, setPos] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -45,6 +49,10 @@ export function usePlayback(count: number, stepsPerSecond = 2.4): Playback {
   const playingRef = useRef(false);
   const lastRef = useRef(last);
   lastRef.current = last;
+
+  // holds por cuadro vía ref: cambian con la cinta sin reiniciar el rAF.
+  const holdsRef = useRef(holds);
+  holdsRef.current = holds;
 
   const reduced = useMemo(
     () =>
@@ -69,7 +77,11 @@ export function usePlayback(count: number, stepsPerSecond = 2.4): Playback {
     const tick = (now: number) => {
       const dt = Math.min((now - prev) / 1000, 0.1);
       prev = now;
-      let next = posRef.current + dt * stepsPerSecond * speedRef.current;
+      // Permanencia del cuadro actual: los hitos (hold > 1) retienen
+      // el avance más tiempo antes de saltar al siguiente.
+      const idx = Math.min(Math.floor(posRef.current), lastRef.current);
+      const hold = clamp(holdsRef.current?.[idx] ?? 1, 0.5, 4);
+      let next = posRef.current + (dt * stepsPerSecond * speedRef.current) / hold;
       if (next >= lastRef.current) {
         next = lastRef.current;
         posRef.current = next;

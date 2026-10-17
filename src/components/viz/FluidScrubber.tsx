@@ -4,22 +4,31 @@
  * atajos de teclado) pero sobre usePlayback: tiempo continuo con
  * requestAnimationFrame. El slider es fraccionario: arrastrarlo
  * interpola entre cuadros en vez de saltar.
+ *
+ * Fase 2 — code playback: si se pasa `code` (snippet Python canónico
+ * del algoritmo), el reproductor se presenta a dos columnas y sincroniza
+ * el panel de código con el cuadro actual (línea activa, líneas ya
+ * ejecutadas fantasma y chips de variables vivas).
  */
 import { useEffect, type ReactNode } from "react";
 import { usePlayback } from "../../hooks/usePlayback";
 import VizErrorBoundary from "./VizErrorBoundary";
+import CodePanel from "./CodePanel";
 import type { Frame } from "../../engine/timeline";
 
 interface Props<F extends Frame> {
   frames: readonly F[];
   /** render(cuadroActual, blend 0..1, cuadroSiguiente, índice) */
   render: (frame: F, blend: number, next: F, index: number) => ReactNode;
+  /** Snippet Python canónico; activa la vista a dos columnas. */
+  code?: string;
 }
 
 const SPEEDS = [0.5, 1, 2];
 
-export default function FluidScrubber<F extends Frame>({ frames, render }: Props<F>) {
-  const p = usePlayback(frames.length);
+export default function FluidScrubber<F extends Frame>({ frames, render, code }: Props<F>) {
+  const holds = frames.map((f) => f.hold ?? 1);
+  const p = usePlayback(frames.length, 1.7, holds);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -48,77 +57,89 @@ export default function FluidScrubber<F extends Frame>({ frames, render }: Props
   const atStart = p.pos <= 0;
   const atEnd = p.pos >= p.last;
 
+  // Líneas ya ejecutadas hasta el cuadro actual (para el fantasma).
+  const seen = new Set<number>();
+  for (let k = 0; k <= p.index; k++) {
+    const l = frames[k].line;
+    if (l != null) seen.add(l);
+  }
+
   const press = (fn: () => void) => (e: React.MouseEvent<HTMLButtonElement>) => {
     fn();
     e.currentTarget.blur();
   };
 
   return (
-    <div className="player">
-      <div className="stage fluid-stage">
-        <VizErrorBoundary resetKey={p.index} label="fluid-player">
-          {render(frame, p.blend, next, p.index)}
-        </VizErrorBoundary>
+    <div className={`player${code ? " with-code" : ""}`}>
+      <div className="player-main">
+        <div className="stage fluid-stage">
+          <VizErrorBoundary resetKey={p.index} label="fluid-player">
+            {render(frame, p.blend, next, p.index)}
+          </VizErrorBoundary>
+        </div>
+        <div className="player-controls">
+          <button className="btn ghost" onClick={press(p.restart)} disabled={atStart} title="Reiniciar">
+            ⏮
+          </button>
+          <button
+            className="btn ghost"
+            onClick={press(() => p.step(-1))}
+            disabled={atStart}
+            title="Paso atrás (←)"
+          >
+            ◀
+          </button>
+          <button
+            className="btn primary"
+            onClick={press(p.toggle)}
+            disabled={p.last === 0}
+            title="Play / pausa (espacio)"
+          >
+            {p.playing ? "⏸ pausa" : "▶ play"}
+          </button>
+          <button
+            className="btn ghost"
+            onClick={press(() => p.step(1))}
+            disabled={atEnd}
+            title="Paso adelante (→)"
+          >
+            ▶
+          </button>
+          <select
+            value={p.speed}
+            onChange={(e) => p.setSpeed(Number(e.target.value))}
+            title="Velocidad"
+          >
+            {SPEEDS.map((s) => (
+              <option key={s} value={s}>
+                {s}×
+              </option>
+            ))}
+          </select>
+          <span className="counter">
+            cuadro {p.index + 1} / {frames.length}
+          </span>
+        </div>
+        <input
+          type="range"
+          className="scrub"
+          min={0}
+          max={p.last}
+          step={0.01}
+          value={p.pos}
+          onChange={(e) => p.seek(Number(e.target.value))}
+          onPointerUp={(e) => e.currentTarget.blur()}
+          aria-label="Línea de tiempo"
+        />
+        <div className="hints">
+          <span className="kbd">espacio</span> reproducir / pausar
+          <span className="kbd">←</span>
+          <span className="kbd">→</span> paso a paso
+        </div>
       </div>
-      <div className="player-controls">
-        <button className="btn ghost" onClick={press(p.restart)} disabled={atStart} title="Reiniciar">
-          ⏮
-        </button>
-        <button
-          className="btn ghost"
-          onClick={press(() => p.step(-1))}
-          disabled={atStart}
-          title="Paso atrás (←)"
-        >
-          ◀
-        </button>
-        <button
-          className="btn primary"
-          onClick={press(p.toggle)}
-          disabled={p.last === 0}
-          title="Play / pausa (espacio)"
-        >
-          {p.playing ? "⏸ pausa" : "▶ play"}
-        </button>
-        <button
-          className="btn ghost"
-          onClick={press(() => p.step(1))}
-          disabled={atEnd}
-          title="Paso adelante (→)"
-        >
-          ▶
-        </button>
-        <select
-          value={p.speed}
-          onChange={(e) => p.setSpeed(Number(e.target.value))}
-          title="Velocidad"
-        >
-          {SPEEDS.map((s) => (
-            <option key={s} value={s}>
-              {s}×
-            </option>
-          ))}
-        </select>
-        <span className="counter">
-          cuadro {p.index + 1} / {frames.length}
-        </span>
-      </div>
-      <input
-        type="range"
-        className="scrub"
-        min={0}
-        max={p.last}
-        step={0.01}
-        value={p.pos}
-        onChange={(e) => p.seek(Number(e.target.value))}
-        onPointerUp={(e) => e.currentTarget.blur()}
-        aria-label="Línea de tiempo"
-      />
-      <div className="hints">
-        <span className="kbd">espacio</span> reproducir / pausar
-        <span className="kbd">←</span>
-        <span className="kbd">→</span> paso a paso
-      </div>
+      {code && (
+        <CodePanel source={code} active={frame.line} seen={seen} vars={frame.vars} />
+      )}
     </div>
   );
 }
