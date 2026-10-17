@@ -14,7 +14,7 @@ import FluidScrubber from "./FluidScrubber";
 import FluidBars from "./FluidBars";
 import FluidTree from "./FluidTree";
 import FluidGraph from "./FluidGraph";
-import HeapViz from "./HeapViz";
+import FluidHeap from "./FluidHeap";
 import ArrayCells from "./ArrayCells";
 import { sorters, type SortId } from "../../algorithms/sorting";
 import { treeOrders, type TreeOrder } from "../../algorithms/binary-tree";
@@ -150,7 +150,17 @@ function metrics(type: VizPlayerProps["type"], f: any) {
         </>
       );
     case "heap":
-      return <span className="badge">montículo: [{f.heap.join(", ")}]</span>;
+      return (
+        <>
+          <span className="badge">
+            montículo: [{f.cards
+              .slice()
+              .sort((x: any, y: any) => x.slot - y.slot)
+              .map((c: any) => c.value)
+              .join(", ")}]
+          </span>
+        </>
+      );
   }
 }
 
@@ -170,7 +180,7 @@ export default function VizPlayer({ type, config }: VizPlayerProps) {
             {type === "array" && <ArrayCells curr={f} next={next} blend={blend} />}
             {type === "tree" && <FluidTree frame={f} />}
             {type === "graph" && <FluidGraph curr={f} next={next} blend={blend} />}
-            {type === "heap" && <HeapViz frame={f} />}
+            {type === "heap" && <FluidHeap curr={f} next={next} blend={blend} />}
             <div className="meta">{metrics(type, f)}</div>
           </>
         )}

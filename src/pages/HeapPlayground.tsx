@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { record } from "../engine/timeline";
 import { heapOps, type HeapOp } from "../algorithms/heap";
 import FluidScrubber from "../components/viz/FluidScrubber";
-import HeapViz from "../components/viz/HeapViz";
+import FluidHeap from "../components/viz/FluidHeap";
 import { parseArray, randomArray } from "../utils/parse";
 
 export default function HeapPlayground() {
@@ -46,12 +46,12 @@ export default function HeapPlayground() {
           <FluidScrubber
             frames={frames}
             code={heapOps[op].code}
-            render={(f, _blend, _next, index) => (
+            render={(f, blend, next, index) => (
               <>
                 <p className="narrate" key={index}>{f.message}</p>
-                <HeapViz frame={f} />
+                <FluidHeap curr={f} next={next} blend={blend} />
                 <div className="meta">
-                  <span className="badge">montículo: [{f.heap.join(", ")}]</span>
+                  <span className="badge">montículo: [{f.cards.map((c: any) => c.value).join(", ")}]</span>
                 </div>
               </>
             )}
