@@ -1,7 +1,7 @@
 /**
  * Editor de código con CodeMirror 6 + sintaxis Python.
  */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { EditorView, basicSetup } from "codemirror";
 import { python } from "@codemirror/lang-python";
 import { oneDark } from "@codemirror/theme-one-dark";
@@ -24,14 +24,16 @@ export default function CodeEditor({
 }: CodeEditorProps) {
   const viewRef = useRef<EditorView | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
+  const onChangeRef = useRef(onChange);
+  // El callback llega por cierre de cada render; la vista creada una sola vez
+  // debe llamar SIEMPRE al más reciente (evita réplicas con stale closures).
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted || !containerRef.current) return;
+    const el = containerRef.current;
+    if (!el) return;
 
     const state = EditorState.create({
       doc: value,
@@ -41,7 +43,7 @@ export default function CodeEditor({
         oneDark,
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
-            onChange(update.state.doc.toString());
+            onChangeRef.current(update.state.doc.toString());
           }
         }),
         EditorView.lineWrapping,
@@ -51,7 +53,7 @@ export default function CodeEditor({
 
     const view = new EditorView({
       state,
-      parent: containerRef.current,
+      parent: el,
     });
     viewRef.current = view;
 
@@ -59,6 +61,8 @@ export default function CodeEditor({
       view.destroy();
       viewRef.current = null;
     };
+    // La vista se crea UNA vez por montaje; el doc inicial va en value.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sincronizar valor externo → editor

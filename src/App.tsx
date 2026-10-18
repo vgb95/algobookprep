@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { I18nProvider, LangSwitch } from "./engine/i18n";
 import HomePage from "./pages/Home";
 import ChapterPage from "./pages/Chapter";
@@ -49,6 +50,7 @@ export default function App() {
       )}
       <Sidebar open={navOpen} />
       <main className="content">
+        <ErrorBoundary>
         {problemId ? (
           <Problem id={problemId} />
         ) : route === "/code-playground" ? (
@@ -60,6 +62,7 @@ export default function App() {
         ) : (
           <HomePage />
         )}
+        </ErrorBoundary>
       </main>
     </div>
     </I18nProvider>

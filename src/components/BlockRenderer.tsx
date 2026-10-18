@@ -4,6 +4,7 @@ import VizPlayer from "../components/viz/VizPlayer";
 import Markdown from "./Markdown";
 import LatexLite from "./LatexLite";
 import { useI18n } from "../engine/i18n";
+import ErrorBoundary from "./ErrorBoundary";
 
 export default function BlockRenderer({ block }: { block: Block }) {
   const { lang } = useI18n();
@@ -35,7 +36,9 @@ export default function BlockRenderer({ block }: { block: Block }) {
     case "problem":
       return (
         <div className="problem-block" key={block.id}>
-          <Problem id={block.problemId} />
+          <ErrorBoundary>
+            <Problem id={block.problemId} />
+          </ErrorBoundary>
         </div>
       );
     default:
