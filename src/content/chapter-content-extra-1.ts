@@ -125,12 +125,14 @@ export const hashTablesChapter: ChapterContent = {
       id: "ht-hook",
       text:
         "**Gancho:** buscar en un array de 10 millones de elementos es O(n): un millón de pasadas. Pero tu `set` de Python responde \"¿está este elemento?\" en milisegundos. ¿Magia? No: la tabla hash convierte la clave en una **dirección de memoria directa** — la búsqueda desaparece y en su lugar hay un cálculo.",
+      textEn: "**Hook:** searching a 10-million-element array is O(n): a million passes. But your Python `set` answers “is this element in it?” in milliseconds. Magic? No: the hash table turns the key into a **direct memory address** — the search disappears and in its place there is a calculation.",
     },
     {
       kind: "prose",
       id: "ht-intro",
       text:
         "Una **tabla hash** guarda pares (clave, valor) con operaciones put/get/delete en **tiempo promedio O(1)**. El truco: la función de hash traduce la clave a un número, y ese número es un **índice directo** del array interno — no hay que buscar: sabes exactamente dónde vive.",
+      textEn: "A **hash table** stores (key, value) pairs with put/get/delete in **average O(1) time**. The trick: the hash function translates the key into a number, and that number is a **direct index** into the internal array — there is nothing to search: you know exactly where it lives.",
     },
     {
       kind: "formula",
@@ -142,18 +144,21 @@ export const hashTablesChapter: ChapterContent = {
       id: "ht-hash-text",
       text:
         "Una función de hash buena debe ser **rápida** de calcular y **uniforme**: repartir las claves de forma pareja entre las *m* posiciones para minimizar las aglomeraciones. En la fórmula del ejemplo h(k) = k mod m, para claves enteras con m primo se distribuyen razonablemente bien.",
+      textEn: "A good hash function must be **fast** to compute and **uniform**: spread the keys evenly across the *m* slots to minimize pile-ups. In the example formula h(k) = k mod m, integer keys with a prime m distribute reasonably well.",
     },
     {
       kind: "prose",
       id: "ht-collision",
       text:
         "Si dos claves distintas caen en la misma casilla, ocurre una **colisión**. Hay dos estrategias clásicas:\n\n1. **Encadenamiento (chaining):** cada casilla apunta a una lista (o bucket) de elementos; las colisiones se apilan ahí. Las listas también admiten borrado directo.\n2. **Direccionamiento abierto (open addressing):** si la casilla está ocupada, se prueba la siguiente de una secuencia de sondeo (lineal: i, i+1, i+2…; o cuadrática/doble hash para evitar aglomeraciones).",
+      textEn: "If two different keys land in the same slot, a **collision** happens. There are two classic strategies:\n\n1. **Chaining:** each slot points to a list (or bucket) of elements; collisions pile up there. Lists also support direct deletion.\n2. **Open addressing:** if the slot is taken, try the next one in a probing sequence (linear: i, i+1, i+2…; or quadratic / double hashing to avoid clusters).",
     },
     {
       kind: "prose",
       id: "ht-load-factor",
       text:
         "El **factor de carga** decide el rendimiento:\n",
+      textEn: "The **load factor** decides the performance:\n",
     },
     {
       kind: "formula",
@@ -165,6 +170,7 @@ export const hashTablesChapter: ChapterContent = {
       id: "ht-load-text",
       text:
         "Con α ≈ 0.7, casi todas las búsquedas dan con el hueco a la primera. Cuando α sube mucho, se hace **rehashing**: un array nuevo (normalmente el doble) y se reinsertan todos los elementos — la operación puntual cuesta O(n) (por eso los diccionarios hablan de **O(1) amortizado**, como el append de un array).",
+      textEn: "With α ≈ 0.7, almost every search finds an empty slot on the first try. When α climbs too high, **rehashing** kicks in: a new array (usually double) and every element re-inserted — that one-off operation costs O(n) (that is why dictionaries speak of **amortized O(1)**, like an array's append).",
     },
     {
       kind: "viz",
@@ -177,30 +183,35 @@ export const hashTablesChapter: ChapterContent = {
       id: "ht-viz-text",
       text:
         "Esta visualización es lo que SUCEDE sin hash: buscar por valor barre casilla a casilla. Con una tabla hash, ese traveseo se convierte en `h(clave) → casilla` — cero búsqueda. Por eso, ante un bucle doble de comparaciones, la primera mejora a proponer en una entrevista es sustituirlo por un mapa.",
+      textEn: "This visualization is what happens WITHOUT a hash: searching by value sweeps slot by slot. With a hash table, that traversal becomes `h(key) → slot` — zero searching. That is why, facing a double loop of comparisons, the first improvement to propose in an interview is to replace it with a map.",
     },
     {
       kind: "prose",
       id: "ht-example",
       text:
         "**Ejemplo resuelto.** Detectar si hay duplicados en un array: bucle doble O(n²); con un set provisional (hash) es O(n) promedio — visitas cada elemento una vez y preguntas \"¿ya lo había guardado?\". Pago: O(n) extra de memoria. Esa es la cara del tradeoff espacio-tiempo, aplicado.",
+      textEn: "**Solved example.** Detecting duplicates in an array: a double loop is O(n²); with a temporary hash set it is average O(n) — you visit each element once and ask “have I already stored this?”. The payment: O(n) extra memory. That is the space-time tradeoff, applied.",
     },
     {
       kind: "prose",
       id: "ht-tradeoffs",
       text:
         "Tabla de alternativas para BUSCAR en una colección:\n\n| Estructura | Requisito | Búsqueda | Borrar/insertar | Memoria |\n| --- | --- | --- | --- | --- |\n| array sin orden | nada | O(n) | O(n) | mínima |\n| array ordenado + binaria | estar ordenado | O(log n) | O(n) | mínima |\n| hash table | función hash | O(1) prom. / O(n) peor | O(1) prom. / O(n) peor | O(n) + huecos |\n| STD set / BST balanceado | nada (ordena solo) | O(log n) garantizado | O(log n) | O(n) |\n",
+      textEn: "Table of alternatives for SEARCHING a collection:\n\n| Structure | Requirement | Search | Delete/insert | Memory |\n| --- | --- | --- | --- | --- |\n| unordered array | none | O(n) | O(n) | minimal |\n| sorted array + binary | must be sorted | O(log n) | O(n) | minimal |\n| hash table | hash function | O(1) avg / O(n) worst | O(1) avg / O(n) worst | O(n) + gaps |\n| STD set / balanced BST | none (sorts itself) | O(log n) guaranteed | O(log n) | O(n) |",
     },
     {
       kind: "prose",
       id: "ht-pitfalls",
       text:
         "**Trampas frecuentes:**\n\n1. **Claves mutables.** Si mutas la clave (una lista) después de meterla al dict, se guarda mal: hash ya no corresponde. Usa claves inmutables (ints, strings, tuples).\n2. **Caso peor real.** Un hash mal elegido (todas las claves al mismo bucket) degenera la tabla a O(n) — la entrevista menciona \"¿y si el atacante eligió las claves?\".\n3. **α = 1 en open addressing.** Con el array lleno, una búsqueda puede girar infinito: siempre has de dejar huecos o hacer rehash antes.\n4. **Orden de iteración.** Un dict no garantiza orden de inserción en casi todos lenguajes: si necesitas orden, ordena las claves por separado.",
+      textEn: "**Frequent traps:**\n\n1. **Mutable keys.** If you mutate the key (a list) after putting it into the dict, it is stored wrong: the hash no longer matches. Use immutable keys (ints, strings, tuples).\n2. **A real worst case.** A badly chosen hash (all keys into one bucket) degenerates the table to O(n) — interviews love “what if the attacker picked the keys?”.\n3. **α = 1 in open addressing.** With the array full, a search can spin forever: always leave gaps or rehash before it comes to that.\n4. **Iteration order.** A dict does not guarantee insertion order in most languages: if you need order, sort the keys separately.",
     },
     {
       kind: "prose",
       id: "ht-recap",
       text:
         "**Recap:** hash O(1) promedio para put/get/delete; la función hash reparte; las colisiones se resuelven con encadenamiento o sondeo; el factor de carga dispara el rehash cuando α crece. El peor caso es O(n), pero con un hash decente y α bajito, la operación es \"directa\". Y desactivar el ahorro de bucles anidados es la jugada nº1 de entrevistas.",
+      textEn: "**Recap:** average O(1) for put/get/delete; the hash function spreads the keys; collisions are resolved with chaining or probing; the load factor triggers rehashing when α grows. The worst case is O(n), but with a decent hash and a low α the operation is “direct”. And swapping the nested-loop scan for a map is the number-one move in interviews.",
     },
   ],
 };
@@ -219,12 +230,14 @@ export const searchChapter: ChapterContent = {
       id: "search-hook",
       text:
         "**Gancho:** busca tu nombre en una guía de teléfono DESORDENADA: 1.000 páginas, una a una — eso es búsqueda lineal. Ahora busca en la ordenada: abres por la mitad, ves que tu letra va antes, tiras la otra mitad… log₂(1.000.000) ≈ 20 pasos. La mitad del trabajo se tira en cada paso. Ese es TODO el capítulo.",
+      textEn: "**Hook:** look for your name in an UNSORTED phone book: 1,000 pages, one by one — that is linear search. Now the sorted one: you open at the middle, see your letter comes earlier, throw the other half away… log₂(1,000,000) ≈ 20 steps. Half of the work is discarded at each step. That is the WHOLE chapter.",
     },
     {
       kind: "prose",
       id: "search-linear",
       text:
         "**Búsqueda lineal** no pide nada a los datos: recorre de principio a fin comparando. Sirve para cualquier colección (ordenada o no), pero en el peor caso examina TODO: O(n). Es la única opción si la colección desordena y no puedes invertir en pre-proceso.",
+      textEn: "**Linear search** asks nothing of the data: it walks from start to end comparing. It works on any collection (sorted or not), but in the worst case it examines EVERYTHING: O(n). It is the only option when the collection is unordered and you cannot invest in pre-processing.",
     },
     {
       kind: "viz",
@@ -241,6 +254,7 @@ export const searchChapter: ChapterContent = {
       id: "search-binary",
       text:
         "**Búsqueda binaria:** exige array **ordenado**. Toma el elemento medio; si es el objetivo, listo; si el objetivo es menor, todo lo que haya a la derecha del medio es descartable (¡está ordenado!) — y viceversa. El rango de candidatos se reduce a la mitad en CADA paso.",
+      textEn: "**Binary search:** it demands a **sorted** array. Take the middle element; if it is the target, done; if the target is smaller, everything to the right of the middle is discardable (it is sorted!) — and vice versa. The range of candidates halves at EVERY step.",
     },
     {
       kind: "formula",
@@ -252,6 +266,7 @@ export const searchChapter: ChapterContent = {
       id: "search-binary-intuition",
       text:
         "Eso es: n → n/2 → n/4 → … → 1 son ⌊log₂ n⌋ pasos para llegar a 1. Un array de un millón no necesita un millón de pasadas: ~20. Diez mil millones de elementos: ~33. El logaritmo mata la escala.",
+      textEn: "Exactly: n → n/2 → n/4 → … → 1 is ⌊log₂ n⌋ steps to reach 1. A million-element array does not need a million passes: ~20. Ten billion elements: ~33. The logarithm kills the scale.",
     },
     {
       kind: "viz",
@@ -264,30 +279,35 @@ export const searchChapter: ChapterContent = {
       id: "search-binary-viz-text",
       text:
         "Mira la visualización: el cursor salta al MEDIO, no a la casilla siguiente. Las casillas tintadas son las ya descartadas — cada gris es media colección que ya no re-visitarás jamás. Con el mismo array y objetivo, la lineal de arriba realizó 5 lecturas; la binaria, 3.",
+      textEn: "Watch the visualization: the cursor jumps to the MIDDLE, not to the next slot. The tinted slots are the ones already discarded — each gray is half a collection you will never revisit again. With the same array and target, the linear search above made 5 reads; the binary one, 3.",
     },
     {
       kind: "prose",
       id: "search-example",
       text:
         "**Ejemplo resuelto.** Array [1, 3, 7, 9, 12, 15, 19, 22], busca 12. Paso 1: lo = 0, hi = 7 → mid = 3 → a[3] = 9 < 12 → lo = 4. Bajamos a la mitad derecha. Paso 2: lo = 4, hi = 7 → mid = 5 → a[5] = 15 > 12 → hi = 4. Paso 3: lo = 4, hi = 4 → mid = 4 → a[4] = 12 ✓. Tres pasadas para n = 8. Con la lineal: cinco.",
+      textEn: "**Solved example.** Array [1, 3, 7, 9, 12, 15, 19, 22], look for 12. Step 1: lo = 0, hi = 7 → mid = 3 → a[3] = 9 < 12 → lo = 4. We drop to the right half. Step 2: lo = 4, hi = 7 → mid = 5 → a[5] = 15 > 12 → hi = 4. Step 3: lo = 4, hi = 4 → mid = 4 → a[4] = 12 ✓. Three passes for n = 8. Linear: five.",
     },
     {
       kind: "prose",
       id: "search-tradeoffs",
       text:
         "| Método | Requisito | Peor caso | Espacio |\n| --- | --- | --- | --- |\n| Lineal | nada | O(n) | O(1) |\n| Binaria (iterativa) | array ordenado | O(log n) | O(1) |\n| Binaria (recursiva) | array ordenado | O(log n) | O(log n) de pila |\n| Hash | función hash | O(1) promedio | O(n) |\n\nLa binaria es el punto dulce: logarítmica y sin memoria extra. Ahora bien: si ordenas (O(n log n)) SOLO para hacer UNA búsqueda, te has pasado — la ordenación es un **pre-proceso**: paga mucho si vas a buscar mil veces.",
+      textEn: "| Method | Requirement | Worst case | Space |\n| --- | --- | --- | --- |\n| Linear | none | O(n) | O(1) |\n| Binary (iterative) | sorted array | O(log n) | O(1) |\n| Binary (recursive) | sorted array | O(log n) | O(log n) of stack |\n| Hash | hash function | O(1) average | O(n) |\n\nBinary is the sweet spot: logarithmic, and no extra memory. That said: if you sort (O(n log n)) ONLY to do ONE search, you have overspent — sorting is a **pre-process**: it pays off when you are going to search a thousand times.",
     },
     {
       kind: "prose",
       id: "search-pitfalls",
       text:
-        "**Trampas frecuentes:**\n\n1. **Rango acumulado incorrecto.** `lo = mid + 1` y `hi = mid - 1`, nunca `= mid`: si el puesto no garantiza progreso, el bucle no termina. Comprueba que o eliminas exactly un elemento del rango o más.\n2. **Overflow del mid** en lenguajes con ints acotados: `mid = lo + (hi − lo) // 2` en lugar de `(lo + hi) // 2` (en Python no aplica, en Java/C++ sí).\n3. **Duplicados.** Si a = [2, 2, 2, 3] y búsqueda 2, la binaria devuelve ALGÚN 2, no el primero. Para el primero: seguir buscando a la izquierda (hi = mid) incluso con a[mid] == target — variante *leftmost*.\n4. **Precondición mentirosa.** Binaria sobre desordenado es un bug silencioso: compila, corre, se equivoca. El invariante lo paga el que llama.",
+        "**Trampas frecuentes:**\n\n1. **Rango acumulado incorrecto.** `lo = mid + 1` y `hi = mid - 1`, nunca `= mid`: si el puesto no garantiza progreso, el bucle no termina. Comprueba que en cada paso eliminas al menos un elemento del rango.\n2. **Overflow del mid** en lenguajes con ints acotados: `mid = lo + (hi − lo) // 2` en lugar de `(lo + hi) // 2` (en Python no aplica, en Java/C++ sí).\n3. **Duplicados.** Si a = [2, 2, 2, 3] y búsqueda 2, la binaria devuelve ALGÚN 2, no el primero. Para el primero: seguir buscando a la izquierda (hi = mid) incluso con a[mid] == target — variante *leftmost*.\n4. **Precondición mentirosa.** Binaria sobre desordenado es un bug silencioso: compila, corre, se equivoca. El invariante lo paga el que llama.",
+      textEn: "**Frequent traps:**\n\n1. **Wrong range update.** `lo = mid + 1` and `hi = mid − 1`, never `= mid`: if the move does not guarantee progress, the loop never ends. Check that each step eliminates at least one element of the range.\n2. **mid overflow** in languages with bounded ints: `mid = lo + (hi − lo) // 2` instead of `(lo + hi) // 2` (in Python it does not apply; in Java/C++ it does).\n3. **Duplicates.** If a = [2, 2, 2, 3] and you search 2, binary returns SOME 2, not the first one. For the first: keep searching left (hi = mid) even when a[mid] == target — the *leftmost* variant.\n4. **Lying precondition.** Binary search over unsorted data is a silent bug: it compiles, it runs, it answers wrong. The invariant is the caller's responsibility.",
     },
     {
       kind: "prose",
       id: "search-recap",
       text:
         "**Recap:** sin orden, lineal O(n); con orden, binaria O(log n) que descarta media colección por paso; hash si puedes pagar memoria y quieres O(1) promedio. La búsqueda binaria es el patrón base de media entrevista: \"encuentra la primera ≥ x\", \"el mínimo en una serie rotada\", \"la primera vez que falla la condición\"… son todas la MISMA plantilla — mantén saneados lo, hi y mid.",
+      textEn: "**Recap:** no order, linear O(n); with order, binary O(log n) that discards half the collection per step; hash if you can afford memory and want average O(1). Binary search is the base pattern of half of all interviews: “find the first ≥ x”, “the minimum in a rotated series”, “the first time the condition fails”… they are all the SAME template — keep lo, hi and mid sane.",
     },
   ],
 };
