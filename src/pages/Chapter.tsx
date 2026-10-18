@@ -9,6 +9,7 @@ import TreePlayground from "./TreePlayground";
 import GraphPlayground from "./GraphPlayground";
 import HeapPlayground from "./HeapPlayground";
 import { useI18n } from "../engine/i18n";
+import { mundoReal } from "../content/mundo-real";
 
 export default function ChapterPage({ id }: { id: string }) {
   const { lang, t } = useI18n();
@@ -64,6 +65,32 @@ export default function ChapterPage({ id }: { id: string }) {
           <a className="btn" href="#/chapter/sorting">{t("chapter.soonCta")}</a>
         </section>
       )}
+
+      {mundoReal[id] && ch.status === "live" && (() => {
+        const m = mundoReal[id];
+        const analogia = lang === "en" ? m.analogiaEn : m.analogia;
+        const casos = lang === "en" && m.casosEn ? m.casosEn : m.casos;
+        return (
+          <section className="mundo-real" aria-label={lang === "en" ? "In the real world" : "En el mundo real"}>
+            <div className="mundo-head">
+              <span className="mundo-tag">{lang === "en" ? "real world" : "mundo real"}</span>
+              <h2 className="serif">{lang === "en" ? "In the wild" : "En el mundo real"}</h2>
+            </div>
+            <p className="mundo-analogia">
+              <b>{lang === "en" ? "The analogy — " : "La analogía — "}</b>
+              {analogia}
+            </p>
+            <div className="mundo-grid">
+              {casos.map((c) => (
+                <div className="mundo-caso" key={c.titulo}>
+                  <h3>{c.titulo}</h3>
+                  <p>{c.detalle}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
 
       {entrevistas[id] && ch.status === "live" && (
         <section className="entrevista" aria-label={lang === "en" ? "Interview tips" : "Consejos para la entrevista"}>

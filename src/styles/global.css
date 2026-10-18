@@ -643,6 +643,7 @@ h2.section-h { font-size: 1.45rem; margin: 42px 0 14px; }
 
 @media (max-width: 940px) {
   .entrevista-grid { grid-template-columns: 1fr; gap: 14px; }
+  .mundo-grid { grid-template-columns: 1fr; gap: 14px; }
   .entrevista { padding: 18px 18px 20px; }
 }
 
@@ -701,4 +702,62 @@ h2.section-h { font-size: 1.45rem; margin: 42px 0 14px; }
   font-size: 0.8rem;
   font-style: italic;
   margin-top: -4px;
+}
+
+/* ————— Fase 10b: «En el mundo real» — anclaje cotidiano por capítulo ————— */
+.mundo-real {
+  margin-top: 40px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent-3);
+  border-radius: var(--radius);
+  padding: 22px 26px 26px;
+}
+.mundo-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.mundo-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent-3);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.mundo-head h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+.mundo-analogia {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.mundo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.mundo-caso {
+  background: #fffdf8;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.mundo-caso h3 {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.mundo-caso p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
 }
