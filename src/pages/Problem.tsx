@@ -114,7 +114,7 @@ export default function Problem({ id }: { id: string }) {
 ${problem.setupCode}
 ${userCode}
 _target = ${resolveTargetName(problem.setupCode, userCode)}
-_result = _target(${callArgs})
+_result = _target(*${callArgs})
 `;
       const frames = await runTraced(tracedCode, 2000);
       setTraceCode(tracedCode);

@@ -83,14 +83,16 @@ export async function evaluateSolution({
   await initPyodide();
 
   const testCalls = tests.map((t) => {
-    // Los corchetes SON los paréntesis de la llamada: _target([a, b]) ≡ _target(a, b).
+    // args es LA LISTA de argumentos de la llamada: se serializa como lista
+    // de Python y se invoca con unpacking — _target(*args) — para que las
+    // funciones de 1, 2 o n parámetros reciban exactamente sus argumentos.
     const argsPy = `[${t.args.map(pyLiteral).join(", ")}]`;
     const expectedPy = pyLiteral(t.expected);
     const hiddenPy = t.hidden === true ? "True" : "False";
     return `
 _budget_reset()
 try:
-    _result = _target(${argsPy})
+    _result = _target(*${argsPy})
     _ok = _result == ${expectedPy}
 except Exception as _e:
     _result = f"ERROR: {_e}"
