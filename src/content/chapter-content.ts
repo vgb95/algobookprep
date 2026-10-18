@@ -17,12 +17,14 @@ export const arraysChapter: ChapterContent = {
       id: "arrays-hook",
       text:
         "**Gancho:** un array es la estructura más humilde y la más rápida. ¿Por qué? Mira cómo vive en RAM: puro orden, sin desvíos. Piensa en una fila de casilleros numerados en línea: la casilla nº i es `primera + i·tamaño`, un solo salto, sin caminar el pasillo. Las demás estructuras existen para arreglar lo que el array NO hace bien: crecer o encoger en medio.",
+      textEn: "**Hook:** the array is the humblest structure and the fastest. Why? Look at how it lives in RAM: pure order, no detours. Picture a row of numbered lockers: locker #i is at `first + i·size` — one single jump, nothing walking down the hallway. Every other data structure exists to fix what the array does NOT do well: grow or shrink in the middle.",
     },
     {
       kind: "prose",
       id: "arrays-intro",
       text:
         "Un **array** es una colección de elementos del mismo tipo almacenados en **posiciones de memoria contiguas**. Todas las casillas tienen el mismo tamaño (¡por eso ese \"elemento del mismo tipo\"!): si sabes dónde empieza el array y cuánto ocupa cada casilla, puedes calcular la dirección de cualquier elemento sin recorrer nada.",
+      textEn: "An **array** is a collection of same-type elements stored in **contiguous memory positions**. Every cell has the same size (that is why “same-type element”!): if you know where the array starts and how much each cell takes, you can compute the address of any element without walking anything.",
     },
     {
       kind: "formula",
@@ -40,12 +42,14 @@ export const arraysChapter: ChapterContent = {
       id: "arrays-o1",
       text:
         "Esa fórmula es el superpoder del array: **acceso aleatorio en O(1)**. Leer o escribir `a[5]` es un solo salto de memoria. PERO mira la visualización: buscar *por valor* (¿dónde está el 7?) obliga a recorrer casilla a casilla — O(n). El O(1) vale solo para el índice; el valor hay que buscarlo.",
+      textEn: "That formula is the array's superpower: **random access in O(1)**. Reading or writing `a[5]` is one single memory jump. BUT watch the visualization: searching *by value* (where is the 7?) forces a walk, cell by cell — O(n). O(1) holds only for the index; the value must be searched.",
     },
     {
       kind: "prose",
       id: "arrays-insert",
       text:
         "Ahora el lado oscuro: la contigüidad es un contrato rígido — no hay huecos. Para **insertar** en la posición *i*, todo lo posterior debe ganar una casilla a la derecha, UNO a UNO, para que siga habiendo contigüidad. En el peor caso (insertar al principio) desplazas los *n* elementos: **O(n)**.",
+      textEn: "Now the dark side: contiguity is a rigid contract — no gaps allowed. To **insert** at position *i*, everything after it must win a cell to the right, ONE at a time, so the contiguity survives. In the worst case (inserting at the front) you shift all *n* elements: **O(n)**.",
     },
     {
       kind: "viz",
@@ -58,6 +62,7 @@ export const arraysChapter: ChapterContent = {
       id: "arrays-delete",
       text:
         "**Borrar** es lo inverso: el elemento sale y los posteriores caen una casilla a la izquierda para tapar el hueco. De nuevo **O(n)**. Fíjate en la visualización: el hueco viaja de la posición de salida al final mientras las tarjetas colapsan — físico, no abstracto.",
+      textEn: "**Deleting** is the reverse: the element leaves and the later ones fall one cell to the left to cover the gap. Again **O(n)**. Look at the visualization: the gap travels from the exit position to the end while the cards collapse — physical, not abstract.",
     },
     {
       kind: "viz",
@@ -74,24 +79,28 @@ export const arraysChapter: ChapterContent = {
       id: "arrays-example",
       text:
         "**Ejemplo resuelto.** ¿Cuál es el coste total de insertar 1.000 veces SIEMPRE al principio de un array? Cada inserción desplaza toda la lista: 1 + 2 + … + 1.000 ≈ 500.000 escrituras — O(n²). En cambio, si insertas SIEMPRE al final (append), no hay que desplazar nada: 1.000 escrituras — O(n) total, O(1) **amortizado** por operación (de vez en cuando la tabla crece y paga un copy). Misma operación, distinta posición: lo que decides es el COSTE.",
+      textEn: "**Solved example.** What is the total cost of inserting 1,000 times ALWAYS at the beginning of an array? Every insertion shifts the whole list: 1 + 2 + … + 1,000 ≈ 500,000 writes — O(n²). Now insert ALWAYS at the end (append): nothing to shift — 1,000 writes — O(n) total, O(1) **amortized** per operation (from time to time the table grows and pays a copy). Same operation, different position: what you are choosing is the COST.",
     },
     {
       kind: "prose",
       id: "arrays-costs",
       text:
         "| Operación | Coste | Motivo |\n| --- | --- | --- |\n| acceso por índice `a[i]` | O(1) | aritmética de direcciones |\n| buscar por valor | O(n) | no hay orden garantizado |\n| insertar / borrar en medio | O(n) | desplazar el resto |\n| append al final | O(1) amortizado | nada que desplazar (crecer paga una copia) |\n\n**Tradeoff frente a otras estructuras:** si tu vida son inserciones en cualquier posición, la lista enlazada (cap. 8) hace la inserción en O(1)… pero su búsqueda también es O(n) y pierde el acceso aleatorio. Ninguna gana de forma absoluta: gana la que encaja con tu patrón de uso.",
+      textEn: "| Operation | Cost | Why |\n| --- | --- | --- |\n| access by index `a[i]` | O(1) | address arithmetic |\n| search by value | O(n) | no guaranteed order |\n| insert / delete in the middle | O(n) | the rest must shift |\n| append at the end | O(1) amortized | nothing to shift (growing pays a copy) |\n\n**Tradeoff against other structures:** if your life is insertions at arbitrary positions, the linked list (ch. 8) inserts in O(1)… but its search is also O(n) and it loses random access. None wins absolutely: the one that fits your usage pattern wins.",
     },
     {
       kind: "prose",
       id: "arrays-pitfalls",
       text:
         "**Trampas frecuentes:**\n\n1. **Off-by-one.** Bucles que en vez de `i < len` ponen `i <= len` — en Python, error; en C, corrupción silenciosa. Las casillas van de 0 a len−1.\n2. **Mutación compartida.** `b = a` copia la REFERENCIA (en Python): ordenar `b` ordena `a`. Copia de verdad cuando necesites copia: `b = a[:]`.\n3. **Borrar mientras iteras.** Eliminar elementos DENTRO de un bucle que recorre la lista hace que se te salten elementos: itera sobre índices ajustando el contador al borrar, o construye una lista nueva.\n4. **Arrays dinámicos como fijos.** En Python una lista es dinámica: el append es feliz. Pero si tu algoritmo promete O(n) total y encadenas N inserciones AL PRINCIPIO, sigue siendo O(n²) — amortizado solo cubre el append.",
+      textEn: "**Frequent traps:**\n\n1. **Off-by-one.** Loops that say `i <= len` instead of `i < len` — in Python, an error; in C, silent corruption. Cells run from 0 to len−1.\n2. **Shared mutation.** `b = a` copies the REFERENCE (in Python): sorting `b` sorts `a`. Take a real copy when you need one: `b = a[:]`.\n3. **Deleting while iterating.** Removing elements INSIDE a loop that walks the list makes you skip some: iterate over indexes, adjusting the counter when you delete, or build a new list.\n4. **Dynamic arrays as fixed.** In Python a list is dynamic: the append is happy. But if your algorithm promises O(n) total and you chain N insertions AT THE FRONT, it stays O(n²) — amortization only covers the append.",
     },
     {
       kind: "prose",
       id: "arrays-recap",
       text:
         "**Recap:** contigüidad = acceso O(1) por índice; buscar por valor O(n); insertar o borrar en medio O(n) porque las tarjetas desplazan; append O(1) amortizado. El array domina cuando tu patrón es \"leer por posición\"; pierde cuando es \"modificar en medio\" — eso lo resuelven listas enlazadas (cap. 8) y deques.",
+      textEn: "**Recap:** contiguity = O(1) access by index; search by value O(n); insert or delete in the middle O(n) because the cards shift; append O(1) amortized. The array rules when your pattern is “read by position”; it loses when it is “modify in the middle” — linked lists (ch. 8) and deques resolve that.",
     },
     {
       kind: "problem",

@@ -17,12 +17,14 @@ export const complexityChapter: ChapterContent = {
       id: "cx-hook",
       text:
         "**Gancho:** dos programas resuelven lo mismo; uno tarda milisegundos con 10.000 datos y otro quema tu portátil. La diferencia no es el lenguaje ni el ordenador: es cómo **crece** el trabajo con el tamaño de la entrada. La complejidad es la charla delante de la codificación: promete qué va a pasar cuando tus datos crezcan.",
+      textEn: "**Hook:** two programs solve the same problem; one finishes in milliseconds with 10,000 records and the other burns your laptop. The difference is not the language nor the computer: it is how the work **grows** with the input size. Complexity is the talk before the coding: it promises what will happen when your data grows.",
     },
     {
       kind: "prose",
       id: "cx-intro",
       text:
         "La **complejidad** mide cuánto crece el coste de un algoritmo (tiempo o memoria) cuando *n* crece. No medimos segundos ni megabytes — eso depende de la máquina — sino el **orden de crecimiento**: cuántas veces más trabajo hace el algoritmo cuando duplicas la entrada.",
+      textEn: "**Complexity** measures how much an algorithm's cost (time or memory) grows as *n* grows. We do not measure seconds or megabytes — that depends on the machine — but the **order of growth**: how many times more work the algorithm does when you double the input.",
     },
     {
       kind: "formula",
@@ -34,6 +36,7 @@ export const complexityChapter: ChapterContent = {
       id: "cx-big-o-text",
       text:
         "**Big-O** es un techo: \"a partir de cierto n, nunca crece más rápido que *g(n)*\". Intuición útil: si un algoritmo es O(n²), al **duplicar** la entrada el trabajo se **cuadruplica**; si es O(n log n), poco más que se duplica; si es O(n), se duplica exactamente. Esa regla del \"¿qué pasa si duplico n?\" vale más que memorizar la definición formal.",
+      textEn: "**Big-O** is a ceiling: “from some n onward, it never grows faster than *g(n)*”. Useful intuition: if an algorithm is O(n²), doubling the input **quadruples** the work; if it is O(n log n), it barely more than doubles; if it is O(n), it exactly doubles. The rule “what happens if I double n?” is worth more than memorizing the formal definition.",
     },
     {
       kind: "formula",
@@ -45,6 +48,7 @@ export const complexityChapter: ChapterContent = {
       id: "cx-theta-text",
       text:
         "**Θ** encierra el crecimiento entre dos cotas iguales: crece *exactamente* como g(n) (a escala constante). **Ω** es el suelo — el mejor caso que puedes esperar. En entrevistas casi siempre hablamos del *peor caso* con Big-O.",
+      textEn: "**Θ** boxes the growth between two equal bounds: it grows *exactly* like g(n) (up to a constant scale). **Ω** is the floor — the best case you can hope for. In interviews we almost always talk about the *worst case* with Big-O.",
     },
     {
       kind: "divider",
@@ -55,6 +59,7 @@ export const complexityChapter: ChapterContent = {
       id: "cx-example",
       text:
         "**Ejemplo resuelto.** Búsqueda lineal: ya visto en el capítulo de arrays; en el peor caso (objetivo ausente o al final) la revisas entera. Duplicar n duplica las comparaciones → T(n) = c·n → **O(n)**, y además es Θ(n) porque aunque el elemento sea el primero (mejor caso Ω(1)), la escala creciente es lineal. Búsqueda binaria: cada paso mata la mitad del rango; 1.000.000 elementos se resuelven en ≈20 pasadas porque 2²⁰ > 10⁶ → **O(log n)**.",
+      textEn: "**Solved example.** Linear search: already seen in the arrays chapter; in the worst case (a missing target or one at the very end) you re-check the whole array. Doubling n doubles the comparisons → T(n) = c·n → **O(n)**; it is also Θ(n), because although a first-slot element is a best case of Ω(1), the growing scale is linear. Binary search: each step kills half of the range; 1,000,000 elements resolve in ≈20 passes because 2²⁰ > 10⁶ → **O(log n)**.",
     },
     {
       kind: "viz",
@@ -68,30 +73,35 @@ export const complexityChapter: ChapterContent = {
       id: "cx-demo-text",
       text:
         "Mira los contadores de la visualización anterior: para un array *casi ordenado*, insertion sort compara muy poco (un O(n) disfrazado). Pulsa 🎲 y elige «aleatorio»: las comparaciones se disparan hacia O(n²). Mismos n, distinto carácter — por eso existen **peor** y **mejor** caso.",
+      textEn: "Look at the counters in the visualization above: for an *almost sorted* array, insertion sort compares very little (an O(n) in disguise). Press 🎲 and pick “random”: comparisons explode toward O(n²). Same n, different character — that is why **worst** and **best** case exist.",
     },
     {
       kind: "prose",
       id: "cx-classes",
       text:
         "Las clases que verás una y otra vez, de más rápido a más lento:\n\n| Clase | Nombre | Ejemplo |\n| --- | --- | --- |\n| O(1) | constante | acceso por índice, insertar en tabla hash (promedio) |\n| O(log n) | logarítmico | búsqueda binaria, altura de un BST balanceado |\n| O(n) | lineal | un bucle que recorre todo |\n| O(n log n) | linealítmico | merge sort, quicksort promedio |\n| O(n²) | cuadrático | bucles anidados, sorts elementales |\n| O(2ⁿ) | exponencial | explorar todos los subconjuntos |",
+      textEn: "The classes you will see over and over, from fastest to slowest:\n\n| Class | Name | Example |\n| --- | --- | --- |\n| O(1) | constant | access by index, insert into a hash table (average) |\n| O(log n) | logarithmic | binary search, the height of a balanced BST |\n| O(n) | linear | one loop that walks everything |\n| O(n log n) | linearithmic | merge sort, average quicksort |\n| O(n²) | quadratic | nested loops, elementary sorts |\n| O(2ⁿ) | exponential | exploring every subset |",
     },
     {
       kind: "prose",
       id: "cx-space",
       text:
         "La **complejidad espacial** mide memoria extra aparte de la entrada: un algoritmo *in-place* usa O(1) extra; uno que copia el array usa O(n). **Tradeoff clásico del capítulo:** la tabla hash paga O(n) de memoria para conseguir búsquedas O(1); sin esa inversión del espacio, buscas en O(n). Espacio a cambio de tiempo es una de las trucos más rentables de las entrevistas.",
+      textEn: "**Spatial complexity** measures extra memory apart from the input: an *in-place* algorithm uses O(1) extra; one that copies the array uses O(n). **Classic chapter tradeoff:** the hash table pays O(n) of memory to gain O(1) lookups; without investing that space, you search in O(n). Space for time is one of the most profitable tricks in interviews.",
     },
     {
       kind: "prose",
       id: "cx-pitfalls",
       text:
         "**Trampas frecuentes:**\n\n1. **Comparar n pequeño.** Para n = 20, O(n²) a veces gana a O(n log n) por constantes ocultas. Big-O es una promesa para entradas grandes, no un cronómetro.\n2. **Contar líneas, no bucles.** Un bucle que trabaja con otro bucle dentro no son dos líneas: es O(n²). Cuenta las veces que se ejecuta el bloque más interno.\n3. **Olvidar el logaritmo disfrazado.** `while (n > 1) n = n / 2` es O(log n) aunque no veas ninguna búsqueda binaria.\n4. **Confundir peor caso con promedio.** Quicksort es O(n log n) promedio pero O(n²) en el peor caso (piras malignas); el entrevistador pregunta por el peor.",
+      textEn: "**Frequent traps:**\n\n1. **Comparing small n.** For n = 20, O(n²) sometimes beats O(n log n) because of hidden constants. Big-O is a promise for large inputs, not a stopwatch.\n2. **Counting lines, not loops.** A loop working inside another is not two lines: it is O(n²). Count how many times the innermost block runs.\n3. **Forgetting the disguised logarithm.** `while (n > 1) n = n / 2` is O(log n) even with no binary search in sight.\n4. **Confusing worst case with average.** Quicksort is O(n log n) on average but O(n²) in the worst case (evil pivots); the interviewer asks about the worst.",
     },
     {
       kind: "prose",
       id: "cx-recap",
       text:
         "**Recap:** Big-O acota el peor crecimiento; Ω el mejor; Θ ambos a la vez. Duplicar la entrada es tu radar mental: O(1) no cambió, O(n) se duplica, O(log n) casi aguantó, O(n²) se cuadruplicó. Y la segunda carta: memoria — comprar espacio pares a bajar el tiempo.",
+      textEn: "**Recap:** Big-O bounds the worst growth; Ω the best; Θ both at once. Doubling the input is your mental radar: O(1) did not move, O(n) doubled, O(log n) almost held, O(n²) quadrupled. And the second card: memory — buying space often buys time.",
     },
     {
       kind: "divider",
