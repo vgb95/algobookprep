@@ -3,13 +3,17 @@ import Problem from "../pages/Problem";
 import VizPlayer from "../components/viz/VizPlayer";
 import Markdown from "./Markdown";
 import LatexLite from "./LatexLite";
+import { useI18n } from "../engine/i18n";
 
 export default function BlockRenderer({ block }: { block: Block }) {
+  const { lang } = useI18n();
   switch (block.kind) {
     case "prose":
       return (
         <div className="prose-block" key={block.id}>
-          <Markdown text={block.text} />
+          <Markdown
+            text={lang === "en" && block.textEn ? block.textEn : block.text}
+          />
         </div>
       );
     case "formula":

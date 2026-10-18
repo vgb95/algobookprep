@@ -171,3 +171,8 @@
     transition: none;
   }
 }
+
+/* Selector de idioma en la barra superior móvil (desktop: topbar oculto) */
+.topbar .lang-switch {
+  margin-left: auto;
+}

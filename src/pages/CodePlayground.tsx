@@ -6,6 +6,7 @@ import FluidScrubber from "../components/viz/FluidScrubber";
 import FluidBars, { type BarMarker } from "../components/viz/FluidBars";
 import { ROLE } from "../components/viz/roles";
 import type { SortFrame } from "../algorithms/sorting";
+import { useI18n } from "../engine/i18n";
 
 /**
  * Heurística de punteros: locales con nombre de índice (i, j, min, mid…)
@@ -44,6 +45,7 @@ print(arr)
 `;
 
 export default function CodePlayground() {
+  const { lang, t } = useI18n();
   const [code, setCode] = useState(DEFAULT_CODE);
   const [lines, setLines] = useState<string[]>(DEFAULT_CODE.split("\n"));
   const [frames, setFrames] = useState<{
@@ -87,14 +89,15 @@ export default function CodePlayground() {
   return (
     <div>
       <p className="prose-note">
-        Cada línea ejecutada se graba como un frame de la cinta. El código corre
-        en <strong>Python real</strong> (Pyodide/WASM) dentro de tu pestaña.
+        {lang === "en"
+          ? "Every executed line is recorded as a frame of the tape. The code runs in real Python (Pyodide/WASM) inside your tab."
+          : "Cada línea ejecutada se graba como un frame de la cinta. El código corre en Python real (Pyodide/WASM) dentro de tu pestaña."}
       </p>
 
       <section className="card">
         <div className="controls">
           <label className="field">
-            código python
+            {t("playground.codeLabel")}
             <textarea
               value={code}
               onChange={(e) => {
@@ -108,19 +111,19 @@ export default function CodePlayground() {
           </label>
           <div className="run-col">
             <button className="btn primary" onClick={run} disabled={loading}>
-              {loading ? "Ejecutando…" : "▶ Run (traza)"}
+              {loading ? t("playground.running") : t("playground.run")}
             </button>
             {error && <p className="err">{error}</p>}
           </div>
           <label className="field">
-            entrada (stdin)
+            {t("playground.stdin")}
             <textarea
               value={stdin}
               onChange={(e) => setStdin(e.target.value)}
               rows={3}
               spellCheck={false}
               className="code-src"
-              placeholder="Solo si tu código usa input(): una línea por cada llamada"
+              placeholder={t("playground.stdinPh")}
             />
           </label>
         </div>
@@ -132,9 +135,9 @@ export default function CodePlayground() {
           render={(f, blend, next, index) => {
             const arrKey =
               arrayVar && f.arrays && f.arrays[arrayVar] ? arrayVar : null;
-            const toViz = (t: (typeof frames)[number]): SortFrame => ({
-              message: `Línea ${t.line} ejecutada.`,
-              cells: (arrKey && t.arrays && t.arrays[arrKey] ? t.arrays[arrKey] : []).map(
+            const toViz = (fr: (typeof frames)[number]): SortFrame => ({
+              message: t("playground.lineExecuted", { n: fr.line }),
+              cells: (arrKey && fr.arrays && fr.arrays[arrKey] ? fr.arrays[arrKey] : []).map(
                 (v, i) => ({ id: i, value: v, slot: i }),
               ),
               settled: [],
@@ -149,7 +152,11 @@ export default function CodePlayground() {
                   </div>
                   <div className="trace-state">
                     <p className="narrate" key={index}>
-                      Línea <b>{f.line}</b> ejecutada
+                      {lang === "en" ? (
+                        <>Line <b>{f.line}</b> executed</>
+                      ) : (
+                        <>Línea <b>{f.line}</b> ejecutada</>
+                      )}
                     </p>
                     <VariableInspector
                       locals={f.locals}
@@ -157,7 +164,7 @@ export default function CodePlayground() {
                     />
                     {f.stdout && (
                       <div className="stdout">
-                        <b>Salida:</b> <span className="stdout-text">{f.stdout}</span>
+                        <b>{t("playground.output")}</b> <span className="stdout-text">{f.stdout}</span>
                       </div>
                     )}
                   </div>
@@ -181,12 +188,12 @@ export default function CodePlayground() {
 
       {frames.length > 0 && (
         <div className="meta">
-          <span className="badge">frames: {frames.length}</span>
+          <span className="badge">{t("playground.frames", { n: frames.length })}</span>
           {arrayNames.length > 0 && (
             <>
-              <span className="badge">arrays: {arrayNames.join(", ")}</span>
+              <span className="badge">{t("playground.arrays", { list: arrayNames.join(", ") })}</span>
               <label className="field" style={{ marginLeft: 10 }}>
-                mostrar array
+                {t("playground.showArray")}
                 <select
                   value={arrayVar ?? ""}
                   onChange={(e) => setArrayVar(e.target.value || null)}

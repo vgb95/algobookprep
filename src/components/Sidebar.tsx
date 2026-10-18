@@ -1,4 +1,6 @@
 import { chapters } from "../content/chapters";
+import { useI18n } from "../engine/i18n";
+import { LangSwitch } from "../engine/i18n";
 
 const isRead = (id: string): boolean => {
   try {
@@ -9,6 +11,7 @@ const isRead = (id: string): boolean => {
 };
 
 export default function Sidebar({ open = false }: { open?: boolean }) {
+  const { t } = useI18n();
   const activeId = window.location.hash.startsWith("#/chapter/")
     ? window.location.hash.slice("#/chapter/".length)
     : null;
@@ -19,13 +22,13 @@ export default function Sidebar({ open = false }: { open?: boolean }) {
         <span className="brand-mark" aria-hidden>▤</span>
         <div>
           <div className="brand-name">AlgoBook</div>
-          <div className="brand-sub">interactive DSA handbook</div>
+          <div className="brand-sub">{t("sidebar.brandSub")}</div>
         </div>
       </a>
       <nav className="toc">
-        <a href="#/problems" className="toc-item problems-link" title="Banco de problemas">
+        <a href="#/problems" className="toc-item problems-link" title={t("sidebar.problemBank")}>
           <span className="toc-num">✦</span>
-          <span>Problemas</span>
+          <span>{t("sidebar.problems")}</span>
         </a>
         {chapters.map((c) => (
           <a
@@ -37,21 +40,20 @@ export default function Sidebar({ open = false }: { open?: boolean }) {
             <span className="toc-num">{c.num}</span>
             <span className="toc-title">{c.title}</span>
             {isRead(c.id) ? (
-              <span className="check" title="completado">✓</span>
+              <span className="check" title={t("sidebar.read")}>✓</span>
             ) : (
               <span
                 className="dot pending"
-                title={
-                  c.status === "live"
-                    ? "demo interactiva — pendiente"
-                    : "próximamente"
-                }
+                title={c.status === "live" ? t("sidebar.dotLive") : t("sidebar.dotSoon")}
               />
             )}
           </a>
         ))}
       </nav>
-      <div className="sidebar-foot">AlgoBook v0.4 · 22 capítulos · PWA offline</div>
+      <div className="lang-row">
+        <LangSwitch />
+      </div>
+      <div className="sidebar-foot">{t("sidebar.foot", { n: chapters.length })}</div>
     </aside>
   );
 }

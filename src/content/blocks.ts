@@ -25,6 +25,8 @@ export interface BlockBase {
 export interface ProseBlock extends BlockBase {
   kind: "prose";
   text: string;
+  /** Versión inglesa del párrafo (traducción progresiva por fases). */
+  textEn?: string;
 }
 
 export interface VizBlock extends BlockBase {

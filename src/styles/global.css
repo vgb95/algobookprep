@@ -659,3 +659,46 @@ h2.section-h { font-size: 1.45rem; margin: 42px 0 14px; }
   .content { padding: 30px 18px 50px; }
   .player.with-code { grid-template-columns: 1fr; }
 }
+
+/* ————— Fase 10a: i18n — selector ES/EN + aviso de traducción en curso ————— */
+.lang-switch {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px;
+  background: #fffdf8;
+}
+.lang-switch button {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.lang-switch button.on {
+  background: var(--ink);
+  color: var(--paper);
+}
+.lang-row {
+  margin-top: 14px;
+  padding: 0 4px;
+}
+.i18n-banner {
+  margin: 18px 0 4px;
+  padding: 10px 14px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: var(--paper-2);
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}
+.i18n-mini {
+  font-size: 0.8rem;
+  font-style: italic;
+  margin-top: -4px;
+}

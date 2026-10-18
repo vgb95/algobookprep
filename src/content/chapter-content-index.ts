@@ -42,3 +42,13 @@ export const chaptersContent: Record<string, ChapterContent> = {
   backtracking: backtrackingChapter,
   "bit-operations": bitOpsChapter,
 };
+
+/** ¿El capítulo está traducido por completo al inglés? (todos sus prose tienen textEn). */
+export function chapterTranslated(id: string): boolean {
+  const c = chaptersContent[id];
+  if (!c) return false;
+  for (const b of c.blocks) {
+    if (b.kind === "prose" && b.textEn == null) return false;
+  }
+  return true;
+}

@@ -5,6 +5,7 @@ import CodeEditor from "../components/editor/CodeEditor";
 import { evaluateSolution, pyLiteral, resolveTargetName } from "../engine/evaluator";
 import FluidScrubber from "../components/viz/FluidScrubber";
 import { runTraced } from "../engine/pyodide";
+import { useI18n } from "../engine/i18n";
 
 type Tab = "enunciado" | "pistas" | "solucion";
 
@@ -22,11 +23,21 @@ const DIFF_CLASS: Record<string, string> = {
  * test usa el mismo reproductor de cinta de cuadros.
  */
 export default function Problem({ id }: { id: string }) {
+  const { lang, t } = useI18n();
   const problem = problems.find((p) => p.id === id);
   const chapter = chapters.find((c) => c.id === problem?.chapter);
   const siblings = problems.filter(
     (p) => p.chapter === problem?.chapter && p.id !== problem?.id,
   );
+
+  const diffLabel = (d: string): string =>
+    lang === "en"
+      ? d === "fácil"
+        ? t("problem.diffEasy")
+        : d === "medio"
+          ? t("problem.diffMedium")
+          : t("problem.diffHard")
+      : d;
 
   const [tab, setTab] = useState<Tab>("enunciado");
   const [hintCount, setHintCount] = useState(1);
@@ -51,9 +62,9 @@ export default function Problem({ id }: { id: string }) {
   if (!problem) {
     return (
       <div className="notfound">
-        <h1 className="serif">Problema no encontrado</h1>
-        <p className="lede">Ese problema no existe todavía.</p>
-        <a className="btn primary" href="#/problems">← Ver el banco de problemas</a>
+        <h1 className="serif">{t("problem.notFoundTitle")}</h1>
+        <p className="lede">{t("problem.notFoundBody")}</p>
+        <a className="btn primary" href="#/problems">{t("problem.backToBank")}</a>
       </div>
     );
   }
@@ -63,6 +74,7 @@ export default function Problem({ id }: { id: string }) {
     setEvalResult(null);
     try {
       const result = await evaluateSolution({
+        lang,
         solutionCode: userCode,
         setupCode: problem.setupCode,
         tests: problem.tests,
@@ -108,24 +120,27 @@ _result = _target(${callArgs})
       setTraceCode(tracedCode);
       setTraceFrames(frames);
     } catch {
-      setTraceError(
-        "no se pudo dibujar la traza — tu código lanza un error o supera el límite de pasos antes de terminar este test",
-      );
+      setTraceError(t("problem.traceError"));
     }
   };
 
   return (
     <article>
       <div className="kicker">
-        problema · cap. {chapter?.num} {chapter ? `· ${chapter.title}` : ""} ·{" "}
-        <span className={`diff ${DIFF_CLASS[problem.difficulty] ?? ""}`}>{problem.difficulty}</span>
+        {t("problem.kickerA")} {chapter?.num}{chapter ? ` · ${chapter.title}` : ""} ·{" "}
+        <span className={`diff ${DIFF_CLASS[problem.difficulty] ?? ""}`}>
+          {diffLabel(problem.difficulty)}
+        </span>
       </div>
       <h1 className="serif">{problem.title}</h1>
       <p className="lede">{problem.blurb}</p>
+      {lang === "en" && (
+        <p className="prose-note i18n-mini">Statement still in Spanish — English on the way.</p>
+      )}
 
       {siblings.length > 0 && (
         <div className="sibling-row">
-          <span className="prose-note">más del capítulo:</span>
+          <span className="prose-note">{t("problem.moreChapter")}</span>
           {siblings.map((s) => (
             <a key={s.id} className="badge chip-link" href={`#/problem/${s.id}`}>
               {s.title}
@@ -135,13 +150,19 @@ _result = _target(${callArgs})
       )}
 
       <nav className="tabs" style={{ marginTop: 16 }}>
-        {(["enunciado", "pistas", "solucion"] as const).map((t) => (
+        {(["enunciado", "pistas", "solucion"] as const).map((tb) => (
           <button
-            key={t}
-            className={`tab ${tab === t ? "active" : ""}`}
-            onClick={() => setTab(t)}
+            key={tb}
+            className={`tab ${tab === tb ? "active" : ""}`}
+            onClick={() => setTab(tb)}
           >
-            {t === "solucion" && allPassed ? "✓ solución" : t}
+            {tb === "solucion" && allPassed
+              ? t("problem.tabSolved")
+              : tb === "solucion"
+                ? t("problem.tabSolution")
+                : tb === "pistas"
+                  ? t("problem.tabHints")
+                  : t("problem.tabStatement")}
           </button>
         ))}
       </nav>
@@ -150,7 +171,7 @@ _result = _target(${callArgs})
         <section className="card" style={{ marginTop: 16 }}>
           <div className="controls" style={{ gap: 10 }}>
             <button className="btn primary" onClick={runTests} disabled={loading}>
-              {loading ? "Ejecutando…" : "▶ Ejecutar tests"}
+              {loading ? t("problem.running") : t("problem.run")}
             </button>
             <button
               className="btn ghost"
@@ -160,14 +181,14 @@ _result = _target(${callArgs})
               }}
               disabled={loading}
             >
-              ↺ reiniciar código
+              {t("problem.reset")}
             </button>
             {allPassed && (
               <span
                 className="badge"
                 style={{ background: "#e7f8ee", color: "#16a34a", borderColor: "#86efac" }}
               >
-                ✓ todos los tests pasan
+                {t("problem.allPass")}
               </span>
             )}
           </div>
@@ -183,7 +204,7 @@ _result = _target(${callArgs})
             </div>
             <div style={{ width: 320, minWidth: 0 }}>
               <h3 className="serif" style={{ fontSize: "1rem", marginBottom: 8 }}>
-                Tests
+                {t("problem.testsH")}
               </h3>
               {evalResult ? (
                 <div className="test-list">
@@ -197,24 +218,24 @@ _result = _target(${callArgs})
                       >
                         <span className="test-mark">{r.passed ? "✓" : "✗"}</span>
                         <span className="test-name">{r.name}</span>
-                        {r.hidden && <span className="test-hidden">(oculto)</span>}
+                        {r.hidden && <span className="test-hidden">{t("problem.hidden")}</span>}
                         {!r.passed && !r.hidden && (
                           <>
                             <div className="test-detail">
-                              esperado: <b>{r.expected}</b> · obtuviste: <b>{r.got}</b>
+                              {t("problem.expected")} <b>{r.expected}</b> · {t("problem.got")} <b>{r.got}</b>
                             </div>
                             <button
                               className="btn ghost"
                               onClick={() => showTrace(r.name)}
                               style={{ marginTop: 4, fontSize: "0.75rem" }}
                             >
-                              ver traza paso a paso
+                              {t("problem.viewTrace")}
                             </button>
                           </>
                         )}
                         {!r.passed && r.hidden && (
                           <div className="test-detail">
-                            falla — los datos del test oculto no se revelan
+                            {t("problem.hiddenFail")}
                           </div>
                         )}
                       </div>
@@ -222,23 +243,23 @@ _result = _target(${callArgs})
                   })}
                   {evalResult.error && (
                     <p className="err" style={{ marginTop: 8 }}>
-                      Error: {evalResult.error}
+                      {t("problem.errPrefix")} {evalResult.error}
                     </p>
                   )}
                   {traceError && (
                     <p className="err" style={{ marginTop: 8 }}>
-                      Traza: {traceError}
+                      {t("problem.tracePrefix")} {traceError}
                     </p>
                   )}
                 </div>
               ) : (
                 <p className="prose-note">
-                  Pulsa «Ejecutar tests» para comprobar tu solución.
+                  {t("problem.runHint")}
                 </p>
               )}
               {evalResult?.stdout && (
                 <div className="stdout" style={{ marginTop: 10 }}>
-                  <b>Salida:</b> <span className="stdout-text">{evalResult.stdout}</span>
+                  <b>{t("problem.output")}</b> <span className="stdout-text">{evalResult.stdout}</span>
                 </div>
               )}
             </div>
@@ -249,27 +270,24 @@ _result = _target(${callArgs})
       {tab === "pistas" && (
         <section className="card" style={{ marginTop: 16 }}>
           <h3 className="serif" style={{ fontSize: "1rem" }}>
-            Pistas progresivas
+            {t("problem.hintsTitle")}
           </h3>
-          <p className="prose-note">
-            Intenta resolverlo con la primera antes de pedir la siguiente — cada una destapa
-            solo una capa del razonamiento.
-          </p>
+          <p className="prose-note">{t("problem.hintsIntro")}</p>
           <ol className="hint-list">
             {problem.hints.slice(0, hintCount).map((h, i) => (
               <li key={i} className="hint-item">
-                <span className="hint-tag">pista {i + 1}</span>
+                <span className="hint-tag">{t("problem.hintN", { n: i + 1 })}</span>
                 {h}
               </li>
             ))}
           </ol>
           {hintCount < problem.hints.length ? (
             <button className="btn ghost" onClick={() => setHintCount(hintCount + 1)}>
-              + otra pista ({hintCount}/{problem.hints.length})
+              {t("problem.moreHint", { a: hintCount, b: problem.hints.length })}
             </button>
           ) : (
             <p className="prose-note" style={{ marginTop: 8 }}>
-              Era la última pista — ya tienes todo lo que necesita la solución.
+              {t("problem.lastHint")}
             </p>
           )}
         </section>
@@ -280,14 +298,14 @@ _result = _target(${callArgs})
           {allPassed ? (
             <>
               <h3 className="serif" style={{ fontSize: "1rem" }}>
-                ✓ Resuelto — así lo hace la referencia
+                {t("problem.solvedH")}
               </h3>
               <p className="prose-block">{problem.explanation}</p>
               <p className="prose-block">
-                <b>Tradeoff:</b> {problem.tradeoff}
+                <b>{t("problem.tradeoffLabel")}</b> {problem.tradeoff}
               </p>
               <details className="solution-details">
-                <summary>Ver código de referencia</summary>
+                <summary>{t("problem.refCode")}</summary>
                 <pre className="snippet" style={{ marginTop: 8 }}>
                   {problem.solutionCode}
                 </pre>
@@ -296,15 +314,11 @@ _result = _target(${callArgs})
           ) : (
             <>
               <h3 className="serif" style={{ fontSize: "1rem" }}>
-                Solución bloqueada
+                {t("problem.lockedH")}
               </h3>
-              <p className="prose-note">
-                Pasa todos los tests para desbloquear la explicación, el tradeoff y el código de
-                referencia. Si te atascas, tienes {problem.hints.length} pistas en la pestaña
-                «pistas».
-              </p>
+              <p className="prose-note">{t("problem.lockedBody", { n: problem.hints.length })}</p>
               <button className="btn primary" onClick={() => setTab("enunciado")}>
-                Ir al editor
+                {t("problem.goEditor")}
               </button>
             </>
           )}
@@ -315,10 +329,10 @@ _result = _target(${callArgs})
         <section className="card" style={{ marginTop: 24 }}>
           <div className="controls" style={{ gap: 10 }}>
             <span className="kicker">
-              Traza del test: {traceFailedTest?.name ?? ""}
+              {t("problem.traceKicker", { name: traceFailedTest?.name ?? "" })}
             </span>
             <button className="btn ghost" onClick={() => setTraceFrames([])}>
-              cerrar traza
+              {t("problem.closeTrace")}
             </button>
           </div>
           <FluidScrubber

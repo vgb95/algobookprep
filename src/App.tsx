@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
+import { I18nProvider, LangSwitch } from "./engine/i18n";
 import HomePage from "./pages/Home";
 import ChapterPage from "./pages/Chapter";
 import CodePlayground from "./pages/CodePlayground";
@@ -27,20 +28,22 @@ export default function App() {
   const chapterId = route.startsWith("/chapter/") ? route.slice("/chapter/".length) : null;
 
   return (
-    <div className="app">
-      <div className="topbar">
-        <button
-          className="topbar-menu"
-          aria-label="Abrir navegación"
-          aria-expanded={navOpen}
-          onClick={() => setNavOpen(true)}
-        >
-          ☰
-        </button>
-        <a href="#/" className="topbar-brand">
-          ▤ AlgoBook
-        </a>
-      </div>
+    <I18nProvider>
+      <div className="app">
+        <div className="topbar">
+          <button
+            className="topbar-menu"
+            aria-label="Abrir navegación"
+            aria-expanded={navOpen}
+            onClick={() => setNavOpen(true)}
+          >
+            ☰
+          </button>
+          <a href="#/" className="topbar-brand">
+            ▤ AlgoBook
+          </a>
+          <LangSwitch />
+        </div>
       {navOpen && (
         <button className="scrim" aria-label="Cerrar navegación" onClick={() => setNavOpen(false)} />
       )}
@@ -59,5 +62,6 @@ export default function App() {
         )}
       </main>
     </div>
+    </I18nProvider>
   );
 }

@@ -72,10 +72,13 @@ export async function evaluateSolution({
   solutionCode,
   setupCode = "",
   tests,
+  lang = "es",
 }: {
   solutionCode: string;
   setupCode?: string;
   tests: ProblemTest[];
+  /** Idioma de los mensajes del presupuesto de pasos/tiempo. */
+  lang?: "es" | "en";
 }): Promise<EvaluationResult> {
   await initPyodide();
 
@@ -133,11 +136,11 @@ def _budget_check(frame, event, arg):
     _pasos += 1
     if _pasos > 2000000:
         raise RuntimeError(
-            "más de 2M de pasos — ¿bucle infinito?"
+            ${JSON.stringify(lang === "en" ? "over 2M steps — infinite loop?" : "más de 2M de pasos — ¿bucle infinito?")}
         )
     if (_pasos & 1023) == 0 and (time.time() - _t0) > 5.0:
         raise RuntimeError(
-            "más de 5 s en un test — imposible: busca un algoritmo más rápido"
+            ${JSON.stringify(lang === "en" ? "over 5 s in one test — find a faster algorithm" : "más de 5 s en un test — imposible: busca un algoritmo más rápido")}
         )
     return _budget_check
 
