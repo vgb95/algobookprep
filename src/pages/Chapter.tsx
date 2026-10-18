@@ -28,6 +28,9 @@ export default function ChapterPage({ id }: { id: string }) {
     );
   }
 
+  const rawEnt = entrevistas[id];
+  const ent = rawEnt ? (lang === "en" && rawEnt.en ? rawEnt.en : rawEnt) : null;
+
   const prev = chapters[idx - 1];
   const next = chapters[idx + 1];
   const content = chaptersContent[id];
@@ -92,22 +95,22 @@ export default function ChapterPage({ id }: { id: string }) {
         );
       })()}
 
-      {entrevistas[id] && ch.status === "live" && (
+      {ent && ch.status === "live" && (
         <section className="entrevista" aria-label={lang === "en" ? "Interview tips" : "Consejos para la entrevista"}>
           <div className="entrevista-head">
             <span className="entrevista-tag">livecoding</span>
             <h2 className="serif">{t("chapter.interviewH")}</h2>
           </div>
-          <p className="entrevista-enfoque">{entrevistas[id].enfoque}</p>
+          <p className="entrevista-enfoque">{ent.enfoque}</p>
           <div className="entrevista-grid">
             <div className="entrevista-col">
               <h3>{t("chapter.interviewCom")}</h3>
-              <p>{entrevistas[id].comunicacion}</p>
+              <p>{ent.comunicacion}</p>
             </div>
             <div className="entrevista-col">
               <h3>{t("chapter.interviewVar")}</h3>
               <ul>
-                {entrevistas[id].variantes.map((v, i) => (
+                {ent.variantes.map((v, i) => (
                   <li key={i}>{v}</li>
                 ))}
               </ul>
@@ -115,7 +118,7 @@ export default function ChapterPage({ id }: { id: string }) {
             <div className="entrevista-col">
               <h3>{t("chapter.interviewChg")}</h3>
               <ul>
-                {entrevistas[id].cambios.map((c, i) => (
+                {ent.cambios.map((c, i) => (
                   <li key={i}>{c}</li>
                 ))}
               </ul>
