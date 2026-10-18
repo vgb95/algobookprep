@@ -2271,5 +2271,210 @@ _target = potencia_cuatro`,
       { name: "negativo (oculto)", args: [-4], expected: false, hidden: true },
     ],
   },
+  {
+    id: "ordenar-longitud",
+    chapter: "sorting",
+    title: "Ordenar por largo y desempate alfabético",
+    difficulty: "fácil",
+    blurb: "Ordena las palabras por LARGO ascendente; a igual largo, en orden alfabético. Es el caso de manual de la clave compuesta del cap. 5: la estabilidad del sort decide quién gana el desempate.",
+    setupCode: `def ordenar_palabras(palabras):
+    \"\"\"Ordenadas por largo; a igual largo, alfabéticamente.\"\"\"
+    pass
 
+_target = ordenar_palabras`,
+    starterCode: `def ordenar_palabras(palabras):
+    # TODO: una sola clave compuesta (largo, palabra)
+    pass`,
+    solutionCode: `def ordenar_palabras(palabras):
+    return sorted(palabras, key=lambda p: (len(p), p))`,
+    explanation:
+      "Un solo sort con clave compuesta (largo, palabra): Python ordena por el primer elemento del par y, en empate, por el segundo. La estabilidad importa menos aquí porque el desempate ES la segunda clave — pero en la entrevista sabes decirlo: «si el comparador no es total, el orden de empate queda indefinido; con esta clave lo es y sale determinista». El coste es O(n log n) con n palabras de largo acotado.",
+    tradeoff:
+      "Iterar por largos (baldes de 1 a largo máximo y concatenar) es counting sort disfrazado: O(L·n) y estable, candidata natural cuando los largos acotan el universo. La clave compuesta gana porque ESCRIBE MENOS y se reutiliza: cambia (len(p), p) por cualquier par de criterios del problema del día — la plantilla del comparador es la pata que se lleva a todas las rondas.",
+    hints: [
+      "La clave es un par: (len(p), p).",
+      "Los strings son inmutables: sorted() devuelve una lista nueva y nada se mordisquiuea por referencia.",
+      "A igual largo, el propio string ordena alfabéticamente por código de carácter.",
+    ],
+    tests: [
+      { name: "tres largos", args: [["sol", "casa", "boca"]], expected: ["sol", "boca", "casa"] },
+      { name: "empate de largo", args: [["a", "ab", "b"]], expected: ["a", "b", "ab"] },
+      { name: "vacio", args: [[]], expected: [] },
+      { name: "todos empates (oculto)", args: [["mm", "aa", "mmm", "bb"]], expected: ["aa", "bb", "mm", "mmm"], hidden: true },
+    ],
+  },
+  {
+    id: "suma-rango-bst",
+    chapter: "binary-search-trees",
+    title: "Suma del rango en el BST",
+    difficulty: "medio",
+    blurb: "Dado el orden de inserciones, construye al vuelo el BST y devuelve la SUMA de los valores dentro de [lo, hi], ambos incluidos. Vacío o sin valores dentro del rango → 0. La gracia es PODAR: fuera del rango solo se baja por un brazo.",
+    setupCode: `def suma_rango(orden, lo, hi):
+    \"\"\"Suma de los valores del BST dentro de [lo, hi].\"\"\"
+    pass
+
+_target = suma_rango`,
+    starterCode: `def suma_rango(orden, lo, hi):
+    # TODO: insertar en orden; en el recorrido, poda por rango
+    pass`,
+    solutionCode: `def suma_rango(orden, lo, hi):
+    raiz = None
+
+    class Nodo:
+        def __init__(self, valor):
+            self.valor = valor
+            self.izq = None
+            self.der = None
+
+    def insertar(nodo, valor):
+        if nodo is None:
+            return Nodo(valor)
+        if valor < nodo.valor:
+            nodo.izq = insertar(nodo.izq, valor)
+        else:
+            nodo.der = insertar(nodo.der, valor)
+        return nodo
+
+    for v in orden:
+        raiz = insertar(raiz, v)
+
+    def recorrido(nodo):
+        if nodo is None:
+            return 0
+        if nodo.valor < lo:
+            return recorrido(nodo.der)
+        if nodo.valor > hi:
+            return recorrido(nodo.izq)
+        return nodo.valor + recorrido(nodo.izq) + recorrido(nodo.der)
+
+    return recorrido(raiz)`,
+    explanation:
+      "Inserción clásica del cap. 15 y recorrido con dos cerrojos. El invariante del BST es quien activa la poda: si nodo.valor < lo, TODO su subárbol izquierdo vale menos que lo (se descarta entero — solo queda bajar por la derecha); si nodo.valor > hi, pasa lo mismo con el derecho. Un nodo dentro del rango suma su valor y expande los dos brazos. Sin las podas el recorrido sería el inorder completo: O(n) de todas formas… pero con un árbol balanceado la poda recorta el coste a O(log n + k), con k = valores dentro del rango.",
+    tradeoff:
+      "Lo directo: inorder completo + sumar a mano — el mismo coste de traversal y menos ifs, ideal si solo pides la suma y la estructura ya la tienes en un array. La versión con poda gana si el rango es NARROW o el árbol es profundo: descarta ramas enteras por el invariante en vez de recorrerlas todas. Y si piden MUCHOS rangos sobre el mismo árbol, lo que conviene es un BST aumentado que anota sumas acumuladas — la pata siguiente del cap. 15.",
+    hints: [
+      "nodo.valor < lo: ignora el izquierdo entero — baja solo por la derecha.",
+      "nodo.valor > hi: ignora el derecho — baja por la izquierda.",
+      "Dentro del rango: suma el valor y expande los dos hijos.",
+    ],
+    tests: [
+      { name: "rango alto", args: [[5, 3, 7, 1, 4, 9], 4, 9], expected: 25 },
+      { name: "rango bajo", args: [[5, 3, 7, 1, 4, 9], 1, 4], expected: 8 },
+      { name: "arbol vacio", args: [[], 0, 10], expected: 0 },
+      { name: "rango vacio (oculto)", args: [[5, 3, 7], 0, 0], expected: 0, hidden: true },
+      { name: "todo dentro (oculto)", args: [[10, 5, 15], 5, 15], expected: 30, hidden: true },
+    ],
+  },
+  {
+    id: "autocompletar-trie",
+    chapter: "tries",
+    title: "Autocompletar palabras por prefijo",
+    difficulty: "fácil",
+    blurb: "Dado un diccionario y una consulta q, devuelve las palabras que empiezan por q, ALFABÉTICAMENTE ordenadas. Ninguna → lista vacía. Prefijo vacío → el diccionario completo ordenado.",
+    setupCode: `def autocompletar(palabras, q):
+    \"\"\"Las palabras que empiezan por q, ordenadas alfabéticamente.\"\"\"
+    pass
+
+_target = autocompletar`,
+    starterCode: `def autocompletar(palabras, q):
+    # TODO: baja por el trie siguiendo q y recolecta el subárbol
+    pass`,
+    solutionCode: `def autocompletar(palabras, q):
+    trie = {}
+    END = "fin"
+    for palabra in palabras:
+        nodo = trie
+        for letra in palabra:
+            nodo = nodo.setdefault(letra, {})
+        nodo[END] = True
+
+    nodo = trie
+    for letra in q:
+        if letra not in nodo:
+            return []
+        nodo = nodo[letra]
+
+    salida = []
+
+    def recolectar(rama, prefijo):
+        if END in rama:
+            salida.append(prefijo)
+        for letra in rama:
+            if letra != END:
+                recolectar(rama[letra], prefijo + letra)
+
+    recolectar(nodo, q)
+    salida.sort()
+    return salida`,
+    explanation:
+      "El trie del cap. 16 funciona exactamente como el buscador de un editor: una vez escrito el prefijo, el subárbol colgante CONTIENE todas las palabras posibles — recolectarlas es recorrerlo con la marca de fin como señal de palabra. La bajada por q cuesta O(len(q)); el resto lo manda el tamaño del subárbol. Ordenar al final nivela el orden: el dict guarda por orden de inserción, no alfabético, así que el sort de salida es el único camino barato y determinista.",
+    tradeoff:
+      "Con pocas consultas, [w for w in palabras if w.startswith(q)] + sort hace lo mismo en tres líneas sin estructura. El trie paga cuando reutiliza: miles de consultas sobre el mismo diccionario bajan a O(len(q) + subárbol) cada una, y con la versión AUMENTADA (contar en cada nodo las palabras que terminan debajo) la colección sale casi lista; el sort final queda barato al ser la salida pequeña. Es el intercambio del capítulo: construir una vez contra pagar en cada consulta.",
+    hints: [
+      "setdefault(letra, {}) deja un dict anidado: después de la última letra, marca END.",
+      "Tras la bajada por q, recolectar(subárbol, q) con la marca END dentro de cada rama.",
+      "Una letra de q ausente en el trie → lista vacía a la primera.",
+    ],
+    tests: [
+      { name: "tres con an", args: [["ana", "anillo", "bolso", "anda", "azul"], "an"], expected: ["ana", "anda", "anillo"] },
+      { name: "prefijo vacio todas", args: [["hola"], ""], expected: ["hola"] },
+      { name: "letra fuera", args: [["a", "b"], "c"], expected: [] },
+      { name: "dos con z (oculto)", args: [["zorro", "zumo", "aceite"], "z"], expected: ["zorro", "zumo"], hidden: true },
+    ],
+  },
+  {
+    id: "mst-gratis",
+    chapter: "mst",
+    title: "Conectar con cables ya puestos",
+    difficulty: "medio",
+    blurb: "n nodos, aristas ponderadas [u, v, w] y una lista de cables YA colocados de gratis [[u, v]] (unirlos, coste 0). Devuelve el coste mínimo para dejar TODO el grafo conectado añadiendo solo los cables que faltan. Un nodo → 0; imposible → −1.",
+    setupCode: `def mst_gratis(n, edges, gratis):
+    \"\"\"Coste extra mínimo con los cables gratis ya unidos.\"\"\"
+    pass
+
+_target = mst_gratis`,
+    starterCode: `def mst_gratis(n, edges, gratis):
+    # TODO: primero asienta los gratis con union-find;
+    # después, Kruskal con lo que queda
+    pass`,
+    solutionCode: `def mst_gratis(n, edges, gratis):
+    padre = list(range(n))
+
+    def buscar(x):
+        while padre[x] != x:
+            x = padre[x]
+        return x
+
+    for a, b in gratis:
+        ra, rb = buscar(a), buscar(b)
+        if ra != rb:
+            padre[ra] = rb
+
+    total = 0
+    for u, v, w in sorted(edges, key=lambda e: e[2]):
+        ru, rv = buscar(u), buscar(v)
+        if ru != rv:
+            padre[ru] = rv
+            total += w
+
+    if all(buscar(0) == buscar(i) for i in range(n)):
+        return total
+    return -1`,
+    explanation:
+      "Es el Kruskal del cap. 20 con un paso previo que lo cambia todo: los cables gratis se ASIENTAN primero en el union-find — dejan terreno ya conquistado a coste 0 — y el sort de las aristas baratas solo paga lo que queda. Un cable ponderado no cuesta si sus extremos ya viven en la misma componente; por eso un gratis puede descargar aristas caras. Y al final la comprobación «todo el mundo en la misma raíz» decide si la red cierra: si no, −1, porque los cables de la entrada no llegan para todos.",
+    tradeoff:
+      "El sort + union-find es el código MÁS CORTO y sigue siendo O(E log E) como columna vertebral; con grafos MUY densos, Prim con min-heap gana (cap. 20). Si te preguntan por un cable gratis que une nodos ya conectados: el union-find lo traga sin costo — misma raíz, nada que unir.",
+    hints: [
+      "Primero gratis, después las ponderadas — nunca al revés.",
+      "Un cable solo paga si sus extremos viven en componentes distintas.",
+      "La comprobación final recorre las raíces: todas iguales → conecta; si no → −1.",
+    ],
+    tests: [
+      { name: "el cable gratis ahorra el caro", args: [4, [[0, 1, 9], [1, 2, 1], [2, 3, 1], [0, 3, 8]], [[0, 1]]], expected: 2 },
+      { name: "sin cables gratis", args: [3, [[0, 1, 2], [1, 2, 3]], []], expected: 5 },
+      { name: "un solo nodo", args: [1, [], []], expected: 0 },
+      { name: "los gratis ya conectan todo (oculto)", args: [3, [[0, 1, 1], [1, 2, 2]], [[0, 1], [1, 2]]], expected: 0, hidden: true },
+      { name: "desconectado aun con gratis (oculto)", args: [3, [[0, 1, 1]], []], expected: -1, hidden: true },
+    ],
+  },
 ];
