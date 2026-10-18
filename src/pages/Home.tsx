@@ -1,5 +1,6 @@
 import { problems } from "../content/problems";
 import { useI18n } from "../engine/i18n";
+import { solvedCount } from "../engine/solved";
 
 const plan: { label: string; labelEn: string; done: boolean }[] = [
   { label: "Fase 0 · Shell del libro — tipografía, 22 capítulos, progreso local", labelEn: "Phase 0 · Book shell — typography, 22 chapters, local progress", done: true },
@@ -116,7 +117,7 @@ export default function HomePage() {
           <div className="stat"><b>22</b><span>{t("home.statChapters")}</span></div>
           <div className="stat"><b>{problems.length}</b><span>{t("home.statProblems")}</span></div>
           <div className="stat"><b>5</b><span>{t("home.statPlaygrounds")}</span></div>
-          <div className="stat"><b>0</b><span>{t("home.statTracking")}</span></div>
+          <div className="stat"><b>{solvedCount()}</b><span>{t("home.statTracking")}</span></div>
         </div>
       </header>
 

@@ -800,3 +800,34 @@ h2.section-h { font-size: 1.45rem; margin: 42px 0 14px; }
 .py-c { color: #79808f; font-style: italic; }
 .py-n { color: #f78c6c; }
 .py-b { color: #ffcb6b; }
+
+/* ————— Fase 10d: progreso de ejercicios (✓, filtro, reset) ————— */
+.solved-mark { color: var(--accent-3); font-weight: 800; flex: none; }
+.problem-card.is-solved { border-color: var(--accent-3); box-shadow: inset 3px 0 0 var(--accent-3); }
+.filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.filter-pill {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.filter-pill:hover { border-color: var(--ink); color: var(--ink); }
+.filter-pill.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.filter-n { font-size: 0.72rem; opacity: 0.65; }
+.reset-link {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-decoration: underline dashed;
+  padding: 4px 2px;
+}
+.reset-link:hover { color: var(--accent); }

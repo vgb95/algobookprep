@@ -52,7 +52,7 @@ export default function App() {
       <main className="content">
         <ErrorBoundary>
         {problemId ? (
-          <Problem id={problemId} />
+          <Problem key={problemId} id={problemId} />
         ) : route === "/code-playground" ? (
           <CodePlayground />
         ) : route === "/problems" ? (

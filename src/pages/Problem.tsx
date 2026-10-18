@@ -7,6 +7,7 @@ import { evaluateSolution, pyLiteral, resolveTargetName } from "../engine/evalua
 import FluidScrubber from "../components/viz/FluidScrubber";
 import { runTraced } from "../engine/pyodide";
 import { useI18n } from "../engine/i18n";
+import { isSolved, markSolved } from "../engine/solved";
 
 type Tab = "enunciado" | "pistas" | "solucion";
 
@@ -59,6 +60,7 @@ export default function Problem({ id }: { id: string }) {
     args: unknown;
     expected: unknown;
   } | null>(null);
+  const [solved, setSolved] = useState(() => isSolved(problem?.id ?? ""));
 
   if (!problem) {
     return (
@@ -87,6 +89,10 @@ export default function Problem({ id }: { id: string }) {
         stdout: result.stdout,
         error: result.error,
       });
+      if (result.passed === result.total && result.total > 0) {
+        markSolved(problem.id);
+        setSolved(true);
+      }
     } catch (e: unknown) {
       setEvalResult({
         passed: 0,
@@ -157,7 +163,7 @@ _result = _target(*${callArgs})
             className={`tab ${tab === tb ? "active" : ""}`}
             onClick={() => setTab(tb)}
           >
-            {tb === "solucion" && allPassed
+            {tb === "solucion" && (allPassed || solved)
               ? t("problem.tabSolved")
               : tb === "solucion"
                 ? t("problem.tabSolution")
@@ -184,7 +190,7 @@ _result = _target(*${callArgs})
             >
               {t("problem.reset")}
             </button>
-            {allPassed && (
+            {(allPassed || solved) && (
               <span
                 className="badge"
                 style={{ background: "#e7f8ee", color: "#16a34a", borderColor: "#86efac" }}
@@ -296,7 +302,7 @@ _result = _target(*${callArgs})
 
       {tab === "solucion" && (
         <section className="card" style={{ marginTop: 16 }}>
-          {allPassed ? (
+          {(allPassed || solved) ? (
             <>
               <h3 className="serif" style={{ fontSize: "1rem" }}>
                 {t("problem.solvedH")}
