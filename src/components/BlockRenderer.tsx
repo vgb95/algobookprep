@@ -5,6 +5,7 @@ import Markdown from "./Markdown";
 import LatexLite from "./LatexLite";
 import { useI18n } from "../engine/i18n";
 import ErrorBoundary from "./ErrorBoundary";
+import PyCode from "./PyCode";
 
 export default function BlockRenderer({ block }: { block: Block }) {
   const { lang } = useI18n();
@@ -30,7 +31,7 @@ export default function BlockRenderer({ block }: { block: Block }) {
     case "code":
       return (
         <div className="code-block" key={block.id}>
-          <pre className="snippet">{block.code}</pre>
+          <PyCode code={block.code} />
         </div>
       );
     case "problem":

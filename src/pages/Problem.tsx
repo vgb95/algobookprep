@@ -2,6 +2,7 @@ import { useState } from "react";
 import { problems } from "../content/problems";
 import { chapters } from "../content/chapters";
 import CodeEditor from "../components/editor/CodeEditor";
+import PyCode from "../components/PyCode";
 import { evaluateSolution, pyLiteral, resolveTargetName } from "../engine/evaluator";
 import FluidScrubber from "../components/viz/FluidScrubber";
 import { runTraced } from "../engine/pyodide";
@@ -306,9 +307,7 @@ _result = _target(*${callArgs})
               </p>
               <details className="solution-details">
                 <summary>{t("problem.refCode")}</summary>
-                <pre className="snippet" style={{ marginTop: 8 }}>
-                  {problem.solutionCode}
-                </pre>
+                <PyCode code={problem.solutionCode} style={{ marginTop: 8 }} />
               </details>
             </>
           ) : (

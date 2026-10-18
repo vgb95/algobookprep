@@ -761,3 +761,42 @@ h2.section-h { font-size: 1.45rem; margin: 42px 0 14px; }
   line-height: 1.55;
   color: var(--ink-soft);
 }
+
+
+/* ————— Fase 10c: PyCode — código Python de solo lectura con resaltado ————— */
+.pycode {
+  margin: 0 0 8px;
+  display: flex;
+  background: var(--code-bg);
+  color: #e8e8e6;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+.pycode-gutter {
+  flex: none;
+  padding: 16px 10px 16px 16px;
+  text-align: right;
+  color: #5b6272;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+.pycode-body {
+  margin: 0;
+  padding: 16px 20px 16px 14px;
+  overflow-x: auto;
+  white-space: pre;
+  flex: 1;
+  min-width: 0;
+}
+.py-k { color: #c792ea; font-weight: 600; }
+.py-d { color: #82aaff; }
+.py-s { color: #c3e88d; }
+.py-c { color: #79808f; font-style: italic; }
+.py-n { color: #f78c6c; }
+.py-b { color: #ffcb6b; }
