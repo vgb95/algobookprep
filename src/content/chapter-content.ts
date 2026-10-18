@@ -130,12 +130,14 @@ export const sortingChapter: ChapterContent = {
       id: "sorting-hook",
       text:
         "**Gancho:** ordenar es la tarea más común del mundo (buscar, deduplicar, rangos, fusionar…). Hay docenas de algoritmos de ordenación, pero los tres elementales —bubble, insertion y selection— comparten la misma figura: en el peor caso hacen **O(n²) comparaciones** y todo sucede dentro del array. Lo que los distingue es CÓMO mueven las tarjetas: intercambiando vecinos, levantando una clave o seleccionando el mínimo.",
+      textEn: "**Hook:** sorting is the most common task in the world (searching, deduping, ranges, merging…). There are dozens of sorting algorithms, but the three elementary ones — bubble, insertion and selection — share the same silhouette: in the worst case they make **O(n²) comparisons** and everything happens inside the array. What distinguishes them is HOW they move the cards: swapping neighbours, lifting a key, or selecting the minimum.",
     },
     {
       kind: "prose",
       id: "sorting-intro",
       text:
         "Los tres trabajan completamente sobre el array: espacio extra O(1) — *in-place*. Míralos en movimiento: cada uno con sus contadores de comparaciones y escrituras activos, y el código Python debajo ejecutándose línea a línea (code playback). Cambia la entrada con 🎲 «casi ordenado» y observa cómo cambia el carácter de cada uno.",
+      textEn: "All three work entirely on the array: O(1) extra space — *in-place*. Watch them in motion: each with its comparison and write counters live, and the Python code below running line by line (code playback). Change the input with 🎲 “almost sorted” and watch how each one's character changes.",
     },
     {
       kind: "viz",
@@ -148,6 +150,7 @@ export const sortingChapter: ChapterContent = {
       id: "sorting-bubble-text",
       text:
         "**Bubble sort** barre pares adyacentes e intercambia si están al revés: en cada pasada, el mayor de la zona activa \"flota\" hasta su posición final (fijada en verde). Su gracia: si una pasada entera se hace sin UN solo intercambio, el array ya está ordenado y puedes PARAR — mejor caso O(n). Sin esa bandera, pierde tiempo recorriendo array ya ordenado.",
+      textEn: "**Bubble sort** sweeps adjacent pairs and swaps them if they are the wrong way around: in each pass, the largest of the active zone “floats” to its final position (pinned in green). Its charm: if a whole pass happens with not ONE swap, the array is already sorted and you can STOP — best case O(n). Without that flag, it wastes time walking an already-sorted array.",
     },
     {
       kind: "viz",
@@ -160,6 +163,7 @@ export const sortingChapter: ChapterContent = {
       id: "sorting-insertion-text",
       text:
         "**Insertion sort** va construyendo a la IZQUIERDA una versión ordenada: toma la siguiente clave, la LEVANTA (verás el hueco punteado), y la desliza hacia atrás hasta encajarla. Es el algoritmo de la baraja que usas sin darte cuenta jugando a cartas. Con entradas **casi ordenadas** vuela: O(n) — cada clave se mueve una casilla o ninguna. Además es **estable** (los iguales conservan su orden relativo).",
+      textEn: "**Insertion sort** keeps building a sorted version on the LEFT: it takes the next key, LIFTS it (you will see the dotted slot), and slides it backwards until it fits. It is the card-hand algorithm you use without noticing while playing cards. With **almost sorted** inputs it flies: O(n) — every key moves one slot or none. It is also **stable** (equals keep their relative order).",
     },
     {
       kind: "viz",
@@ -172,6 +176,7 @@ export const sortingChapter: ChapterContent = {
       id: "sorting-selection-text",
       text:
         "**Selection sort** busca el mínimo de la zona desordenada y lo intercambia con el primer hueco libre. Su marca: hace SIEMPRE las mismas comparaciones — ~n²/2, sin importar cómo venga la entrada, son tarifa fija. A cambio solo hace hasta n−1 intercambios: si cada ESCRITURA te cuesta cara (memoria lenta, flash), escribir poco importa. No es estable.",
+      textEn: "**Selection sort** finds the minimum of the unsorted zone and swaps it with the first free slot. Its mark: it ALWAYS makes the same comparisons — ~n²/2, however the input arrives, a fixed fare. In exchange it only makes up to n−1 swaps: if every WRITE is expensive for you (slow memory, flash), writing little matters. It is not stable.",
     },
     {
       kind: "divider",
@@ -182,24 +187,28 @@ export const sortingChapter: ChapterContent = {
       id: "sorting-example",
       text:
         "**Ejemplo resuelto.** [7, 3, 9, 1, 5, 2] con bubble: pasada 1 fija el 9 al final, pasada 2 fija el 7… los mayores van migrando hacia la derecha hasta que solo queda el 1 suelto. Pregunta clave: ¿cuántas pasadas si la entrada YA está ordenada? Con la bandera `swapped`: UNA pasada de n−1 comparaciones → O(n). Sin bandera: las n pasadas igualmente. Nada es gratis para quien no vigile su bucle.",
+      textEn: "**Solved example.** [7, 3, 9, 1, 5, 2] with bubble: pass 1 pins the 9 at the end, pass 2 pins the 7… the larger values keep migrating to the right until only the 1 remains loose. Key question: how many passes if the input is ALREADY sorted? With the `swapped` flag: ONE pass of n−1 comparisons → O(n). Without the flag: all n passes anyway. Nothing is free for whoever does not watch their loop.",
     },
     {
       kind: "prose",
       id: "sorting-costs",
       text:
         "| Algoritmo | Peor | Mejor | Espacio | Estable | Cuándo usarlo |\n| --- | --- | --- | --- | --- | --- |\n| Bubble | O(n²) | O(n) (con bandera) | O(1) | sí | docencia, arrays minúsculos |\n| Insertion | O(n²) | O(n) | O(1) | sí | casi ordenado, n pequeño |\n| Selection | O(n²) | O(n²) | O(1) | no | escrituras caras, n pequeño |\n\n**Tradeoff central:** los tres comparten el O(n²) en el peor caso — lo que los distingue es el caso mejor (el carácter) y cuántas escrituras hacen. Para n grande: merge sort / quicksort O(n log n), los verás en el capítulo de recursión.",
+      textEn: "| Algorithm | Worst | Best | Space | Stable | When to use it |\n| --- | --- | --- | --- | --- | --- |\n| Bubble | O(n²) | O(n) (with flag) | O(1) | yes | teaching, tiny arrays |\n| Insertion | O(n²) | O(n) | O(1) | yes | almost sorted, small n |\n| Selection | O(n²) | O(n²) | O(1) | no | expensive writes, small n |\n\n**Core tradeoff:** all three share the O(n²) worst case — what distinguishes them is the best case (their character) and how many writes they make. For large n: merge sort / quicksort O(n log n) — you will meet them in the recursion chapter.",
     },
     {
       kind: "prose",
       id: "sorting-pitfalls",
       text:
         "**Trampas frecuentes:**\n\n1. **Bucle infinito «invisible».** Cualquier variante que en vez de avanzar (`i+1`, `hi−1`) deje el rango igual puede no terminar. Comprueba SIEMPRE que cada paso reduce el rango activo.\n2. **Estabilidad en selección.** El intercambio salta distancias: [2a, 2b, 1] → [1, 2b, 2a] reordena dos iguales — por eso selection NO es estable.\n3. **Insertion disfrazado.** Contar solo «escrituras» esconde el trabajo real del desplazamiento: la comparación `while j ≥ 0` es la que dispara el coste en orden inverso, no la escritura.\n4. **O(n²) a escala.** n = 10⁵ son ~10¹⁰ operaciones — minutos de CPU. Para millones de elementos, pasar a O(n log n) es la diferencia entre «hoy» y «nunca».",
+      textEn: "**Frequent traps:**\n\n1. **“Invisible” infinite loop.** Any variant that, instead of advancing (`i+1`, `hi−1`), leaves the range the same may not terminate. ALWAYS check that each step shrinks the active range.\n2. **Stability in selection.** The swap jumps distances: [2a, 2b, 1] → [1, 2b, 2a] reorders two equals — that is why selection is NOT stable.\n3. **Insertion in disguise.** Counting only “writes” hides the real shifting work: the `while j ≥ 0` comparison is what explodes the cost on reversed input, not the write.\n4. **O(n²) at scale.** n = 10⁵ is ~10¹⁰ operations — minutes of CPU. For millions of elements, moving to O(n log n) is the difference between “today” and “never”.",
     },
     {
       kind: "prose",
       id: "sorting-recap",
       text:
         "**Recap:** bubble = intercambios de vecinos con bandera de parada temprana; insertion = clave levantada que se encaja en el lado ordenado (rey del casi ordenado, estable); selection = mínimo global a lo suyo (pocas escrituras, inestable). Los tres in-place con O(1) extra y O(n²) en el peor caso. El paso siguiente: divide y vencerás (recursión) reduce ese n² a n log n.",
+      textEn: "**Recap:** bubble = neighbour swaps with an early-stop flag; insertion = a lifted key slotted into the sorted side (king of almost-sorted, stable); selection = global minimum in its own style (few writes, unstable). All three are in-place with O(1) extra and O(n²) worst case. The next step: divide and conquer (recursion) brings that n² down to n log n.",
     },
   ],
 };

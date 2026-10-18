@@ -185,19 +185,21 @@ export const linkedListsChapter: ChapterContent = {
   num: 8,
   title: "LinkedLists",
   blurb:
-    "Nodos con punteros: nada se desplaza, se recosen flechas. Caminar cuesta; coser es O(1).",
+    "Nodos con punteros: nada se desplaza, se cosen flechas. Caminar cuesta; coser es O(1).",
   blocks: [
     {
       kind: "prose",
       id: "ll-hook",
       text:
         "**Gancho:** el array lleva todo agarrado en una barra: para meter un eslabón en medio, la fila entera retrocede casilla a casilla. La lista enlazada rompe ese contrato: cada nodo es una isla suelta en memoria y el orden vive en FLECHAS. Cambiar la estructura = cambiar punteros, no mover datos. En la visualización lo verás: las tarjetas no cambian de lugar; lo que cambia son las flechas.",
+      textEn: "**Hook:** the array keeps everything held on a bar: to fit a link in the middle, the whole row steps back cell by cell. The linked list breaks that contract: every node is a loose island in memory and the order lives in ARROWS. Changing the structure = changing pointers, not moving data. You will see it in the visualization: the cards do not change places; what changes are the arrows.",
     },
     {
       kind: "prose",
       id: "ll-intro",
       text:
         "Una **lista enlazada** es una secuencia de nodos: cada uno guarda su valor y un puntero al siguiente. Un puntero externo marca la **cabeza** (head). Sin memoria contigua no hay fórmula de direcciones: llegar al nodo i exige caminar i saltos desde la cabeza.\n\n- **Acceso por índice / buscar por valor:** O(n) — flecha a flecha.\n- **Insertar/borrar tras un nodo que YA conoces:** O(1) — dos escrituras de puntero.\n- **Espacio:** O(n) + uno o dos punteros extra por nodo.",
+      textEn: "A **linked list** is a sequence of nodes: each stores its value and a pointer to the next one. An external pointer marks the **head**. With no contiguous memory there is no address formula: reaching node i takes walking i hops from the head.\n\n- **Index access / search by value:** O(n) — arrow by arrow.\n- **Insert/delete after a node you ALREADY know:** O(1) — two pointer writes.\n- **Space:** O(n) plus one or two extra pointers per node.",
     },
     {
       kind: "viz",
@@ -210,6 +212,7 @@ export const linkedListsChapter: ChapterContent = {
       id: "ll-lookup-text",
       text:
         "El recorrido no tiene atajos: head → next → next… Cada paso examina y salta; las flechas del grafo son LITERALES los saltos de memoria. Si el objetivo está al final (o no está) has caminado toda la lista. Comparado con el array: por índice pierde (O(n) frente a O(1)); por valor empatan (O(n) ambos) — lo que la lista pierde es el acceso aleatorio y NADA más.",
+      textEn: "The walk has no shortcuts: head → next → next… Each step examines and hops; the arrows of the graph are LITERAL memory hops. If the target is at the end (or not there at all) you have walked the whole list. Compared with the array: by index it loses (O(n) vs O(1)); by value they tie (O(n) both) — what the list loses is random access and NOTHING else.",
     },
     {
       kind: "divider",
@@ -220,6 +223,7 @@ export const linkedListsChapter: ChapterContent = {
       id: "ll-insert",
       text:
         "**Insertar** = dos escrituras de puntero: `nuevo.next = prev.next` y `prev.next = nuevo`. Nada se desplaza en memoria. PERO encontrar al previo exige caminar O(n) — por eso el caso de oro es insertar EN LA CABEZA (el previo es gratis) o desde un marcador/iterador que ya esté colocado.",
+      textEn: "**Inserting** = two pointer writes: `new.next = prev.next` and `prev.next = new`. Nothing shifts in memory. BUT finding the previous node takes an O(n) walk — that is why the golden case is inserting AT THE HEAD (the previous is free) or from a marker/iterator already in place.",
     },
     {
       kind: "viz",
@@ -232,6 +236,7 @@ export const linkedListsChapter: ChapterContent = {
       id: "ll-delete",
       text:
         "**Borrar** también es costura: el previo apunta POR ENCIMA de la víctima (`prev.next = victim.next`) y el nodo queda huérfano — el gestor de memoria lo recogerá. O(1) tras caminar hasta el previo… O(1) total si es la cabeza (no hay que caminar para nada).",
+      textEn: "**Deleting** is also stitching: the previous points PAST the victim (`prev.next = victim.next`) and the node is orphaned — the memory manager will collect it. O(1) after walking to the previous… O(1) total if it is the head (no walking at all).",
     },
     {
       kind: "viz",
@@ -248,24 +253,28 @@ export const linkedListsChapter: ChapterContent = {
       id: "ll-variants",
       text:
         "**Variantes que verás por ahí:**\n\n- **Simple:** cada nodo → siguiente; el último apunta a None (lo que ves aquí).\n- **Doble:** además apunta al anterior — caminas en ambas direcciones y borrar un nodo SIN previo vuelve a ser O(1) (usa su propio puntero prev). Paga un puntero más por nodo.\n- **Circular:** el último apunta a la cabeza — ideal para rotar buffers sin huecos (schedulers round-robin).",
+      textEn: "**Variants you will meet around:**\n\n- **Singly:** each node → next; the last points to None (what you see here).\n- **Doubly:** it also points to the previous — you walk both directions and deleting a node WITHOUT its previous becomes O(1) again (use its own prev pointer). It pays one more pointer per node.\n- **Circular:** the last points to the head — ideal for rotating buffers with no gaps (round-robin schedulers).",
     },
     {
       kind: "prose",
       id: "ll-tradeoffs",
       text:
         "**Array vs lista, respondiendo a la misma pregunta:**\n\n| Criterio | Array | Lista enlazada |\n| --- | --- | --- |\n| acceso por índice | O(1) | O(n) |\n| buscar por valor | O(n) | O(n) |\n| insertar/borrar en medio | O(n) desplazando | O(1) con puntero (O(n) caminar hasta él) |\n| insertar/borrar en cabeza | O(n) | **O(1)** |\n| memoria | solo datos | datos + puntero(s) por nodo |\n| localidad de caché | contigua, amiga de la caché | dispersa, misses constantes |\n\nEn la práctica: si hay que caminar hasta el medio y luego tocar UN punto, gana el array (su desplazamiento es un memmove ultrarrápido); si vas a guardar marcadores para operar sin recorrer, gana la lista.",
+      textEn: "**Array vs list, answering the same question:**\n\n| Criterion | Array | Linked list |\n| --- | --- | --- |\n| index access | O(1) | O(n) |\n| search by value | O(n) | O(n) |\n| insert/delete in the middle | O(n) shifting | O(1) with the pointer (O(n) to walk to it) |\n| insert/delete at the head | O(n) | **O(1)** |\n| memory | data only | data + pointer(s) per node |\n| cache locality | contiguous, cache-friendly | scattered, constant misses |\n\nIn practice: if you must walk to the middle and then touch ONE point, the array wins (its shifting is an ultra-fast memmove); if you are going to keep markers to operate without walking, the list wins.",
     },
     {
       kind: "prose",
       id: "ll-pitfalls",
       text:
         "**Trampas frecuentes:**\n\n1. **Perder el head.** Si avanzas destruyendo la referencia head, la lista se «acorta» para el resto del mundo: camina con un cursor `node = head` y nunca escribas sobre head.\n2. **Ciclos accidentales.** Un puntero cosido mal (apuntando hacia atrás) crea una cadena eterna — para detectar ciclos: dos punteros (Floyd, el lento y el rápido).\n3. **Borrar sin previo.** Sabes QUÉ borrar pero nadie sabe quién apunta a él: caminas de nuevo buscando el previo; la doble enlazada rompe ese problema.\n4. **Los bordes muerden.** Lista vacía, un solo nodo, borrar la cabeza, borrar la cola: el 80 % de los bugs con esta estructura viven en los bordes — prueba SIEMPRE los casos extremos.",
+      textEn: "**Frequent traps:**\n\n1. **Losing the head.** If you advance destroying the head reference, the list “shortens” for everyone else: walk with a cursor `node = head` and never write over head.\n2. **Accidental cycles.** A badly stitched pointer (pointing backwards) creates an eternal chain — to detect cycles: two pointers (Floyd, the slow and the fast).\n3. **Deleting without the previous.** You know WHAT to delete but nobody knows who points to it: walk again looking for the previous; the doubly linked list kills that problem.\n4. **The edges bite.** Empty list, single node, deleting the head, deleting the tail: 80% of the bugs with this structure live at the edges — ALWAYS test the extreme cases.",
     },
     {
       kind: "prose",
       id: "ll-recap",
       text:
         "**Recap:** la lista enlazada compra flexibilidad estructural (coser punteros en O(1)) pagando caminatas O(n) y memoria extra. Su marca: insertar/borrar en cabeza O(1). Su lastre: acceso por índice. Y su herencia: el nodo suelto es la unidad de la que están fabricados los stacks y las queues (capítulos 9–10).",
+      textEn: "**Recap:** the linked list buys structural flexibility (stitching pointers in O(1)) by paying O(n) walks and extra memory. Its mark: insert/delete at the head in O(1). Its drag: index access. And its legacy: the loose node is the unit stacks and queues (chapters 9–10) are made of.",
     },
   ],
 };
